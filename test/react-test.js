@@ -3,6 +3,7 @@ var tape = require("tape"),
 
 tape("react to single existing property", function (test){
   var model = new ReactiveModel();
+
   model.set({ x: "foo" });
 
   test.plan(1);
@@ -12,3 +13,17 @@ tape("react to single existing property", function (test){
     }]
   });
 });
+
+
+//tape("react to single added property", function (test){
+//  var model = new ReactiveModel();
+//
+//  test.plan(1);
+//  model.react({
+//    testOutput: ["x", function (x) {
+//      test.equal(x, "foo");
+//    }]
+//  });
+//
+//  model.set({ x: "foo" });
+//});
