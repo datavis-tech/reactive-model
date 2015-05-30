@@ -17,11 +17,16 @@
   },
   "homepage": "https://github.com/curran/reactive-model",
   "devDependencies": {
-    "browserify": "10",
-    "faucet": "0.0",
-    "jsdom": "3",
-    "tape": "4",
-    "uglify-js": "2",
-    "requirejs": "2"
+    "esperanto": "^0.7.2",
+    "jspm": "^0.15.6",
+    "mocha": "^2.2.5",
+    "uglifyjs": "^2.4.10"
+  },
+  "jspm": {
+    "directories": {},
+    "dependencies": {
+      "curran/graph": "github:curran/graph@^0.0.2"
+    },
+    "devDependencies": {}
   }
 }

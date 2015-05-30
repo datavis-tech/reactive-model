@@ -1,0 +1,37 @@
+{
+  "name": "graph",
+  "version": "0.0.2",
+  "description": "A graph implementation with depth first search.",
+  "main": "src/graph",
+  "directories": {
+    "test": "test",
+    "packages": "jspm_packages"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/curran/graph.git"
+  },
+  "keywords": [
+    "graph"
+  ],
+  "author": "Curran Kelleher",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/curran/graph/issues"
+  },
+  "homepage": "https://github.com/curran/graph#readme",
+  "devDependencies": {
+    "esperanto": "^0.7.1",
+    "mocha": "^2.2.5",
+    "uglifyjs": "^2.4.10"
+  },
+  "jspm": {
+    "main": "src/graph",
+    "format": "es6"
+  },
+  "format": "es6",
+  "registry": "github"
+}
