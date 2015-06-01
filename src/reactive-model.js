@@ -4,7 +4,13 @@ var Graph = require("./graph");
 // shared by all instances of ReactiveModel.
 var dependencyGraph = new Graph();
 
-exports = function ReactiveModel(){
+module.exports = function ReactiveModel(){
+
+  // Enforce use of new.
+  // See http://stackoverflow.com/questions/17032749/pattern-for-enforcing-new-in-javascript
+  if (!(this instanceof ReactiveModel)) {
+    return new ReactiveModel();
+  }
 }
 
 //function ReactiveFunction(inProperties, outProperty, callback){

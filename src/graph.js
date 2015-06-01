@@ -1,6 +1,5 @@
 // Constructor function for a directed graph data structure.
-// Usage `var graph = Graph();` or (optionally) `var graph = new Graph();`
-exports = function Graph(){
+module.exports = function Graph(){
   
   // The adjacency list of the graph.
   // Keys are node ids.

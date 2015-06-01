@@ -1,9 +1,18 @@
-var ReactiveModel = require("../dist/reactive-model.js");
+var ReactiveModel = require("../src/reactive-model.js");
 var assert = require("assert");
 
 describe("reactive-model", function (){
+
   it("should be a function", function (){
-    assert(typeof ReactiveModel === "function");
+    assert.equal(typeof ReactiveModel, "function");
+  });
+
+  it("should enforce new", function (){
+    var model1 = ReactiveModel();
+    var model2 = new ReactiveModel();
+
+    assert(model1 instanceof ReactiveModel);
+    assert(model2 instanceof ReactiveModel);
   });
 });
 
