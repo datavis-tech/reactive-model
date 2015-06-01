@@ -21,6 +21,7 @@ I am making up these terms:
  * "reactive model" the result of `new ReactiveModel`
 
 # usage
+Aspirational, not yet implemented. Following [readme-driven development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html).
 
 ```javascript
 var model = new ReactiveModel();
