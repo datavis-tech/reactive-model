@@ -1,10 +1,10 @@
-import Graph from "graph";
+var Graph = require("./graph");
 
-// This is not a global, it should be contained within the ES6 module.
+// This is the singleton dependency graph
+// shared by all instances of ReactiveModel.
 var dependencyGraph = new Graph();
 
-// Currently trying to just get bundling to work and settle on tooling.
-export function ReactiveModel(){
+exports = function ReactiveModel(){
 }
 
 //function ReactiveFunction(inProperties, outProperty, callback){

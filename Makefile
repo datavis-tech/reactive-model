@@ -5,6 +5,8 @@ GENERATED_FILES = \
 	dist/reactive-model.js \
 	dist/reactive-model.min.js
 
+BIN = ./node_modules/.bin
+
 all: $(GENERATED_FILES)
 
 .PHONY: clean all test publish
@@ -14,15 +16,7 @@ test:
 
 dist/reactive-model.js: src/reactive-model.js
 	- rm $@
-
-  # The built bundle source code is infinitely nicer with Esperanto as compared to JSPM.
-	# However I can't seem to figure out how to get graph.js included in this bundle.
-	#./node_modules/esperanto/bin/index.js -i src/reactive-model.js -t umd -o dist/reactive-model.js -n ReactiveModel -s -b
-
-  # The bundle built by this command looks like it has way too much stuff in it,
-	# and it's not clear how to expose ReactiveModel as UMD from this,
-	# but the resulting bundle does contain graph.js.
-	node_modules/.bin/jspm bundle-sfx src/reactive-model dist/reactive-model.js
+	$(BIN)/browserify $^ -o $@
 
 dist/reactive-model.min.js: dist/reactive-model.js
 	- rm $@
