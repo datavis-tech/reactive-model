@@ -2,7 +2,7 @@
   "name": "reactive-model",
   "version": "0.0.1",
   "description": "A library for reactive models.",
-  "main": "src/reactive-model.js",
+  "main": "src/reactiveModel.js",
   "scripts": {
     "test": "mocha"
   },

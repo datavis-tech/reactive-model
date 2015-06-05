@@ -1,25 +1,63 @@
 var Graph = require("./graph");
+var ReactiveFunction = require("./reactiveFunction");
+
+var stringIdentifiers = require("./stringIdentifiers");
+var encodeReactiveFunction = stringIdentifiers.encodeReactiveFunction;
+var encodeProperty         = stringIdentifiers.encodeProperty;
 
 // This is the singleton dependency graph
 // shared by all instances of ReactiveModel.
 var dependencyGraph = new Graph();
 
-module.exports = function ReactiveModel(){
+// Each model gets a unique id.
+// This is so (model, property) pairs can be identified by strings,
+// and those strings can be used as node ids in the dependency graph.
+// For example, the string "3.foo" identifies the "foo" property of model with id 3.
+var modelIdCounter = 0;
+
+function ReactiveModel(){
 
   // Enforce use of new.
   // See http://stackoverflow.com/questions/17032749/pattern-for-enforcing-new-in-javascript
   if (!(this instanceof ReactiveModel)) {
     return new ReactiveModel();
   }
+
+  // Refer to `this` (the ReactiveModel instance) as `model`, for code clarity.
+  var model = this;
+
+  // Each model gets a unique id.
+  model.id = modelIdCounter++;
+
+  model.react = function (options){
+
+    var reactiveFunctions = ReactiveFunction.parse(options);
+
+    reactiveFunctions.forEach(function (λ){
+
+      var λNode = encodeReactiveFunction(λ);
+      var outNode = encodeProperty(model, λ.outProperty);
+
+      dependencyGraph.addEdge(λNode, outNode);
+
+      λ.inProperties.forEach(function (inProperty){
+        var inNode = encodeProperty(model, inProperty);
+        dependencyGraph.addEdge(inNode, λNode);
+        //track(inProperty);
+      });
+    });
+
+    return reactiveFunctions;
+  };
 }
 
-//function ReactiveFunction(inProperties, outProperty, callback){
-//  return {
-//    inProperties: inProperties, // [String]
-//    outProperty: outProperty,   // String
-//    callback: callback          // function (...inProperties) -> outPropertyValue
-//  };
-//}
+// Expose internals for unit testing only.
+ReactiveModel.dependencyGraph = dependencyGraph;
+ReactiveModel.encodeReactiveFunction = encodeReactiveFunction;
+ReactiveModel.encodeProperty = encodeProperty;
+
+module.exports = ReactiveModel;
+
 //
 //function allAreDefined(arr){
 //  return !arr.some(isNotDefined);
