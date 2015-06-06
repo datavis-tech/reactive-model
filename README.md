@@ -29,10 +29,11 @@ The reactive model maintains internally a graph data structure (the data depende
 
 These terms have a specific meaning within this project:
 
- * "reactive model" the result of `new ReactiveModel()`
- * "reactive function" a function and metadata that describes its input and output properties. A representation of set of reactive functions is passed into `model.react`.
- * "digest" a cycle of the algorithm that resolves the data dependency graph.
-
+ * "reactive model" The result of `new ReactiveModel()`.
+ * "reactive function" A callback function and metadata that describes its input and output properties. A representation of set of reactive functions is passed into `model.react`.
+ * "reactive function callback" The callback function portion of a reactive function.
+ * "digest" A cycle of the algorithm that evaluates the data dependency graph. This occurst at most once per animation frame.
+ * "evaluate" A term to denote complete resolution of the data dependency graph. After the complete data dependency graph has been **evaluated** by a digest, the state of the model is consistent, and all reactive functions that are transitively dependent on any changed property have been executed in the proper order, with their output values assigned to model properties.
 
 # usage
 Aspirational, not yet implemented. Following [readme-driven development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html).
@@ -45,12 +46,13 @@ model.react({
   // The output property, assigned by reacting to input properties.
   fullName: [
   
-    // A comma delimited list of input property names.
+    // A comma delimited list of input property names,
+    // followed by the reactive function callback.
     "firstName", "lastName", function (d){
     
       // Following a popular convention from the D3 community,
       // "d" is used as the variable name for objects that contain many properties.
-      // In this API, "d" contains values for each input property.
+      // "d" contains values for each input property, in this case "firstName" and "lastName".
       
       // This function is only invoked if all input properties are defined.
 
@@ -96,9 +98,9 @@ model.react({
 });
 ```
 
-When the data flow graph has reactive functions that use asynchronous operations, then `requestAnimationFrame` is no longer a valid way to detect when the complete data dependency graph has been resolved. This is because the asynchronous operation may take longer than a single animation frame to complete.
+When the data flow graph has reactive functions that use asynchronous operations, `requestAnimationFrame` is no longer a valid way to detect when the complete data dependency graph has been evaluated. This is because the asynchronous operation may take longer than a single animation frame to complete.
 
-In this situation, use `model.set()`, which returns a Promise that is resolved only after the complete data dependency graph has been evaluated, including asynchronous reactive functions.
+In this situation, you can use `model.set()`, which returns a Promise that is resolved only after the complete data dependency graph has been evaluated, including asynchronous reactive functions.
 
 ```javascript
 model.set({
