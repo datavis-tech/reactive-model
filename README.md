@@ -20,6 +20,7 @@ The reactive model maintains internally a graph data structure (the data depende
  * edges represent a data dependency
 
 [![](http://curran.github.io/images/reactive-model/firstLastFlow.png)](http://bl.ocks.org/curran/5905182da50a4667dc00)
+<centered><small>This is an example of a data dependency graph.</small></centered>
 
 These terms have a specific meaning within this project:
 
