@@ -1,7 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 // Constructor function for a directed graph data structure.
-// Usage `var graph = Graph();` or (optionally) `var graph = new Graph();`
-exports = function Graph(){
+module.exports = function Graph(){
   
   // The adjacency list of the graph.
   // Keys are node ids.
@@ -42,22 +41,131 @@ exports = function Graph(){
 }
 
 },{}],2:[function(require,module,exports){
+// Each reactive function gets a unique id.
+// This is so reactive functions can be identified by strings,
+// and those strings can be used as node ids in the dependency graph.
+// For example, the string "λ45" identifies reactive function with id 45.
+var reactiveFunctionIdCounter = 0;
+
+// This function is a factory for objects that represent reactive functions,
+// each having input properties, a single output property, and an associated callback.
+function ReactiveFunction(inProperties, outProperty, callback){
+  return {
+
+    // Each ective function gets a unique id.
+    id: reactiveFunctionIdCounter++,
+
+    // An array of property name strings.
+    inProperties: inProperties,
+
+    // A single property name string.
+    outProperty: outProperty,
+
+    // function (...inProperties) -> outPropertyValue
+    // Invoked when all input properties are defined,
+    // at most once each animation frame with most recent values,
+    // triggered whenever input properties change.
+    callback: callback
+  };
+}
+
+// This is where the options object passed into `model.react(options)` gets
+// transformed into an array of ReactiveFunction instances.
+ReactiveFunction.parse = function (options){
+
+  var outProperties = Object.keys(options);
+
+  return outProperties.map( function (outProperty){
+
+    var arr = options[outProperty];
+
+    // The first element in the array should be a comma delimited
+    // list of input property names.
+    var inPropertiesStr = arr[0];
+    var inProperties = inPropertiesStr.split(",").map( function (inPropertyStr){
+      return inPropertyStr.trim();
+    });
+
+    // The second element in the array should be a callback.
+    var callback = arr[1]; 
+
+    return ReactiveFunction(inProperties, outProperty, callback);
+  });
+};
+
+module.exports = ReactiveFunction;
+
+},{}],3:[function(require,module,exports){
+module.exports = {
+  encodeProperty: function (model, property){
+    return model.id + "." + property;
+  },
+  encodeReactiveFunction: function (reactiveFunction) {
+    return "λ" + reactiveFunction.id
+  }
+};
+
+},{}],4:[function(require,module,exports){
 var Graph = require("./graph");
+var ReactiveFunction = require("./reactiveFunction");
+
+var stringIdentifiers = require("./stringIdentifiers");
+var encodeReactiveFunction = stringIdentifiers.encodeReactiveFunction;
+var encodeProperty         = stringIdentifiers.encodeProperty;
 
 // This is the singleton dependency graph
 // shared by all instances of ReactiveModel.
 var dependencyGraph = new Graph();
 
-exports = function ReactiveModel(){
+// Each model gets a unique id.
+// This is so (model, property) pairs can be identified by strings,
+// and those strings can be used as node ids in the dependency graph.
+// For example, the string "3.foo" identifies the "foo" property of model with id 3.
+var modelIdCounter = 0;
+
+function ReactiveModel(){
+
+  // Enforce use of new.
+  // See http://stackoverflow.com/questions/17032749/pattern-for-enforcing-new-in-javascript
+  if (!(this instanceof ReactiveModel)) {
+    return new ReactiveModel();
+  }
+
+  // Refer to `this` (the ReactiveModel instance) as `model`, for code clarity.
+  var model = this;
+
+  // Each model gets a unique id.
+  model.id = modelIdCounter++;
+
+  model.react = function (options){
+
+    var reactiveFunctions = ReactiveFunction.parse(options);
+
+    reactiveFunctions.forEach(function (λ){
+
+      var λNode = encodeReactiveFunction(λ);
+      var outNode = encodeProperty(model, λ.outProperty);
+
+      dependencyGraph.addEdge(λNode, outNode);
+
+      λ.inProperties.forEach(function (inProperty){
+        var inNode = encodeProperty(model, inProperty);
+        dependencyGraph.addEdge(inNode, λNode);
+        //track(inProperty);
+      });
+    });
+
+    return reactiveFunctions;
+  };
 }
 
-//function ReactiveFunction(inProperties, outProperty, callback){
-//  return {
-//    inProperties: inProperties, // [String]
-//    outProperty: outProperty,   // String
-//    callback: callback          // function (...inProperties) -> outPropertyValue
-//  };
-//}
+// Expose internals for unit testing only.
+ReactiveModel.dependencyGraph = dependencyGraph;
+ReactiveModel.encodeReactiveFunction = encodeReactiveFunction;
+ReactiveModel.encodeProperty = encodeProperty;
+
+module.exports = ReactiveModel;
+
 //
 //function allAreDefined(arr){
 //  return !arr.some(isNotDefined);
@@ -158,4 +266,4 @@ exports = function ReactiveModel(){
 //  return model;
 //};
 
-},{"./graph":1}]},{},[2]);
+},{"./graph":1,"./reactiveFunction":2,"./stringIdentifiers":3}]},{},[4]);

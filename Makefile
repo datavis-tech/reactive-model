@@ -14,7 +14,7 @@ all: $(GENERATED_FILES)
 test:
 	node_modules/.bin/mocha
 
-dist/reactive-model.js: src/reactive-model.js
+dist/reactive-model.js: src/reactiveModel.js
 	- rm $@
 	$(BIN)/browserify $^ -o $@
 

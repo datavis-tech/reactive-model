@@ -3,7 +3,7 @@ module.exports = function Graph(){
   
   // The adjacency list of the graph.
   // Keys are node ids.
-  // Values are arrays of adjacent node ids.
+  // Values are adjacent node arrays.
   var edges = {};
   
   // Gets or creates the adjacent node list for node u.
@@ -16,6 +16,14 @@ module.exports = function Graph(){
     adjacent: adjacent,
 
     addEdge: function (u, v){
+      adjacent(u).push(v);
+    },
+
+    // TODO test this function
+    removeEdge: function (u, v){
+      if(edges[u]) {
+        edges[u] =  edges[u]
+      }
       adjacent(u).push(v);
     },
 
