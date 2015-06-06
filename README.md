@@ -5,8 +5,8 @@ An unfinished library for building reactive models. This is an experiment that m
 This is a re-design of [model.js](https://github.com/curran/model) that addresses the following issues:
 
  * The model.js syntax forces you to type each dependency property twice.
- * The model.js syntax does not encode the data dependency graph explicitly, it is expressed implicitly by setting model property values within model.when callbacks.
- * The execution model of model.js uses setTimeout for every single edge in the data dependency graph. This can have a performance impact. Let's say setTimeout takes 4 ms to resolve. This means it would take 4 * d ms where d is the number of hops required through the data dependency graph.
+ * The model.js syntax does not encode the data dependency graph explicitly, it is expressed implicitly by setting model property values within reactive functions (`model.when` callbacks).
+ * The execution model of model.js uses `setTimeout` to queue evaluation of every single edge in the data dependency graph. This can have a performance impact, and can lead to inconsistent system state while the dependency graph is being evaluated. Let's say `setTimeout` takes about 4 ms to resolve. This means it would take 4 * d ms to evaluate any full data dependency graph, where d is the number of hops required through the data dependency graph (there must be some graph theory term for this..).
 
 The core ideas of this redesign are:
 
