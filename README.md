@@ -21,10 +21,12 @@ The reactive model maintains internally a graph data structure in which
 
 [![](http://curran.github.io/images/reactive-model/firstLastFlow.png)](http://bl.ocks.org/curran/5905182da50a4667dc00)
 
-I am making up these terms:
+These terms have a specific meaning within this project:
 
- * "reactive function" a function and metadata that describes its inputs and outputs. A set of reactive functions is passed into `model.react`.
- * "reactive model" the result of `new ReactiveModel`
+ * "reactive model" the result of `new ReactiveModel()`
+ * "reactive function" a function and metadata that describes its input and output properties. A representation of set of reactive functions is passed into `model.react`.
+ * "digest" a cycle of the algorithm that resolves the data dependency graph.
+
 
 # usage
 Aspirational, not yet implemented. Following [readme-driven development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html).
@@ -38,41 +40,64 @@ model.react({
   fullName: [
   
     // A comma delimited list of input property names.
-    "firstName, lastName", function (d){
+    "firstName", "lastName", function (d){
+    
+      // Following a popular convention from the D3 community,
+      // "d" is used as the variable name for objects that contain many properties.
+      // In this API, "d" contains values for each input property.
+      
+      // This function is only invoked if all input properties are defined.
 
-      // Returns the value for the output property, "fullName".
+      // Return the computed value for the output property, "fullName".
       return d.firstName + " " + d.lastName;
     }
   ]
 });
 
-// Calling model.set returns a promise.
-model.set({
-  firstName: "John",
-  lastName: "Smith"
-}).then(function (){
+// Setting properties like this queues a digest to occur at the next animation frame,
+// where changed properties are propagated through the data dependency graph.
+model.firstName = "Jane";
+model.lastName = "Smith";
 
-  // The promise is fulfilled after changes are propagated.
+// Using requestAnimationFrame, we can queue this callback to run
+// directly after the upcoming digest completes,
+requestAnimationFrame(function (){
+
+  // so here, we can expect that the dependency graph has been fully evaluated.
   expect(model.fullName).to.equal("John Smith");
 });
 ```
 
-## Asynchronous reactive functions
+## Asynchronous Reactive Runctions
 
-For asynchronouos operations, the API supports returning a Promise from the reactive function.
+For asynchronouos operations, the API supports returning a Promise from the reactive function. Here's an example that uses this API to fetch a CSV file using [d3.csv](https://github.com/mbostock/d3/wiki/CSV):
 
 ```javascript
 var model = new ReactiveModel();
 
 model.react({
   data: ["url", function (d){
-    return fetchTheDataAsynchronouslyAndReturnAPromise(d.url);
+    return new Promise(function (resolve, reject){
+      d3.csv(d.url, function (error, data){
+        if(error) {
+          reject(error);
+        } else {
+          resolve(data);
+        }
+      });
+    });
   ]
 });
+```
 
+When the data flow graph has reactive functions that use asynchronous operations, then `requestAnimationFrame` is no longer a valid way to detect when the complete data dependency graph has been resolved. This is because the asynchronous operation may take longer than a single animation frame to complete.
+
+In this situation, use `model.set()`, which returns a Promise that is resolved only after the complete data dependency graph has been evaluated, including asynchronous reactive functions.
+
+```javascript
 model.set({
-  url: "http://www.google.com"
+  url: "http://curran.github.io/data/iris/iris.csv"
 }).then(function (){
-  // At this point, model.data should be populated.
+  // At this point, model.data should be populated with parsed CSV data.
 });
 ```
