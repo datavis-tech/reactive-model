@@ -1,16 +1,5 @@
-// Each reactive function gets a unique id.
-// This is so reactive functions can be identified by strings,
-// and those strings can be used as node ids in the dependency graph.
-// For example, the string "λ45" identifies reactive function with id 45.
-var reactiveFunctionIdCounter = 0;
-
-// This function is a factory for objects that represent reactive functions,
-// each having input properties, a single output property, and an associated callback.
 function ReactiveFunction(inProperties, outProperty, callback){
   return {
-
-    // Each ective function gets a unique id.
-    id: reactiveFunctionIdCounter++,
 
     // An array of property name strings.
     inProperties: inProperties,
@@ -50,4 +39,4 @@ ReactiveFunction.parse = function (options){
   });
 };
 
-module.exports = ReactiveFunction;
+export default ReactiveFunction;
