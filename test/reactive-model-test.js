@@ -19,7 +19,7 @@ describe("ReactiveModel", function (){
   });
 
   it("should evaluate the data dependency graph", function (done){
-    //var model = new ReactiveModel();
+    var model = new ReactiveModel();
 
     //model.react({
     //  bar: ["foo", function (d){
@@ -27,10 +27,11 @@ describe("ReactiveModel", function (){
     //  }]
     //});
 
-    //model.foo = 5;
+    model.foo = 5;
 
     nextFrame(function (){
-      //expect(model.bar).to.equal(6);
+      assert.equal(model.foo, 5);
+      //assert.equal(model.bar, 6);
       done();
     });
 
