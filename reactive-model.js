@@ -196,6 +196,7 @@ function ReactiveModel(){
   }
 
   // Constructs the object to be passed into reactive function callbacks.
+  // Returns an object with values for each inProperty of the given reactive function.
   function inPropertyValues(λ){
     var d = {};
     λ.inProperties.forEach(function (inProperty){
@@ -210,6 +211,7 @@ function ReactiveModel(){
   //    return allAreDefined();
   //  }
   //}
+
   var digest = debounce(function (){
     var properties = Object.keys(changedProperties);
     var sourceNodes = properties.map(getPropertyNode);
@@ -236,10 +238,9 @@ function ReactiveModel(){
     if(!(property in trackedProperties)){
       trackedProperties[property] = true;
 
-      // TODO test this behavior
-      //if(property in model){
-      //  simpleModel.set(property, model[property]);
-      //}
+      if(property in model){
+        simpleModel.set(property, model[property]);
+      }
 
       Object.defineProperty(model, property, {
         get: function () {
