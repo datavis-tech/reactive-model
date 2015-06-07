@@ -119,4 +119,27 @@ describe("ReactiveModel", function (){
       done();
     });
   });
+
+  it("should propagate two hops in a single digest", function (done){
+
+    var model = new ReactiveModel();
+
+    model.react({
+      b: ["a", function (d){
+        return d.a + 1;
+      }],
+      c: ["b", function (d){
+        return d.b + 1;
+      }]
+    });
+
+    model.a = 1;
+
+    nextFrame(function (){
+      assert.equal(model.a, 1);
+      assert.equal(model.b, 2);
+      assert.equal(model.c, 3);
+      done();
+    });
+  });
 });
