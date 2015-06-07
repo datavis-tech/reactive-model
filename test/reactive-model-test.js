@@ -1,3 +1,5 @@
+require("source-map-support").install();
+
 var ReactiveModelModules = require("../reactive-model.js");
 var ReactiveModel = ReactiveModelModules.ReactiveModel;
 var nextFrame = ReactiveModelModules.nextFrame;
@@ -21,22 +23,20 @@ describe("ReactiveModel", function (){
   it("should evaluate the data dependency graph", function (done){
     var model = new ReactiveModel();
 
-    //model.react({
-    //  bar: ["foo", function (d){
-    //    return d.foo + 1;
-    //  }]
-    //});
+    model.react({
+      bar: ["foo", function (d){
+        return d.foo + 1;
+      }]
+    });
 
     model.foo = 5;
 
     nextFrame(function (){
       assert.equal(model.foo, 5);
-      //assert.equal(model.bar, 6);
+      assert.equal(model.bar, 6);
       done();
     });
-
   });
-
 });
 
 //var encodeReactiveFunction = ReactiveModel.encodeReactiveFunction;

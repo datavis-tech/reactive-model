@@ -15,8 +15,12 @@ function SimpleModel(){
   };
 
   function set(property, value){
-    values[property] = value;
+    setSilently(property, value);
     getListeners(property).forEach(invoke);
+  }
+
+  function setSilently(property, value){
+    values[property] = value;
   }
 
   function get(property){
@@ -26,6 +30,7 @@ function SimpleModel(){
   return {
     on: on,
     set: set,
+    setSilently: setSilently,
     get: get
   };
 }
