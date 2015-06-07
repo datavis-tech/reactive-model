@@ -2,25 +2,23 @@
 # https://github.com/d3/d3-selection/blob/99164693a37927b94bba1b125e9605186326963f/Makefile
 
 GENERATED_FILES = \
-	dist/reactive-model.js \
-	dist/reactive-model.min.js
+	reactive-model.js \
+	reactive-model.min.js
 
 BIN = ./node_modules/.bin
 
 all: $(GENERATED_FILES)
 
-.PHONY: clean all test publish
+.PHONY: clean all test 
 
-test:
-	node_modules/.bin/mocha
+test: clean all
+	$(BIN)/mocha
 
-dist/reactive-model.js: src/reactiveModel.js
-	- rm $@
-	$(BIN)/browserify $^ -o $@
+reactive-model.js: src/reactiveModel.js
+	$(BIN)/rollup --output $@ --format cjs $^ 
 
-dist/reactive-model.min.js: dist/reactive-model.js
-	- rm $@
-	node_modules/.bin/uglifyjs $^ -c -m -o $@
+reactive-model.min.js: reactive-model.js
+	$(BIN)/uglifyjs $^ -c -m -o $@
 
 clean:
 	rm -f -- $(GENERATED_FILES)

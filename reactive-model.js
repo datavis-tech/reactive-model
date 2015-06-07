@@ -1,3 +1,20 @@
+'use strict';
+
+function ReactiveModel(){
+
+  // Enforce use of new.
+  // See http://stackoverflow.com/questions/17032749/pattern-for-enforcing-new-in-javascript
+  if (!(this instanceof ReactiveModel)) {
+    return new ReactiveModel();
+  }
+
+  // Refer to `this` (the ReactiveModel instance) as `model` in this closure.
+  var model = this;
+
+  return model;
+}
+
+
 // Constructor function for a directed graph data structure.
 function Graph(){
   
@@ -46,4 +63,27 @@ function Graph(){
     }
   };
 }
-export default Graph;
+
+
+// A simple requestAnimationFrame polyfill.
+//
+// Inspired by:
+//
+//   https://github.com/chrisdickinson/raf
+//   http://jsmodules.io/
+//
+// Curran Kelleher June 2015
+var nextFrame;
+if(typeof requestAnimationFrame === "undefined"){
+  nextFrame = setTimeout;
+} else {
+  nextFrame = requestAnimationFrame;
+}
+var _nextFrame = nextFrame;
+
+ReactiveModel.Graph = Graph;
+ReactiveModel.nextFrame = _nextFrame;
+
+var reactiveModel = ReactiveModel;
+
+module.exports = reactiveModel;

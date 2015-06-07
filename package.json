@@ -4,7 +4,8 @@
   "description": "A library for reactive models.",
   "main": "src/reactiveModel.js",
   "scripts": {
-    "test": "mocha"
+    "test": "make test",
+    "bundle": "make bundle"
   },
   "repository": {
     "type": "git",
@@ -17,8 +18,9 @@
   },
   "homepage": "https://github.com/curran/reactive-model",
   "devDependencies": {
-    "browserify": "^10.2.3",
     "mocha": "^2.2.5",
+    "rollup": "^0.7.6",
+    "source-map-support": "^0.3.1",
     "uglifyjs": "^2.4.10"
   }
 }
