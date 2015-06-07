@@ -142,4 +142,36 @@ describe("ReactiveModel", function (){
       done();
     });
   });
+
+  it("should evaluate consecutive digests independently", function (done){
+
+    var model = new ReactiveModel();
+    var counter = 0;
+
+    model.react({
+      fullName: [
+        "firstName", "lastName", function (d){
+          counter++;
+          return d.firstName + " " + d.lastName;
+        }
+      ],
+      b: ["a", function (d){ return d.a + 1; }]
+    });
+
+    model.firstName = "Jane";
+    model.lastName = "Smith";
+
+    nextFrame(function (){
+      assert.equal(model.fullName, "Jane Smith");
+      assert.equal(counter, 1);
+
+      model.a = 5;
+
+      nextFrame(function (){
+        assert.equal(model.b, 6);
+        assert.equal(counter, 1);
+        done();
+      });
+    });
+  });
 });

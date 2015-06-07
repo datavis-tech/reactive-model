@@ -183,11 +183,11 @@ function ReactiveModel(){
   // The set of tracked properties. { property -> true }
   var trackedProperties = {};
 
-  // The set of changed properties. { property -> true }
+  // The set of changed properties for the upcoming digest. { property -> true }
   // Cleared out at the end of each digest.
   var changedProperties = {};
 
-  // The properties that are set as output by reactive functions.
+  // The properties set as output by reactive functions in the upcoming digest. { property -> true }
   // Cleared out at the end of each digest.
   var computedProperties = {}
     
@@ -199,6 +199,7 @@ function ReactiveModel(){
   // values are reactive functions.
   var reactiveFunctions = {};
 
+  // Gets or creates a graph node for the given property.
   function getPropertyNode(property){
     if(property in propertyNodes){
       return propertyNodes[property];
@@ -216,7 +217,6 @@ function ReactiveModel(){
     });
     return d;
   }
-  
 
   // Returns true if all elements of the given array are defined, false otherwise.
   function allAreDefined(arr){
@@ -271,10 +271,7 @@ function ReactiveModel(){
       }
     });
 
-    //console.log(topologicallySorted);
-
-    // TODO test
-    //changedProperties = {};
+    changedProperties = {};
     //
     // TODO test
     //computedProperties = {};
@@ -300,20 +297,15 @@ function ReactiveModel(){
     }
   }
 
-  // The set of tracked properties. { property -> true }
-  //var trackedProperties = {};
   model.react = function (options){
 
-    // An array of ReactiveFunction objects parsed from options.
     ReactiveFunction.parse(options).forEach(function (λ){
 
       var λNode = makeNode();
       var outNode = getPropertyNode(λ.outProperty);
 
       reactiveFunctions[λNode] = λ;
-
       dependencyGraph.addEdge(λNode, outNode);
-
       track(λ.outProperty);
 
       λ.inProperties.forEach(function (inProperty){
