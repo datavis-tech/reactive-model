@@ -1,5 +1,6 @@
-var ReactiveModel = require("../reactive-model.js");
-var nextFrame = ReactiveModel.nextFrame;
+var ReactiveModelModules = require("../reactive-model.js");
+var ReactiveModel = ReactiveModelModules.ReactiveModel;
+var nextFrame = ReactiveModelModules.nextFrame;
 
 var assert = require("assert");
 

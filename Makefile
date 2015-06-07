@@ -9,7 +9,7 @@ BIN = ./node_modules/.bin
 
 all: $(GENERATED_FILES)
 
-.PHONY: clean all test 
+.PHONY: clean all test list
 
 test: clean all
 	$(BIN)/mocha
@@ -23,3 +23,5 @@ reactive-model.min.js: reactive-model.js
 clean:
 	rm -f -- $(GENERATED_FILES)
 
+list:
+	tree -I node_modules

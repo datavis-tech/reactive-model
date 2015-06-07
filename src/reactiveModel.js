@@ -15,10 +15,11 @@ function ReactiveModel(){
   return model;
 }
 
-ReactiveModel.Graph = Graph;
-ReactiveModel.nextFrame = nextFrame;
-
-export default ReactiveModel;
+export {
+  ReactiveModel,
+  Graph,
+  nextFrame
+};
 //
 //  // Each model gets a unique id.
 //  model.id = modelIdCounter++;

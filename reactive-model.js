@@ -15,6 +15,23 @@ function ReactiveModel(){
 }
 
 
+// A simple requestAnimationFrame polyfill.
+//
+// Inspired by:
+//
+//   https://github.com/chrisdickinson/raf
+//   http://jsmodules.io/
+//
+// Curran Kelleher June 2015
+var nextFrame;
+if(typeof requestAnimationFrame === "undefined"){
+  nextFrame = setTimeout;
+} else {
+  nextFrame = requestAnimationFrame;
+}
+var _nextFrame = nextFrame;
+
+
 // Constructor function for a directed graph data structure.
 function Graph(){
   
@@ -64,26 +81,6 @@ function Graph(){
   };
 }
 
-
-// A simple requestAnimationFrame polyfill.
-//
-// Inspired by:
-//
-//   https://github.com/chrisdickinson/raf
-//   http://jsmodules.io/
-//
-// Curran Kelleher June 2015
-var nextFrame;
-if(typeof requestAnimationFrame === "undefined"){
-  nextFrame = setTimeout;
-} else {
-  nextFrame = requestAnimationFrame;
-}
-var _nextFrame = nextFrame;
-
-ReactiveModel.Graph = Graph;
-ReactiveModel.nextFrame = _nextFrame;
-
-var reactiveModel = ReactiveModel;
-
-module.exports = reactiveModel;
+exports.ReactiveModel = ReactiveModel;
+exports.Graph = Graph;
+exports.nextFrame = _nextFrame;
