@@ -109,3 +109,9 @@ model.set({
   // At this point, model.data should be populated with parsed CSV data.
 });
 ```
+
+# Development
+
+This project uses [Rollup](https://github.com/rollup/rollup) for bundling ES6 modules into a CommonJS build. The unit tests use the bundle. To re-generate the bundle and run the unit tests, execute
+
+`make test`
