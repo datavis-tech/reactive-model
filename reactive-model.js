@@ -1,5 +1,10 @@
 'use strict';
 
+function always(){
+  return true;
+}
+
+
 // Constructor function for a directed graph data structure.
 function Graph(){
   
@@ -31,13 +36,15 @@ function Graph(){
 
     // Depth First Search algorithm, inspired by
     // Cormen et al. "Introduction to Algorithms" 3rd Ed. p. 604
-    DFS: function (sourceNodes){
+    DFS: function (sourceNodes, shouldVisit){
 
       var visited = {};
       var nodes = [];
 
+      shouldVisit = shouldVisit || always;
+
       sourceNodes.forEach(function DFSVisit(node){
-        if(!visited[node]){
+        if(!visited[node] && shouldVisit(node)){
           visited[node] = true;
           adjacent(node).forEach(DFSVisit);
           nodes.push(node);
@@ -205,18 +212,32 @@ function ReactiveModel(){
     return d;
   }
   
-  // TODO test this.
-  //function shouldVisit(node){
-  //  if(node in reactiveFunctionNodes){
-  //    return allAreDefined();
-  //  }
-  //}
+  // Constructs an array or values for each inProperty of the given reactive function.
+  function inPropertyValuesArr(λ){
+    return λ.inProperties.map(simpleModel.get);
+  }
+
+  // Returns true if all elements of the given array are defined, false otherwise.
+  function allAreDefined(arr){
+    return !arr.some(function (d) {
+      return typeof d === "undefined" || d === null;
+    });
+  }
+  
+  function shouldVisit(node){
+    if(node in reactiveFunctions){
+      var λ = reactiveFunctions[node];
+      return allAreDefined(inPropertyValuesArr(λ));
+    } else {
+      return true;
+    }
+  }
 
   var digest = debounce(function (){
     var properties = Object.keys(changedProperties);
     var sourceNodes = properties.map(getPropertyNode);
     var topologicallySorted = dependencyGraph
-      .DFS(sourceNodes/*, shouldVisit*/)
+      .DFS(sourceNodes, shouldVisit)
       .reverse();
 
     topologicallySorted.forEach(function (node){

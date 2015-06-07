@@ -29,13 +29,15 @@ function Graph(){
 
     // Depth First Search algorithm, inspired by
     // Cormen et al. "Introduction to Algorithms" 3rd Ed. p. 604
-    DFS: function (sourceNodes){
+    DFS: function (sourceNodes, shouldVisit){
 
       var visited = {};
       var nodes = [];
 
+      shouldVisit = shouldVisit || always;
+
       sourceNodes.forEach(function DFSVisit(node){
-        if(!visited[node]){
+        if(!visited[node] && shouldVisit(node)){
           visited[node] = true;
           adjacent(node).forEach(DFSVisit);
           nodes.push(node);
@@ -45,5 +47,8 @@ function Graph(){
       return nodes;
     }
   };
+}
+function always(){
+  return true;
 }
 export default Graph;
