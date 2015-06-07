@@ -1,13 +1,13 @@
 import Graph from "./graph";
 import ReactiveFunction from "./reactiveFunction";
 import SimpleModel from "./simpleModel";
-
 import nextFrame from "./nextFrame";
 import makeNode from "./makeNode";
 
 var dependencyGraph = new Graph();
 
 // Queues the given callback function to execute
+// on the next animation frame.
 function debounce(callback){
   var queued = false;
   return function () {

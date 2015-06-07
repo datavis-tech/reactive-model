@@ -20,7 +20,7 @@ describe("ReactiveModel", function (){
     assert(model2 instanceof ReactiveModel);
   });
 
-  it("should evaluate the data dependency graph", function (done){
+  it("should evaluate the data dependency graph with single input property", function (done){
     var model = new ReactiveModel();
 
     model.react({
@@ -34,6 +34,27 @@ describe("ReactiveModel", function (){
     nextFrame(function (){
       assert.equal(model.foo, 5);
       assert.equal(model.bar, 6);
+      done();
+    });
+  });
+
+  it("should evaluate the data dependency graph with two input properties", function (done){
+
+    var model = new ReactiveModel();
+
+    model.react({
+      fullName: [
+        "firstName", "lastName", function (d){
+          return d.firstName + " " + d.lastName;
+        }
+      ]
+    });
+
+    model.firstName = "Jane";
+    model.lastName = "Smith";
+
+    nextFrame(function (){
+      assert.equal(model.fullName, "Jane Smith");
       done();
     });
   });

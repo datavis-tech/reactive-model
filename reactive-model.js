@@ -76,23 +76,10 @@ function ReactiveFunction(inProperties, outProperty, callback){
 // This is where the options object passed into `model.react(options)` gets
 // transformed into an array of ReactiveFunction instances.
 ReactiveFunction.parse = function (options){
-
-  var outProperties = Object.keys(options);
-
-  return outProperties.map( function (outProperty){
-
+  return Object.keys(options).map( function (outProperty){
     var arr = options[outProperty];
-
-    // The first element in the array should be a comma delimited
-    // list of input property names.
-    var inPropertiesStr = arr[0];
-    var inProperties = inPropertiesStr.split(",").map( function (inPropertyStr){
-      return inPropertyStr.trim();
-    });
-
-    // The second element in the array should be a callback.
-    var callback = arr[1]; 
-
+    var callback = arr.splice(arr.length - 1)[0];
+    var inProperties = arr;
     return ReactiveFunction(inProperties, outProperty, callback);
   });
 };
@@ -158,6 +145,7 @@ function SimpleModel(){
 
 
 // Queues the given callback function to execute
+// on the next animation frame.
 function debounce(callback){
   var queued = false;
   return function () {
