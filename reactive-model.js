@@ -101,6 +101,22 @@ if(typeof requestAnimationFrame === "undefined"){
 }
 var _nextFrame = nextFrame;
 
+
+// Queues the given callback function to execute
+// on the next animation frame.
+function debounce(callback){
+  var queued = false;
+  return function () {
+    if(!queued){
+      queued = true;
+      _nextFrame(function () {
+        queued = false;
+        callback();
+      });
+    }
+  };
+}
+
 function invoke(callback){
   callback();
 }
@@ -140,22 +156,6 @@ function SimpleModel(){
     set: set,
     setSilently: setSilently,
     get: get
-  };
-}
-
-
-// Queues the given callback function to execute
-// on the next animation frame.
-function debounce(callback){
-  var queued = false;
-  return function () {
-    if(!queued){
-      queued = true;
-      _nextFrame(function () {
-        queued = false;
-        callback();
-      });
-    }
   };
 }
 
