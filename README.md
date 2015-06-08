@@ -2,28 +2,6 @@
 
 An unfinished library for building reactive models. This is an experiment that may be thrown away.
 
-
-This library maintains internally a graph data structure (the data dependency graph) in which
-
- * vertices may be either properties or reactive functions
- * edges represent a data dependency
-<figure>
-  <a href="http://bl.ocks.org/curran/5905182da50a4667dc00">
-   <img src="http://curran.github.io/images/reactive-model/firstLastFlow.png" alt="Caption to image">
-  </a>
-  <figcaption style="text-align: center;">
-    An example of a data dependency graph.
-  </figcaption>
-</figure>
-
-These terms have a specific meaning within this project:
-
- * "reactive model" The result of `new ReactiveModel()`.
- * "reactive function" A callback function and metadata that describes its input and output properties. A representation of set of reactive functions is passed into `model.react`.
- * "reactive function callback" The callback function portion of a reactive function.
- * "digest" A cycle of the algorithm that evaluates the data dependency graph. This occurst at most once per animation frame.
- * "evaluate" A term to denote complete resolution of the data dependency graph. After the complete data dependency graph has been **evaluated** by a digest, the state of the model is consistent, and all reactive functions that are transitively dependent on any changed property have been executed in the proper order, with their output values assigned to model properties.
-
 # usage
 Aspirational, not yet implemented. Following [readme-driven development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html).
 
@@ -100,6 +78,30 @@ model.set({
 ```
 
 A special default value `model.NONE` refers to a value that is defined, but represents that the property is optional and has not been speficied (similar conceptually to [Scala's Option Type](http://danielwestheide.com/blog/2012/12/19/the-neophytes-guide-to-scala-part-5-the-option-type.html).
+
+
+# Overview
+
+This library maintains internally a graph data structure (the data dependency graph) in which
+
+ * vertices may be either properties or reactive functions
+ * edges represent a data dependency
+<figure>
+  <a href="http://bl.ocks.org/curran/5905182da50a4667dc00">
+   <img src="http://curran.github.io/images/reactive-model/firstLastFlow.png" alt="Caption to image">
+  </a>
+  <figcaption style="text-align: center;">
+    An example of a data dependency graph.
+  </figcaption>
+</figure>
+
+These terms have a specific meaning within this project:
+
+ * "reactive model" The result of `new ReactiveModel()`.
+ * "reactive function" A callback function and metadata that describes its input and output properties. A representation of set of reactive functions is passed into `model.react`.
+ * "reactive function callback" The callback function portion of a reactive function.
+ * "digest" A cycle of the algorithm that evaluates the data dependency graph. This occurst at most once per animation frame.
+ * "evaluate" A term to denote complete resolution of the data dependency graph. After the complete data dependency graph has been **evaluated** by a digest, the state of the model is consistent, and all reactive functions that are transitively dependent on any changed property have been executed in the proper order, with their output values assigned to model properties.
 
 # Development Flow
 
