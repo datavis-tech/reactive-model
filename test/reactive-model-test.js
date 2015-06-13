@@ -174,4 +174,39 @@ describe("ReactiveModel", function (){
       });
     });
   });
+
+  //it("should clear computedProperties after each digest", function (done){
+
+  //  var model = new ReactiveModel();
+  //  var counter = 0;
+
+  //  model.react({
+  //    c: ["a", function (_){
+  //      return _.a + 1;
+  //    }],
+  //    d: ["b", function (_){
+  //      return _.b + 1;
+  //    }],
+  //    e: ["c", "d", function (_){
+  //      return _.c + _.d;
+  //    }]
+  //  });
+
+  //  model.a = 1;
+  //  model.b = 2;
+
+  //  nextFrame(function (){
+
+  //    assert.equal(model.c, 3);
+  //    assert.equal(counter, 1);
+
+  //    console.log("here");
+  //    //model.a = null;
+
+  //    nextFrame(function (){
+  //      assert.equal(counter, 1);
+  //      done();
+  //    });
+  //  });
+  //});
 });

@@ -234,7 +234,8 @@ function ReactiveModel(){
       // only visit the node if all input properties are defined,
       var inPropertyDefs = λ.inProperties.map(function (inProperty){
 
-        // or if they are computed by previously visited reactive functions.
+        // or if they are computed as output by reactive functions previously 
+        // visited within the current digest.
         if(inProperty in computedProperties){
           return true;
         } else {
@@ -256,6 +257,8 @@ function ReactiveModel(){
     }
   }
 
+  // TODO move this logic to global dependency graph,
+  // should not live inside the model instance.
   var digest = debounce(function (){
     var properties = Object.keys(changedProperties);
     var sourceNodes = properties.map(getPropertyNode);
@@ -271,10 +274,8 @@ function ReactiveModel(){
       }
     });
 
+    // TODO add a test that fails if this line is not present.
     changedProperties = {};
-    //
-    // TODO test
-    //computedProperties = {};
   });
 
   // Tracks a property if it is not already tracked.
