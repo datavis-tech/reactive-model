@@ -1,9 +1,6 @@
 function SimpleModel(){
 
-  // The internal stored values for tracked properties. { property -> value }
   var values = {};
-
-  // The callback functions for each tracked property. { property -> [callback] }
   var listeners = {};
 
   function getListeners(property){
@@ -12,7 +9,9 @@ function SimpleModel(){
 
   function on(property, callback){
     getListeners(property).push(callback);
-  };
+  }
+
+  // TODO off(property, callback)
 
   function set(property, value){
     setSilently(property, value);
@@ -38,6 +37,5 @@ function SimpleModel(){
 function invoke(callback){
   callback();
 }
-
 
 export default SimpleModel;

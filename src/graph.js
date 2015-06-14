@@ -1,4 +1,3 @@
-// Constructor function for a directed graph data structure.
 function Graph(){
   
   // The adjacency list of the graph.
@@ -34,7 +33,9 @@ function Graph(){
       var visited = {};
       var nodes = [];
 
-      shouldVisit = shouldVisit || always;
+      if(!shouldVisit){
+        shouldVisit = function () { return true; };
+      }
 
       sourceNodes.forEach(function DFSVisit(node){
         if(!visited[node] && shouldVisit(node)){
@@ -47,8 +48,5 @@ function Graph(){
       return nodes;
     }
   };
-}
-function always(){
-  return true;
 }
 export default Graph;

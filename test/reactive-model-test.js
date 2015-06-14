@@ -1,8 +1,4 @@
-require("source-map-support").install();
-
-var ReactiveModelModules = require("../reactive-model.js");
-var ReactiveModel = ReactiveModelModules.ReactiveModel;
-var nextFrame = ReactiveModelModules.nextFrame;
+var ReactiveModel = require("../reactive-model.js");
 
 var assert = require("assert");
 
@@ -20,193 +16,87 @@ describe("ReactiveModel", function (){
     assert(model2 instanceof ReactiveModel);
   });
 
-  it("should evaluate the data dependency graph, property set before model.react", function (done){
-    var model = new ReactiveModel();
+  //it("should evaluate the data dependency graph, property set after model.react", function (done){
+  //  var model = new ReactiveModel();
 
-    model.foo = 5;
+  //  model.react({
+  //    bar: ["foo", function (_){
+  //      return _.foo + 1;
+  //    }]
+  //  });
 
-    model.react({
-      bar: ["foo", function (d){
-        return d.foo + 1;
-      }]
-    });
+  //  model.foo(5);
 
-    nextFrame(function (){
-      assert.equal(model.foo, 5);
-      assert.equal(model.bar, 6);
-      done();
-    });
-  });
+  //  ReactiveModel.digest();
 
-  it("should evaluate the data dependency graph, property set after model.react", function (done){
-    var model = new ReactiveModel();
+  //  assert.equal(model.foo(), 5);
+  //  assert.equal(model.bar(), 6);
+  //});
 
-    model.react({
-      bar: ["foo", function (d){
-        return d.foo + 1;
-      }]
-    });
+  //it("should evaluate the data dependency graph, property set before model.react", function (){
+  //  var model = new ReactiveModel();
 
-    model.foo = 5;
+  //  model.foo(5);
 
-    nextFrame(function (){
-      assert.equal(model.foo, 5);
-      assert.equal(model.bar, 6);
-      done();
-    });
-  });
+  //  model.react({
+  //    bar: ["foo", function (_){
+  //      return _.foo + 1;
+  //    }]
+  //  });
 
-  it("should evaluate the data dependency graph, using most recent value only", function (done){
-    var model = new ReactiveModel();
+  //  ReactiveModel.digest();
 
-    model.foo = 3;
+  //  assert.equal(model.foo(), 5);
+  //  assert.equal(model.bar(), 6);
+  //});
 
-    model.react({
-      bar: ["foo", function (d){
-        return d.foo + 1;
-      }]
-    });
-
-    model.foo = 4;
-    model.foo = 5;
-
-    nextFrame(function (){
-      assert.equal(model.foo, 5);
-      assert.equal(model.bar, 6);
-      done();
-    });
-  });
-
-  it("should evaluate the data dependency graph with two input properties", function (done){
-
-    var model = new ReactiveModel();
-
-    model.react({
-      fullName: [
-        "firstName", "lastName", function (d){
-          return d.firstName + " " + d.lastName;
-        }
-      ]
-    });
-
-    model.firstName = "Jane";
-    model.lastName = "Smith";
-
-    nextFrame(function (){
-      assert.equal(model.fullName, "Jane Smith");
-      done();
-    });
-  });
-
-  it("should not evaluate reactive function when not all input properties are defined", function (done){
-
-    var model = new ReactiveModel();
-    var counter = 0;
-
-    model.react({
-      fullName: [
-        "firstName", "lastName", function (d){
-          counter++;
-          return d.firstName + " " + d.lastName;
-        }
-      ]
-    });
-
-    model.firstName = "Jane";
-
-    nextFrame(function (){
-      assert.equal(counter, 0);
-      done();
-    });
-  });
-
-  it("should propagate two hops in a single digest", function (done){
-
-    var model = new ReactiveModel();
-
-    model.react({
-      b: ["a", function (d){
-        return d.a + 1;
-      }],
-      c: ["b", function (d){
-        return d.b + 1;
-      }]
-    });
-
-    model.a = 1;
-
-    nextFrame(function (){
-      assert.equal(model.a, 1);
-      assert.equal(model.b, 2);
-      assert.equal(model.c, 3);
-      done();
-    });
-  });
-
-  it("should evaluate consecutive digests independently", function (done){
-
-    var model = new ReactiveModel();
-    var counter = 0;
-
-    model.react({
-      fullName: [
-        "firstName", "lastName", function (d){
-          counter++;
-          return d.firstName + " " + d.lastName;
-        }
-      ],
-      b: ["a", function (d){ return d.a + 1; }]
-    });
-
-    model.firstName = "Jane";
-    model.lastName = "Smith";
-
-    nextFrame(function (){
-      assert.equal(model.fullName, "Jane Smith");
-      assert.equal(counter, 1);
-
-      model.a = 5;
-
-      nextFrame(function (){
-        assert.equal(model.b, 6);
-        assert.equal(counter, 1);
-        done();
-      });
-    });
-  });
-
-  //it("should clear computedProperties after each digest", function (done){
-
+  //it("should not evaluate when input is undefined", function (){
   //  var model = new ReactiveModel();
   //  var counter = 0;
 
   //  model.react({
-  //    c: ["a", function (_){
-  //      return _.a + 1;
-  //    }],
-  //    d: ["b", function (_){
-  //      return _.b + 1;
-  //    }],
-  //    e: ["c", "d", function (_){
-  //      return _.c + _.d;
+  //    bar: ["foo", function (_){
+  //      counter++;
+  //      return _.foo + 1;
   //    }]
   //  });
 
-  //  model.a = 1;
-  //  model.b = 2;
+  //  ReactiveModel.digest();
 
-  //  nextFrame(function (){
-
-  //    assert.equal(model.c, 3);
-  //    assert.equal(counter, 1);
-
-  //    console.log("here");
-  //    //model.a = null;
-
-  //    nextFrame(function (){
-  //      assert.equal(counter, 1);
-  //      done();
-  //    });
-  //  });
+  //  assert.equal(counter, 0);
   //});
+
+  //it("should evaluate computed properties", function (){
+  //  var model = new ReactiveModel();
+  //  var counter = 0;
+
+  //  model.react({
+  //    b: ["a", function (_){
+  //      return _.a + 1;
+  //    }],
+  //    c: ["b", function (_){
+  //      return _.b + 1;
+  //    }]
+  //  });
+  //  
+  //  model.a(1);
+
+  //  ReactiveModel.digest();
+
+  //  assert.equal(model.c(), 3);
+  //});
+
+  //it("should bind properties from different models", function (){
+  //  var model1 = new ReactiveModel();
+  //  var model2 = new ReactiveModel();
+
+  //  ReactiveModel.bind(model1, "foo", model2, "bar");
+  //  
+  //  model1.foo(1);
+
+  //  ReactiveModel.digest();
+
+  //  assert.equal(model2.far(), 3);
+  //});
+
 });
