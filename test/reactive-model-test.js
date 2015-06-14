@@ -16,9 +16,31 @@ describe("ReactiveModel", function (){
     assert(model2 instanceof ReactiveModel);
   });
 
+  it("should create getter-setters for tracked properties", function (){
+    var model = new ReactiveModel();
+    var counter = 0;
+
+    model.react({
+      bar: ["foo", function (_){
+        counter++;
+        return _.foo + 1;
+      }]
+    });
+
+    model.foo(5);
+    assert.equal(model.foo(), 5);
+
+    model.bar(6);
+    assert.equal(model.bar(), 6);
+
+    assert.equal(counter, 0);
+
+  });
+
   //it("should evaluate the data dependency graph, property set after model.react", function (done){
   //  var model = new ReactiveModel();
 
+  //  // bar = foo + 1
   //  model.react({
   //    bar: ["foo", function (_){
   //      return _.foo + 1;
@@ -29,8 +51,8 @@ describe("ReactiveModel", function (){
 
   //  ReactiveModel.digest();
 
-  //  assert.equal(model.foo(), 5);
-  //  assert.equal(model.bar(), 6);
+  //  //assert.equal(model.foo(), 5);
+  //  //assert.equal(model.bar(), 6);
   //});
 
   //it("should evaluate the data dependency graph, property set before model.react", function (){
