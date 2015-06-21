@@ -119,7 +119,7 @@ This is a re-design of [model.js](https://github.com/curran/model) that addresse
 
 The core ideas of this redesign are:
 
- * data dependency graphs are speficied explicitly (a lot like [Make](http://en.wikipedia.org/wiki/Make_%28software%29))
+ * data dependency graphs are specified explicitly (a lot like [Make](http://en.wikipedia.org/wiki/Make_%28software%29))
  * processing of changes is delayed until the next animation frame, so updates are synchronized with rendering
  * changes are processed (or "digested") using an explicit topological sort algorithm on the data dependency graph.
 
