@@ -45,4 +45,28 @@ describe("ReactiveModel", function (){
     assert.equal(model.x(), 6);
   });
 
+  it("should get state", function (){
+    var model = new ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.addPublicProperty("y", 10);
+    model.finalize();
+
+    var state = model.getState();
+    assert.equal(state.x, 5);
+    assert.equal(state.y, 10);
+  });
+
+  it("should get state after modification with getter-setters", function (){
+    var model = new ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.addPublicProperty("y", 10);
+    model.finalize();
+
+    model.x(10).y(20)
+
+    var state = model.getState();
+    assert.equal(state.x, 10);
+    assert.equal(state.y, 20);
+  });
+
 });

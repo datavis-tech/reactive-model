@@ -44,8 +44,17 @@ function ReactiveModel(){
 
   }
 
+  function getState(){
+    var state = {};
+    Object.keys(publicProperties).forEach( function (property){
+      state[property] = values[property];
+    });
+    return state;
+  }
+
   model.addPublicProperty = addPublicProperty;
   model.finalize = finalize;
+  model.getState = getState;
 }
 
 
