@@ -25,6 +25,8 @@ function ReactiveModel(){
 
     publicProperties[property] = defaultValue;
     values[property] = defaultValue;
+
+    return model;
   }
 
   function finalize(){
@@ -43,19 +45,38 @@ function ReactiveModel(){
       };
     });
 
+    return model;
   }
 
   function getState(){
     var state = {};
-    Object.keys(publicProperties).forEach( function (property){
-      state[property] = values[property];
+    Object.keys(publicProperties).forEach( function (publicProperty){
+      state[publicProperty] = values[publicProperty];
     });
     return state;
+  }
+
+  function setState(state){
+
+    // Reset state to default values.
+    Object.keys(publicProperties).forEach(function (property){
+      var defaultValue = publicProperties[property];
+      model[property](defaultValue);
+    });
+
+    // Apply values included in the new state.
+    Object.keys(state).forEach(function (property){
+      var newValue = state[property]
+      model[property](newValue);
+    });
+
+    return model;
   }
 
   model.addPublicProperty = addPublicProperty;
   model.finalize = finalize;
   model.getState = getState;
+  model.setState = setState;
 }
 
 // Export Graph for unit testing via Rollup CommonJS build.
