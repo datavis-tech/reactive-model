@@ -16,14 +16,33 @@ describe("ReactiveModel", function (){
     assert(model2 instanceof ReactiveModel);
   });
 
-  //it("should create getter-setters for public properties", function (){
-  //  var model = new ReactiveModel();
+  it("should throw an error if finalizing twice", function (){
+    var model = new ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.finalize();
+    assert.throws(model.finalize, Error);
+  });
 
-  //  model.addPublicProperty("x", 5);
-  //  
-  //  model.finalize();
+  it("should throw an error if adding public property after finalize", function (){
+    var model = new ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.finalize();
+    assert.throws(model.addPublicProperty, Error);
+  });
 
-  //  assert.equal(model.x(), 6);
-  //});
+  it("should create getter-setters that get public properties", function (){
+    var model = new ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.finalize();
+    assert.equal(model.x(), 5);
+  });
+
+  it("should create getter-setters that set public properties", function (){
+    var model = new ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.finalize();
+    model.x(6);
+    assert.equal(model.x(), 6);
+  });
 
 });
