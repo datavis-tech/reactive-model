@@ -13,7 +13,7 @@ function ReactiveFunction(inProperties, outProperty, callback){
     //   - in response to any changes in input property values.
     callback: callback,
 
-    // inNodes and outNodes are populated in the function assignNodes(),
+    // inNodes and outNodes are populated in the function reactiveModel.assignNodes(),
     // which is invoked after the original ReactiveFunction object is created.
 
     // An array of node id strings corresponding

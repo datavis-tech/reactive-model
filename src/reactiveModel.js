@@ -1,4 +1,5 @@
 import Graph from "./graph";
+import ReactiveGraph from "./reactiveGraph";
 import ReactiveFunction from "./reactiveFunction";
 
 function ReactiveModel(){
@@ -79,7 +80,9 @@ function ReactiveModel(){
   model.setState = setState;
 }
 
-// Export Graph for unit testing via Rollup CommonJS build.
+// Export these internal modules for unit testing via Rollup CommonJS build.
 ReactiveModel.Graph = Graph;
+ReactiveModel.ReactiveGraph = ReactiveGraph;
+ReactiveModel.ReactiveFunction = ReactiveFunction;
 
 export default ReactiveModel;

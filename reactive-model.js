@@ -134,9 +134,88 @@ function Graph(){
   };
 }
 
+function ReactiveGraph(){
+  var reactiveGraph = new Graph();
+  var nodeCounter = 0;
 
-// Export Graph for unit testing via Rollup CommonJS build.
+  // { node -> getterSetter }
+  var getterSetters = {};
+
+  function makeNode(){
+    return nodeCounter++;
+  }
+
+  function assignNodes(reactiveFunction, getterSettersByProperty){
+
+    function makePropertyNode(property){
+      var node = makeNode();
+      getterSetters[node] = getterSettersByProperty[property];
+      return node;
+    }
+
+    reactiveFunction.inNodes = reactiveFunction.inProperties.map(makePropertyNode);
+    reactiveFunction.outNode = makePropertyNode(reactiveFunction.outProperty);
+  }
+
+  function addReactiveFunction(reactiveFunction){
+    if( (reactiveFunction.inNodes === undefined) ||
+        (reactiveFunction.outNode === undefined)){
+        throw new Error("Attempting to add a reactive function that " +
+          "doesn't have inNodes or outNode defined first.");
+    }
+  }
+
+  reactiveGraph.addReactiveFunction = addReactiveFunction;
+  reactiveGraph.assignNodes = assignNodes;
+  reactiveGraph.makeNode = makeNode;
+
+  return reactiveGraph;
+}
+
+
+function ReactiveFunction(inProperties, outProperty, callback){
+  return {
+
+    // An array of input property names.
+    inProperties: inProperties,
+
+    // The output property name.
+    outProperty: outProperty,
+
+    // function (inPropertyValues) -> outPropertyValue
+    // Invoked during a digest,
+    //   - when all input property values are first defined,
+    //   - in response to any changes in input property values.
+    callback: callback,
+
+    // inNodes and outNodes are populated in the function reactiveModel.assignNodes(),
+    // which is invoked after the original ReactiveFunction object is created.
+
+    // An array of node id strings corresponding
+    // to the property names in inProperties.
+    inNodes: undefined,
+
+    // The node id string corresponding to the output property.
+    outNode: undefined
+  };
+}
+
+// This is where the options object passed into `model.react(options)` gets
+// transformed into an array of ReactiveFunction instances.
+ReactiveFunction.parse = function (options){
+  return Object.keys(options).map( function (outProperty){
+    var arr = options[outProperty];
+    var callback = arr.splice(arr.length - 1)[0];
+    var inProperties = arr;
+    return ReactiveFunction(inProperties, outProperty, callback);
+  });
+};
+
+
+// Export these internal modules for unit testing via Rollup CommonJS build.
 ReactiveModel.Graph = Graph;
+ReactiveModel.ReactiveGraph = ReactiveGraph;
+ReactiveModel.ReactiveFunction = ReactiveFunction;
 
 var reactiveModel = ReactiveModel;
 
