@@ -2,6 +2,7 @@ var ReactiveModel = require("../reactive-model.js");
 var ReactiveGraph = ReactiveModel.ReactiveGraph;
 var ReactiveFunction = ReactiveModel.ReactiveFunction;
 var assert = require("assert");
+require("source-map-support").install();
 
 function increment(x){
   return x + 1;
