@@ -92,6 +92,8 @@ function ReactiveModel(){
     var reactiveFunctions = ReactiveFunction.parse(options);
     reactiveFunctions.forEach(function (reactiveFunction){
 
+      // TODO refactor this into "track()",
+      // and only create getter-setters once for each property
       createGetterSetters(reactiveFunction.inProperties);
       createGetterSetters([reactiveFunction.outProperty]);
 
