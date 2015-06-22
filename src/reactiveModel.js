@@ -21,6 +21,9 @@ function ReactiveModel(){
 
   var values = {};
 
+  // { property -> node }
+  var propertyNodes = {};
+
   function addPublicProperty(property, defaultValue){
     if(isFinalized){
       throw new Error("model.addPublicProperty() is being invoked after model.finalize, but this is not allowed. Public properties may only be added before the model is finalized.");
@@ -39,6 +42,10 @@ function ReactiveModel(){
           return values[property];
         }
         values[property] = value;
+
+        var node = propertyNodes[property]
+        reactiveGraph.changedPropertyNodes[node] = true;
+
         return model;
       };
     });
@@ -89,12 +96,12 @@ function ReactiveModel(){
       createGetterSetters([reactiveFunction.outProperty]);
 
       reactiveGraph.assignNodes(reactiveFunction, model);
+
       reactiveGraph.addReactiveFunction(reactiveFunction);
 
       reactiveFunction.inNodes.forEach(function (node){
         reactiveGraph.changedPropertyNodes[node] = true;
       });
-
     });
   }
 

@@ -17,23 +17,29 @@ function ReactiveGraph(){
     return nodeCounter++;
   }
 
+  function makePropertyNode(getterSetter){
+    var node = makeNode();
+    getterSetters[node] = getterSetter;
+    return node;
+  }
+
+  function makeReactiveFunctionNode(reactiveFunction){
+    var node = makeNode();
+    reactiveFunctions[node] = reactiveFunction;
+    return node;
+  }
+
   function assignNodes(reactiveFunction, getterSettersByProperty){
 
-    function makePropertyNode(property){
-      var node = makeNode();
-      getterSetters[node] = getterSettersByProperty[property];
-      return node;
-    }
-    
-    function makeReactiveFunctionNode(reactiveFunction){
-      var node = makeNode();
-      reactiveFunctions[node] = reactiveFunction;
-      return node;
+    // TODO move into reactiveModel
+    function getPropertyNode(property){
+      var getterSetter = getterSettersByProperty[property];
+      return makePropertyNode(getterSetter);
     }
 
-    reactiveFunction.inNodes = reactiveFunction.inProperties.map(makePropertyNode);
+    reactiveFunction.inNodes = reactiveFunction.inProperties.map(getPropertyNode)
     reactiveFunction.node = makeReactiveFunctionNode(reactiveFunction);
-    reactiveFunction.outNode = makePropertyNode(reactiveFunction.outProperty);
+    reactiveFunction.outNode = getPropertyNode(reactiveFunction.outProperty);
   }
 
   function addReactiveFunction(reactiveFunction){

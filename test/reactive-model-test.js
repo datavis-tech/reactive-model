@@ -127,7 +127,6 @@ describe("ReactiveModel", function (){
   });
 
   it("should react", function (){
-
     var model = new ReactiveModel()
       .addPublicProperty("a", 5)
       .finalize();
@@ -142,5 +141,44 @@ describe("ReactiveModel", function (){
 
     assert.equal(model.b(), 6);
   });
+
+  it("should react and use newly set value", function (){
+    var model = new ReactiveModel()
+      .addPublicProperty("a", 5)
+      .finalize();
+
+    model.react({
+      b: ["a", function (a){
+        return a + 1;
+      }]
+    });
+
+    model.a(7);
+    ReactiveModel.digest();
+    assert.equal(model.b(), 8);
+  });
+
+  //it("should track when values change", function (){
+  //  var model = new ReactiveModel()
+  //    .addPublicProperty("a", 5)
+  //    .finalize();
+
+  //  model.react({
+  //    b: ["a", function (a){
+  //      return a + 1;
+  //    }]
+  //  });
+
+  //  model.a(7);
+  //  ReactiveModel.digest();
+  //  assert.equal(model.b(), 8);
+
+  //  model.a(8);
+  //  model.a(9);
+  //  model.a(10);
+  //  ReactiveModel.digest();
+  //  assert.equal(model.b(), 11);
+  //});
+
 
 });
