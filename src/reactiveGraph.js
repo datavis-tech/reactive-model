@@ -31,11 +31,11 @@ function ReactiveGraph(){
           "doesn't have inNodes or outNode defined first.");
     }
 
+    reactiveFunction.inNodes.forEach(function (inNode){
+      reactiveGraph.addEdge(inNode, reactiveFunction.node);
+    });
 
-    //reactiveFunction.inProperties.forEach(function (property){
-    //  var inNode = getPropertyNode(inProperty);
-    //  dependencyGraph.addEdge(inNode, reactiveFunction.node);
-    //});
+    reactiveGraph.addEdge(reactiveFunction.node, reactiveFunction.outNode);
 
   }
 

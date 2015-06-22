@@ -58,19 +58,24 @@ describe("ReactiveGraph", function (){
     assert.equal(reactiveFunction.outNode, 2);
   });
 
-  //it("should add an edge to the dependency graph", function (){
-  //  var reactiveGraph = new ReactiveGraph();
-  //  var reactiveFunction = new ReactiveFunction(["a"], "b", increment);
-  //  var getterSettersByProperty = createGetterSetters();
+  it("should add edges to the dependency graph", function (){
+    var reactiveGraph = new ReactiveGraph();
+    var reactiveFunction = new ReactiveFunction(["a"], "b", increment);
+    var getterSettersByProperty = createGetterSetters();
 
-  //  reactiveGraph.assignNodes(reactiveFunction, getterSettersByProperty);
+    reactiveGraph.assignNodes(reactiveFunction, getterSettersByProperty);
 
-  //  var inNode = reactiveFunction.inNodes[0];
-  //  var outNode = reactiveFunction.outNode;
+    reactiveGraph.addReactiveFunction(reactiveFunction);
 
-  //  assert.equal(reactiveGraph.adjacent(inNode).length, 1);
-  //  assert.equal(reactiveGraph.adjacent(inNode)[0], outNode);
-  //});
+    var inNode = reactiveFunction.inNodes[0];
+    var outNode = reactiveFunction.outNode;
+
+    assert.equal(reactiveGraph.adjacent(inNode).length, 1);
+    assert.equal(reactiveGraph.adjacent(inNode)[0], reactiveFunction.node);
+
+    assert.equal(reactiveGraph.adjacent(reactiveFunction.node).length, 1);
+    assert.equal(reactiveGraph.adjacent(reactiveFunction.node)[0], outNode);
+  });
 
 
   //it("should digest", function (){
