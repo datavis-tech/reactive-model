@@ -1,6 +1,6 @@
 var ReactiveModel = require("../reactive-model.js");
-
 var assert = require("assert");
+require("source-map-support").install();
 
 describe("ReactiveModel", function (){
 
