@@ -15,7 +15,7 @@ test: clean all
 	$(BIN)/mocha
 
 reactive-model.js: src/reactiveModel.js
-	$(BIN)/rollup --output $@ --format cjs $^ 
+	$(BIN)/rollup --output $@ --format cjs $^ -m inline
 
 reactive-model.min.js: reactive-model.js
 	$(BIN)/uglifyjs $^ -c -m -o $@

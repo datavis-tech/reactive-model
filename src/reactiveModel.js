@@ -2,6 +2,8 @@ import Graph from "./graph";
 import ReactiveGraph from "./reactiveGraph";
 import ReactiveFunction from "./reactiveFunction";
 
+var reactiveGraph = new ReactiveGraph();
+
 function ReactiveModel(){
   
   // Enforce use of new, so instanceof and typeof checks will work.
@@ -30,13 +32,8 @@ function ReactiveModel(){
     return model;
   }
 
-  function finalize(){
-    if(isFinalized){
-      throw new Error("model.finalize() is being invoked more than once, but this function should only be invoked once.");
-    }
-    isFinalized = true;
-
-    Object.keys(publicProperties).forEach(function (property){
+  function createGetterSetters(properties){
+    properties.forEach(function (property){
       model[property] = function (value){
         if (!arguments.length) {
           return values[property];
@@ -45,6 +42,16 @@ function ReactiveModel(){
         return model;
       };
     });
+  }
+
+  function finalize(){
+    if(isFinalized){
+      throw new Error("model.finalize() is being invoked " +
+        "more than once, but this function should only be invoked once.");
+    }
+    isFinalized = true;
+
+    createGetterSetters(Object.keys(publicProperties));
 
     return model;
   }
@@ -74,11 +81,31 @@ function ReactiveModel(){
     return model;
   }
 
+  function react(options){
+    var reactiveFunctions = ReactiveFunction.parse(options);
+    reactiveFunctions.forEach(function (reactiveFunction){
+
+      createGetterSetters(reactiveFunction.inProperties);
+      createGetterSetters([reactiveFunction.outProperty]);
+
+      reactiveGraph.assignNodes(reactiveFunction, model);
+      reactiveGraph.addReactiveFunction(reactiveFunction);
+
+      reactiveFunction.inNodes.forEach(function (node){
+        reactiveGraph.changedPropertyNodes[node] = true;
+      });
+
+    });
+  }
+
   model.addPublicProperty = addPublicProperty;
   model.finalize = finalize;
   model.getState = getState;
   model.setState = setState;
+  model.react = react;
 }
+
+ReactiveModel.digest = reactiveGraph.digest;
 
 // Export these internal modules for unit testing via Rollup CommonJS build.
 ReactiveModel.Graph = Graph;

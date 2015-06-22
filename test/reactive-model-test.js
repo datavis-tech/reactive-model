@@ -126,4 +126,21 @@ describe("ReactiveModel", function (){
     assert.equal(model.y(), 45);
   });
 
+  it("should react", function (){
+
+    var model = new ReactiveModel()
+      .addPublicProperty("a", 5)
+      .finalize();
+
+    model.react({
+      b: ["a", function (a){
+        return a + 1;
+      }]
+    });
+
+    ReactiveModel.digest();
+
+    assert.equal(model.b(), 6);
+  });
+
 });

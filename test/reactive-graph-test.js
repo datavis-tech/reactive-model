@@ -112,22 +112,4 @@ describe("ReactiveGraph", function (){
     var b = getterSettersByProperty.b();
     assert.equal(b, 4);
   });
-
-  //it("should digest", function (){
-  //  var reactiveGraph = new ReactiveGraph();
-  //  var reactiveFunction = new ReactiveFunction(["a"], "b", increment);
-  //  var getterSettersByProperty = createGetterSetters();
-
-  //  reactiveGraph.assignNodes(reactiveFunction, getterSettersByProperty);
-
-  //  reactiveGraph.addReactiveFunction(reactiveFunction);
-
-  //  reactiveGraph.digest();
-
-  //  // Assert that b = a + 1, where a = 3
-  //  var b = getterSettersByProperty.b();
-  //  assert.equal(b, 4);
-
-  //});
-
 });
