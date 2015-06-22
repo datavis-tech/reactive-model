@@ -30,32 +30,65 @@ describe("ReactiveGraph", function (){
     assert.equal(reactiveGraphB.makeNode(), 2);
   });
 
-  it("should assign nodes to reactive function input and output properties", function (){
-    var reactiveGraph = new ReactiveGraph();
-    var reactiveFunction = new ReactiveFunction(["a"], "b", increment);
-
+  function createGetterSetters(){
     var a = 3;
     var b;
-    var getterSettersByProperty = {
-      a: function(value){ if (!arguments.length) { return a; } a = value; },
-      b: function(value){ if (!arguments.length) { return b; } b = value; }
+    return {
+      a: function(value){
+        if (!arguments.length) { return a; }
+        a = value;
+      },
+      b: function(value){
+        if (!arguments.length) { return b; }
+        b = value;
+      }
     };
+  }
+
+  it("should assign nodes", function (){
+    var reactiveGraph = new ReactiveGraph();
+    var reactiveFunction = new ReactiveFunction(["a"], "b", increment);
+    var getterSettersByProperty = createGetterSetters();
 
     reactiveGraph.assignNodes(reactiveFunction, getterSettersByProperty);
 
     assert.equal(reactiveFunction.inNodes.length, 1);
     assert.equal(reactiveFunction.inNodes[0], 0);
-    assert.equal(reactiveFunction.outNode, 1);
+    assert.equal(reactiveFunction.node, 1);
+    assert.equal(reactiveFunction.outNode, 2);
   });
 
-  //it("should digest", function (){
-  //      reactiveFunction = new ReactiveFunction(["a"], "b", increment);
+  //it("should add an edge to the dependency graph", function (){
+  //  var reactiveGraph = new ReactiveGraph();
+  //  var reactiveFunction = new ReactiveFunction(["a"], "b", increment);
+  //  var getterSettersByProperty = createGetterSetters();
 
-  //  reactiveGraph.assignNodes(reactiveFunction);
+  //  reactiveGraph.assignNodes(reactiveFunction, getterSettersByProperty);
 
-  //  ReactiveGraph.digest();
+  //  var inNode = reactiveFunction.inNodes[0];
+  //  var outNode = reactiveFunction.outNode;
 
-  //  assert.equal(b, 3);
-
+  //  assert.equal(reactiveGraph.adjacent(inNode).length, 1);
+  //  assert.equal(reactiveGraph.adjacent(inNode)[0], outNode);
   //});
+
+
+  //it("should digest", function (){
+  //  var reactiveGraph = new ReactiveGraph();
+  //  var reactiveFunction = new ReactiveFunction(["a"], "b", increment);
+
+  //  var a = 3;
+  //  var b;
+  //  var getterSettersByProperty = {
+  //    a: function(value){ if (!arguments.length) { return a; } a = value; },
+  //    b: function(value){ if (!arguments.length) { return b; } b = value; }
+  //  };
+
+  //  reactiveGraph.assignNodes(reactiveFunction, getterSettersByProperty);
+  //  reactiveGraph.addReactiveFunction(reactiveFunction);
+  //  reactiveGraph.digest();
+
+  //  assert.equal(b, 4);
+  //});
+
 });

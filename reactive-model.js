@@ -154,6 +154,7 @@ function ReactiveGraph(){
     }
 
     reactiveFunction.inNodes = reactiveFunction.inProperties.map(makePropertyNode);
+    reactiveFunction.node = makeNode();
     reactiveFunction.outNode = makePropertyNode(reactiveFunction.outProperty);
   }
 
@@ -163,6 +164,16 @@ function ReactiveGraph(){
         throw new Error("Attempting to add a reactive function that " +
           "doesn't have inNodes or outNode defined first.");
     }
+
+
+    //reactiveFunction.inProperties.forEach(function (property){
+    //  var inNode = getPropertyNode(inProperty);
+    //  dependencyGraph.addEdge(inNode, reactiveFunction.node);
+    //});
+
+  }
+
+  function digest(){
   }
 
   reactiveGraph.addReactiveFunction = addReactiveFunction;
