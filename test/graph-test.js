@@ -1,5 +1,6 @@
 var Graph = require("../reactive-model.js").Graph;
 var assert = require("assert");
+require("source-map-support").install();
 
 describe("Graph", function (){
 
