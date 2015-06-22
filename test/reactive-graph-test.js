@@ -77,23 +77,46 @@ describe("ReactiveGraph", function (){
     assert.equal(reactiveGraph.adjacent(reactiveFunction.node)[0], outNode);
   });
 
+  it("should clear changed property nodes on digest", function (){
+    var reactiveGraph = new ReactiveGraph();
+    var reactiveFunction = new ReactiveFunction(["a"], "b", increment);
+    var getterSettersByProperty = createGetterSetters();
+
+    reactiveGraph.assignNodes(reactiveFunction, getterSettersByProperty);
+    reactiveGraph.addReactiveFunction(reactiveFunction);
+
+    var inNode = reactiveFunction.inNodes[0];
+    reactiveGraph.changedPropertyNodes[inNode] = true;
+
+    assert.equal(inNode in reactiveGraph.changedPropertyNodes, true);
+
+    reactiveGraph.digest();
+
+    assert.equal(inNode in reactiveGraph.changedPropertyNodes, false);
+
+    //reactiveGraph.changedPropertyNodes[inNode] = true;
+
+    //// Assert that b = a + 1, where a = 3
+    //var b = getterSettersByProperty.b();
+    //assert.equal(b, 4);
+
+  });
 
   //it("should digest", function (){
   //  var reactiveGraph = new ReactiveGraph();
   //  var reactiveFunction = new ReactiveFunction(["a"], "b", increment);
-
-  //  var a = 3;
-  //  var b;
-  //  var getterSettersByProperty = {
-  //    a: function(value){ if (!arguments.length) { return a; } a = value; },
-  //    b: function(value){ if (!arguments.length) { return b; } b = value; }
-  //  };
+  //  var getterSettersByProperty = createGetterSetters();
 
   //  reactiveGraph.assignNodes(reactiveFunction, getterSettersByProperty);
+
   //  reactiveGraph.addReactiveFunction(reactiveFunction);
+
   //  reactiveGraph.digest();
 
+  //  // Assert that b = a + 1, where a = 3
+  //  var b = getterSettersByProperty.b();
   //  assert.equal(b, 4);
+
   //});
 
 });

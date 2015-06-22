@@ -141,6 +141,9 @@ function ReactiveGraph(){
   // { node -> getterSetter }
   var getterSetters = {};
 
+  // { node -> true }
+  var changedPropertyNodes = {};
+
   function makeNode(){
     return nodeCounter++;
   }
@@ -171,18 +174,33 @@ function ReactiveGraph(){
 
     reactiveGraph.addEdge(reactiveFunction.node, reactiveFunction.outNode);
 
+    //reactiveFunction.inNodes.forEach(function (inNode){
+    //  if(isDefined(getterSetters[inNode]))
+    //    changedNodes
+  }
+
+  function isDefined(value){
+    return typeof d === "undefined" || d === null;
   }
 
   function digest(){
+    var sourceNodes = Object.keys(changedPropertyNodes);
+
+    sourceNodes.forEach(function (node){
+      delete changedPropertyNodes[node];
+    });
   }
 
   reactiveGraph.addReactiveFunction = addReactiveFunction;
   reactiveGraph.assignNodes = assignNodes;
   reactiveGraph.makeNode = makeNode;
+  reactiveGraph.digest = digest;
+
+  // This is exposed for unit testing only.
+  reactiveGraph.changedPropertyNodes = changedPropertyNodes;
 
   return reactiveGraph;
 }
-
 
 function ReactiveFunction(inProperties, outProperty, callback){
   return {
