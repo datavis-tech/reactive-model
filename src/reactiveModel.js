@@ -78,6 +78,15 @@ function ReactiveModel(){
 
   function setState(state){
 
+    // TODO throw an error if some property in state
+    // is not in publicProperties
+    //Object.keys(state).forEach(function (property){
+    //  if(!property in publicProperties){
+    //    throw new Error("Attempting to set a property that has not" +
+    //      " been added as a public property in model.setState()");
+    //  }
+    //});
+
     // Reset state to default values.
     Object.keys(publicProperties).forEach(function (property){
       var defaultValue = publicProperties[property];
