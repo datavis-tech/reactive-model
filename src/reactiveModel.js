@@ -1,8 +1,16 @@
+// This is the top-level module exported by the reactive-model package.
+// The exported function is a constructor for reactive models
+// that also exposes the digest() function, which synchronously
+// evaluates the data dependency graph.
+
+// By Curran Kelleher June 2015
+
 import Graph from "./graph";
 import ReactiveGraph from "./reactiveGraph";
 import ReactiveFunction from "./reactiveFunction";
 
 var reactiveGraph = new ReactiveGraph();
+
 var changedPropertyNodes     = reactiveGraph.changedPropertyNodes;
 var addReactiveFunction      = reactiveGraph.addReactiveFunction;
 var makePropertyNode         = reactiveGraph.makePropertyNode;
@@ -10,7 +18,7 @@ var makeReactiveFunctionNode = reactiveGraph.makeReactiveFunctionNode;
 
 function ReactiveModel(){
   
-  // Enforce use of new, so instanceof and typeof checks will work.
+  // Enforce use of new, so instanceof and typeof checks will always work.
   if (!(this instanceof ReactiveModel)) {
     return new ReactiveModel();
   }
@@ -21,13 +29,13 @@ function ReactiveModel(){
   // { property -> defaultValue }
   var publicProperties = {};
 
-  var isFinalized = false;
-
   // { property -> value }
   var values = {};
 
   // { property -> node }
   var trackedProperties = {};
+
+  var isFinalized = false;
 
   function addPublicProperty(property, defaultValue){
     if(isFinalized){
@@ -37,7 +45,7 @@ function ReactiveModel(){
     }
 
     publicProperties[property] = defaultValue;
-    values[property] = defaultValue;
+    values[property]           = defaultValue;
 
     return model;
   }

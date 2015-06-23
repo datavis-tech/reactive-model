@@ -1,3 +1,5 @@
+// This file serves to document the reactive function data structure,
+// and contains a utility function for parsing the options passed to model.react().
 function ReactiveFunction(inProperties, outProperty, callback){
   return {
 
@@ -25,13 +27,13 @@ function ReactiveFunction(inProperties, outProperty, callback){
   };
 }
 
-// This is where the options object passed into `model.react(options)` gets
-// transformed into an array of ReactiveFunction instances.
+// This function parses the options object passed into `model.react(options)`,
+// transforming it into an array of ReactiveFunction instances.
 ReactiveFunction.parse = function (options){
-  return Object.keys(options).map( function (outProperty){
-    var arr = options[outProperty];
-    var callback = arr.splice(arr.length - 1)[0];
-    var inProperties = arr;
+  return Object.keys(options).map(function (outProperty){
+    var array = options[outProperty];
+    var callback = array.splice(array.length - 1)[0];
+    var inProperties = array;
     return ReactiveFunction(inProperties, outProperty, callback);
   });
 };

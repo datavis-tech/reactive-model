@@ -1,3 +1,10 @@
+// A graph data structure that represents a data dependency graph.
+// Nodes represent properties of reactive models and reactive functions.
+// Edges represent reactive dependencies.
+
+// A single instance of ReactiveGraph contains nodes for properties
+// from many different instances of ReactiveModel.
+
 import Graph from "./graph";
 
 function ReactiveGraph(){
@@ -44,9 +51,9 @@ function ReactiveGraph(){
     reactiveGraph.addEdge(reactiveFunction.node, reactiveFunction.outNode);
   }
 
-  function isDefined(value){
-    return typeof d === "undefined" || d === null;
-  }
+  //function isDefined(value){
+  //  return typeof d === "undefined" || d === null;
+  //}
 
   function evaluate(reactiveFunction){
 
@@ -61,8 +68,10 @@ function ReactiveGraph(){
   }
 
   function digest(){
+  
     var sourceNodes = Object.keys(changedPropertyNodes);
-    var topologicallySorted = reactiveGraph.DFS(sourceNodes).reverse();
+    var visitedNodes = reactiveGraph.DFS(sourceNodes);
+    var topologicallySorted = visitedNodes.reverse();
 
     topologicallySorted.forEach(function (node){
       if(node in reactiveFunctions){
@@ -73,17 +82,15 @@ function ReactiveGraph(){
     sourceNodes.forEach(function (node){
       delete changedPropertyNodes[node];
     });
+
   }
 
-  reactiveGraph.addReactiveFunction = addReactiveFunction;
-  reactiveGraph.makeNode = makeNode;
-  reactiveGraph.digest = digest;
-
-  // This is exposed for unit testing only.
-  reactiveGraph.changedPropertyNodes = changedPropertyNodes;
-
-  reactiveGraph.makePropertyNode = makePropertyNode;
+  reactiveGraph.addReactiveFunction      = addReactiveFunction;
+  reactiveGraph.makeNode                 = makeNode;
+  reactiveGraph.digest                   = digest;
+  reactiveGraph.makePropertyNode         = makePropertyNode;
   reactiveGraph.makeReactiveFunctionNode = makeReactiveFunctionNode;
+  reactiveGraph.changedPropertyNodes     = changedPropertyNodes;
 
   return reactiveGraph;
 }

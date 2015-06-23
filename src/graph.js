@@ -16,12 +16,12 @@ function Graph(){
   }
 
   // TODO test this function
-  function removeEdge(u, v){
-    if(edges[u]) {
-      edges[u] = edges[u]
-    }
-    adjacent(u).push(v);
-  }
+  //function removeEdge(u, v){
+  //  if(edges[u]) {
+  //    edges[u] = edges[u]
+  //  }
+  //  adjacent(u).push(v);
+  //}
 
   // Depth First Search algorithm, inspired by
   // Cormen et al. "Introduction to Algorithms" 3rd Ed. p. 604
@@ -48,7 +48,7 @@ function Graph(){
   return {
     adjacent: adjacent,
     addEdge: addEdge,
-    removeEdge: removeEdge,
+    //removeEdge: removeEdge,
     DFS: DFS
   };
 }
