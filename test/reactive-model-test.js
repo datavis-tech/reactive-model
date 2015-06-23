@@ -1,10 +1,6 @@
-require("source-map-support").install();
-
-var ReactiveModelModules = require("../reactive-model.js");
-var ReactiveModel = ReactiveModelModules.ReactiveModel;
-var nextFrame = ReactiveModelModules.nextFrame;
-
+var ReactiveModel = require("../reactive-model.js");
 var assert = require("assert");
+require("source-map-support").install();
 
 describe("ReactiveModel", function (){
 
@@ -20,193 +16,265 @@ describe("ReactiveModel", function (){
     assert(model2 instanceof ReactiveModel);
   });
 
-  it("should evaluate the data dependency graph, property set before model.react", function (done){
+  it("should throw an error if finalizing twice", function (){
     var model = new ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.finalize();
+    assert.throws(model.finalize, Error);
+  });
 
-    model.foo = 5;
+  it("should throw an error if adding public property after finalize", function (){
+    var model = new ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.finalize();
+    assert.throws(model.addPublicProperty, Error);
+  });
+
+  it("should create getter-setters that get public properties", function (){
+    var model = new ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.finalize();
+    assert.equal(model.x(), 5);
+  });
+
+  it("should create getter-setters that set public properties", function (){
+    var model = new ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.finalize();
+    model.x(6);
+    assert.equal(model.x(), 6);
+  });
+
+  it("should create getter-setters that chain", function (){
+    var model = new ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.addPublicProperty("y", 6);
+    model.finalize();
+    model.x(10).y(20);
+    assert.equal(model.x(), 10);
+    assert.equal(model.y(), 20);
+  });
+
+  it("should chain addPublicProperty and finalize", function (){
+    var model = new ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 6)
+      .finalize();
+
+    model.y(20);
+
+    assert.equal(model.x(), 5);
+    assert.equal(model.y(), 20);
+  });
+
+  it("should get state", function (){
+    var model = new ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.addPublicProperty("y", 10);
+    model.finalize();
+
+    var state = model.getState();
+    assert.equal(state.x, 5);
+    assert.equal(state.y, 10);
+  });
+
+  it("should get state after modification with getter-setters", function (){
+    var model = new ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.addPublicProperty("y", 10);
+    model.finalize();
+
+    model.x(10).y(20)
+
+    var state = model.getState();
+    assert.equal(state.x, 10);
+    assert.equal(state.y, 20);
+  });
+  
+  function createModel(){
+    return new ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 6)
+      .finalize();
+  }
+
+  it("should set state", function (){
+    var modelA = createModel().x(10).y(20);
+    var modelB = createModel();
+
+    modelB.setState(modelA.getState());
+
+    assert.equal(modelB.x(), 10);
+    assert.equal(modelB.y(), 20);
+  });
+
+  it("should set state that omits default values", function (){
+    var model = createModel().x(10).y(20);
+    model.setState({});
+    assert.equal(model.x(), 5);
+    assert.equal(model.y(), 6);
+  });
+
+  it("should chain setState", function (){
+
+    var model = createModel()
+      .x(10)
+      .y(20)
+      .setState({y: 45});
+
+    assert.equal(model.x(), 5);
+    assert.equal(model.y(), 45);
+  });
+
+  it("should react", function (){
+    var model = new ReactiveModel()
+      .addPublicProperty("a", 5)
+      .finalize();
 
     model.react({
-      bar: ["foo", function (d){
-        return d.foo + 1;
+      b: ["a", function (a){
+        return a + 1;
       }]
     });
 
-    nextFrame(function (){
-      assert.equal(model.foo, 5);
-      assert.equal(model.bar, 6);
-      done();
-    });
+    ReactiveModel.digest();
+
+    assert.equal(model.b(), 6);
   });
 
-  it("should evaluate the data dependency graph, property set after model.react", function (done){
-    var model = new ReactiveModel();
+  it("should react and use newly set value", function (){
+    var model = new ReactiveModel()
+      .addPublicProperty("a", 5)
+      .finalize();
 
     model.react({
-      bar: ["foo", function (d){
-        return d.foo + 1;
+      b: ["a", function (a){
+        return a + 1;
       }]
     });
 
-    model.foo = 5;
-
-    nextFrame(function (){
-      assert.equal(model.foo, 5);
-      assert.equal(model.bar, 6);
-      done();
-    });
+    model.a(7);
+    ReactiveModel.digest();
+    assert.equal(model.b(), 8);
   });
 
-  it("should evaluate the data dependency graph, using most recent value only", function (done){
-    var model = new ReactiveModel();
-
-    model.foo = 3;
+  it("should track when values change", function (){
+    var model = new ReactiveModel()
+      .addPublicProperty("a", 5)
+      .finalize();
 
     model.react({
-      bar: ["foo", function (d){
-        return d.foo + 1;
+      b: ["a", function (a){
+        return a + 1;
       }]
     });
 
-    model.foo = 4;
-    model.foo = 5;
+    model.a(7);
+    ReactiveModel.digest();
+    assert.equal(model.b(), 8);
 
-    nextFrame(function (){
-      assert.equal(model.foo, 5);
-      assert.equal(model.bar, 6);
-      done();
-    });
+    model.a(8);
+    model.a(9);
+    model.a(10);
+    ReactiveModel.digest();
+    assert.equal(model.b(), 11);
   });
 
-  it("should evaluate the data dependency graph with two input properties", function (done){
+  it("should react with two input properties", function (){
 
     var model = new ReactiveModel();
 
     model.react({
       fullName: [
-        "firstName", "lastName", function (d){
-          return d.firstName + " " + d.lastName;
+        "firstName", "lastName", function (firstName, lastName){
+          return firstName + " " + lastName;
         }
       ]
     });
 
-    model.firstName = "Jane";
-    model.lastName = "Smith";
+    model
+      .firstName("Jane")
+      .lastName("Smith");
 
-    nextFrame(function (){
-      assert.equal(model.fullName, "Jane Smith");
-      done();
-    });
+    ReactiveModel.digest();
+
+    assert.equal(model.fullName(), "Jane Smith");
   });
 
-  it("should not evaluate reactive function when not all input properties are defined", function (done){
+  it("should not react when only one of two input properties is defined", function (){
 
     var model = new ReactiveModel();
     var counter = 0;
 
     model.react({
       fullName: [
-        "firstName", "lastName", function (d){
+        "firstName", "lastName", function (firstName, lastName){
           counter++;
-          return d.firstName + " " + d.lastName;
+          return firstName + " " + lastName;
         }
       ]
     });
 
-    model.firstName = "Jane";
+    model.firstName("Jane");
 
-    nextFrame(function (){
-      assert.equal(counter, 0);
-      done();
-    });
+    ReactiveModel.digest();
+
+    assert.equal(counter, 0);
+    assert.equal(model.fullName(), undefined);
   });
+
+  function increment(x){
+    return x + 1;
+  }
 
   it("should propagate two hops in a single digest", function (done){
 
     var model = new ReactiveModel();
 
     model.react({
-      b: ["a", function (d){
-        return d.a + 1;
-      }],
-      c: ["b", function (d){
-        return d.b + 1;
-      }]
+      b: ["a", increment],
+      c: ["b", increment]
     });
 
-    model.a = 1;
+    model.a(1);
+    ReactiveModel.digest();
 
-    nextFrame(function (){
-      assert.equal(model.a, 1);
-      assert.equal(model.b, 2);
-      assert.equal(model.c, 3);
-      done();
-    });
+    assert.equal(model.a(), 1);
+    assert.equal(model.b(), 2);
+    assert.equal(model.c(), 3);
+    done();
   });
 
-  it("should evaluate consecutive digests independently", function (done){
-
-    var model = new ReactiveModel();
-    var counter = 0;
-
-    model.react({
-      fullName: [
-        "firstName", "lastName", function (d){
-          counter++;
-          return d.firstName + " " + d.lastName;
-        }
-      ],
-      b: ["a", function (d){ return d.a + 1; }]
-    });
-
-    model.firstName = "Jane";
-    model.lastName = "Smith";
-
-    nextFrame(function (){
-      assert.equal(model.fullName, "Jane Smith");
-      assert.equal(counter, 1);
-
-      model.a = 5;
-
-      nextFrame(function (){
-        assert.equal(model.b, 6);
-        assert.equal(counter, 1);
-        done();
-      });
-    });
-  });
-
-  //it("should clear computedProperties after each digest", function (done){
+  //it("should evaluate consecutive digests independently", function (done){
 
   //  var model = new ReactiveModel();
   //  var counter = 0;
 
   //  model.react({
-  //    c: ["a", function (_){
-  //      return _.a + 1;
-  //    }],
-  //    d: ["b", function (_){
-  //      return _.b + 1;
-  //    }],
-  //    e: ["c", "d", function (_){
-  //      return _.c + _.d;
-  //    }]
+  //    fullName: [
+  //      "firstName", "lastName", function (d){
+  //        counter++;
+  //        return d.firstName + " " + d.lastName;
+  //      }
+  //    ],
+  //    b: ["a", function (d){ return d.a + 1; }]
   //  });
 
-  //  model.a = 1;
-  //  model.b = 2;
+  //  model.firstName = "Jane";
+  //  model.lastName = "Smith";
 
   //  nextFrame(function (){
-
-  //    assert.equal(model.c, 3);
+  //    assert.equal(model.fullName, "Jane Smith");
   //    assert.equal(counter, 1);
 
-  //    console.log("here");
-  //    //model.a = null;
+  //    model.a = 5;
 
   //    nextFrame(function (){
+  //      assert.equal(model.b, 6);
   //      assert.equal(counter, 1);
   //      done();
   //    });
   //  });
   //});
+
 });

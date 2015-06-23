@@ -1,175 +1,231 @@
 'use strict';
 
-function always(){
-  return true;
-}
-
-
-// Constructor function for a directed graph data structure.
+// A graph data structure with depth-first search.
 function Graph(){
   
   // The adjacency list of the graph.
   // Keys are node ids.
-  // Values are adjacent node arrays.
+  // Values are adjacent node id arrays.
   var edges = {};
-  
+
   // Gets or creates the adjacent node list for node u.
   function adjacent(u){
     return edges[u] || (edges[u] = []);
   }
+
+  function addEdge(u, v){
+    adjacent(u).push(v);
+  }
+
+  // TODO test this function
+  //function removeEdge(u, v){
+  //  if(edges[u]) {
+  //    edges[u] = edges[u]
+  //  }
+  //  adjacent(u).push(v);
+  //}
+
+  // Depth First Search algorithm, inspired by
+  // Cormen et al. "Introduction to Algorithms" 3rd Ed. p. 604
+  function DFS(sourceNodes, shouldVisit){
+
+    var visited = {};
+    var nodes = [];
+
+    if(!shouldVisit){
+      shouldVisit = function (node) { return true; };
+    }
+
+    sourceNodes.forEach(function DFSVisit(node){
+      if(!visited[node] && shouldVisit(node)){
+        visited[node] = true;
+        adjacent(node).forEach(DFSVisit);
+        nodes.push(node);
+      }
+    });
+
+    return nodes;
+  }
   
   return {
-
     adjacent: adjacent,
-
-    addEdge: function (u, v){
-      adjacent(u).push(v);
-    },
-
-    // TODO test this function
-    removeEdge: function (u, v){
-      if(edges[u]) {
-        edges[u] =  edges[u]
-      }
-      adjacent(u).push(v);
-    },
-
-    // Depth First Search algorithm, inspired by
-    // Cormen et al. "Introduction to Algorithms" 3rd Ed. p. 604
-    DFS: function (sourceNodes, shouldVisit){
-
-      var visited = {};
-      var nodes = [];
-
-      shouldVisit = shouldVisit || always;
-
-      sourceNodes.forEach(function DFSVisit(node){
-        if(!visited[node] && shouldVisit(node)){
-          visited[node] = true;
-          adjacent(node).forEach(DFSVisit);
-          nodes.push(node);
-        }
-      });
-
-      return nodes;
-    }
+    addEdge: addEdge,
+    //removeEdge: removeEdge,
+    DFS: DFS
   };
 }
 
-var dependencyGraph = new Graph();
+function ReactiveGraph(){
+  var reactiveGraph = new Graph();
 
-var counter = 0;
-var makeNode = function (){
-  return "" + (counter++);
+  // { node -> getterSetter }
+  var getterSetters = {};
+
+  // { node -> reactiveFunction }
+  var reactiveFunctions = {};
+
+  // { node -> true }
+  var changedPropertyNodes = {};
+  
+  var nodeCounter = 0;
+
+  function makeNode(){
+    return nodeCounter++;
+  }
+
+  function makePropertyNode(getterSetter){
+    var node = makeNode();
+    getterSetters[node] = getterSetter;
+    return node;
+  }
+
+  function makeReactiveFunctionNode(reactiveFunction){
+    var node = makeNode();
+    reactiveFunctions[node] = reactiveFunction;
+    return node;
+  }
+
+  function addReactiveFunction(reactiveFunction){
+
+    if( (reactiveFunction.inNodes === undefined) || (reactiveFunction.outNode === undefined) ){
+        throw new Error("Attempting to add a reactive function that " +
+          "doesn't have inNodes or outNode defined first.");
+    }
+
+    reactiveFunction.inNodes.forEach(function (inNode){
+      reactiveGraph.addEdge(inNode, reactiveFunction.node);
+    });
+
+    reactiveGraph.addEdge(reactiveFunction.node, reactiveFunction.outNode);
+  }
+
+  function evaluate(reactiveFunction){
+    var inValues = reactiveFunction.inNodes.map(getPropertyNodeValue);
+    var outValue = reactiveFunction.callback.apply(null, inValues);
+    getterSetters[reactiveFunction.outNode](outValue);
+  }
+
+  function getPropertyNodeValue(node){
+    return getterSetters[node]();
+  }
+
+  function digest(){
+  
+    var sourceNodes = Object.keys(changedPropertyNodes);
+    var visitedNodes = reactiveGraph.DFS(sourceNodes, shouldVisit);
+    var topologicallySorted = visitedNodes.reverse();
+
+    topologicallySorted.forEach(function (node){
+      if(node in reactiveFunctions){
+        evaluate(reactiveFunctions[node]);
+      }
+    });
+
+    // Not using sourceNodes.forEach() here,
+    // because shouldVisit mutates changedPropertyNodes,
+    // adding output property nodes for visited reactive functions.
+    Object.keys(changedPropertyNodes).forEach(function(node){
+      delete changedPropertyNodes[node];
+    });
+
+  }
+
+  function shouldVisit(node){
+
+    // Only visit reactive function whose inputs are all defined.
+    if(node in reactiveFunctions){
+      var reactiveFunction = reactiveFunctions[node];
+      var willVisit = reactiveFunction.inNodes.every(function (node){
+        var defined = isDefined(getPropertyNodeValue(node));
+        var changed = node in changedPropertyNodes;
+        return defined || changed;
+      });
+
+      if(willVisit){
+        propertyNodeDidChange(reactiveFunction.outNode);
+      }
+
+      return willVisit;
+    } else {
+     
+      // Visit all property nodes regardless.
+      return true;
+    }
+  }
+
+  function isDefined(value){
+    return !(typeof value === "undefined" || value === null);
+  }
+
+
+  function propertyNodeDidChange(node){
+    changedPropertyNodes[node] = true;
+
+    // TODO add this:
+    // scheduleDigestOnNextFrame();
+  }
+
+  reactiveGraph.addReactiveFunction      = addReactiveFunction;
+  reactiveGraph.makeNode                 = makeNode;
+  reactiveGraph.digest                   = digest;
+  reactiveGraph.makePropertyNode         = makePropertyNode;
+  reactiveGraph.makeReactiveFunctionNode = makeReactiveFunctionNode;
+  reactiveGraph.propertyNodeDidChange    = propertyNodeDidChange;
+
+  return reactiveGraph;
 }
 
+var reactiveGraph = new ReactiveGraph();
+
+var addReactiveFunction      = reactiveGraph.addReactiveFunction;
+var makePropertyNode         = reactiveGraph.makePropertyNode;
+var makeReactiveFunctionNode = reactiveGraph.makeReactiveFunctionNode;
+var propertyNodeDidChange    = reactiveGraph.propertyNodeDidChange;
+
+
+// This file serves to document the reactive function data structure,
+// and contains a utility function for parsing the options passed to model.react().
 function ReactiveFunction(inProperties, outProperty, callback){
   return {
 
-    // An array of property name strings.
+    // An array of input property names.
     inProperties: inProperties,
 
-    // A single property name string.
+    // The output property name.
     outProperty: outProperty,
 
-    // function (...inProperties) -> outPropertyValue
-    // Invoked when all input properties are defined,
-    // at most once each animation frame with most recent values,
-    // triggered whenever input properties change.
-    callback: callback
+    // function (inPropertyValues) -> outPropertyValue
+    // Invoked during a digest,
+    //   - when all input property values are first defined,
+    //   - in response to any changes in input property values.
+    callback: callback,
+
+    // inNodes and outNodes are populated in the function reactiveModel.assignNodes(),
+    // which is invoked after the original ReactiveFunction object is created.
+
+    // An array of node id strings corresponding
+    // to the property names in inProperties.
+    inNodes: undefined,
+
+    // The node id string corresponding to the output property.
+    outNode: undefined
   };
 }
 
-// This is where the options object passed into `model.react(options)` gets
-// transformed into an array of ReactiveFunction instances.
+// This function parses the options object passed into `model.react(options)`,
+// transforming it into an array of ReactiveFunction instances.
 ReactiveFunction.parse = function (options){
-  return Object.keys(options).map( function (outProperty){
-    var arr = options[outProperty];
-    var callback = arr.splice(arr.length - 1)[0];
-    var inProperties = arr;
+  return Object.keys(options).map(function (outProperty){
+    var array = options[outProperty];
+    var callback = array.splice(array.length - 1)[0];
+    var inProperties = array;
     return ReactiveFunction(inProperties, outProperty, callback);
   });
 };
 
-
-// A simple requestAnimationFrame polyfill.
-//
-// Inspired by:
-//
-//   https://github.com/chrisdickinson/raf
-//   http://jsmodules.io/
-//
-// Curran Kelleher June 2015
-var nextFrame;
-if(typeof requestAnimationFrame === "undefined"){
-  nextFrame = setTimeout;
-} else {
-  nextFrame = requestAnimationFrame;
-}
-var _nextFrame = nextFrame;
-
-
-// Queues the given callback function to execute
-// on the next animation frame.
-function debounce(callback){
-  var queued = false;
-  return function () {
-    if(!queued){
-      queued = true;
-      _nextFrame(function () {
-        queued = false;
-        callback();
-      });
-    }
-  };
-}
-
-function invoke(callback){
-  callback();
-}
-
-
-function SimpleModel(){
-
-  // The internal stored values for tracked properties. { property -> value }
-  var values = {};
-
-  // The callback functions for each tracked property. { property -> [callback] }
-  var listeners = {};
-
-  function getListeners(property){
-    return listeners[property] || (listeners[property] = []);
-  }
-
-  function on(property, callback){
-    getListeners(property).push(callback);
-  };
-
-  function set(property, value){
-    setSilently(property, value);
-    getListeners(property).forEach(invoke);
-  }
-
-  function setSilently(property, value){
-    values[property] = value;
-  }
-
-  function get(property){
-    return values[property];
-  }
-
-  return {
-    on: on,
-    set: set,
-    setSilently: setSilently,
-    get: get
-  };
-}
-
 function ReactiveModel(){
-
-  // Enforce use of new.
-  // See http://stackoverflow.com/questions/17032749/pattern-for-enforcing-new-in-javascript
+  
+  // Enforce use of new, so instanceof and typeof checks will always work.
   if (!(this instanceof ReactiveModel)) {
     return new ReactiveModel();
   }
@@ -177,159 +233,141 @@ function ReactiveModel(){
   // Refer to `this` (the ReactiveModel instance) as `model` in this closure.
   var model = this;
 
-  // This object tracks the state of tracked properties.
-  var simpleModel = new SimpleModel();
+  // { property -> defaultValue }
+  var publicProperties = {};
 
-  // The set of tracked properties. { property -> true }
+  // { property -> value }
+  var values = {};
+
+  // { property -> node }
   var trackedProperties = {};
 
-  // The set of changed properties for the upcoming digest. { property -> true }
-  // Cleared out at the end of each digest.
-  var changedProperties = {};
+  var isFinalized = false;
 
-  // The properties set as output by reactive functions in the upcoming digest. { property -> true }
-  // Cleared out at the end of each digest.
-  var computedProperties = {}
-    
-  // Keys are property names,
-  // values are node identifiers generated by makeNode().
-  var propertyNodes = {};
-
-  // Keys are node identifiers,
-  // values are reactive functions.
-  var reactiveFunctions = {};
-
-  // Gets or creates a graph node for the given property.
-  function getPropertyNode(property){
-    if(property in propertyNodes){
-      return propertyNodes[property];
-    } else {
-      return (propertyNodes[property] = makeNode());
+  function addPublicProperty(property, defaultValue){
+    if(isFinalized){
+      throw new Error("model.addPublicProperty() is being " +
+        "invoked after model.finalize, but this is not allowed. "+
+        "Public properties may only be added before the model is finalized.");
     }
+
+    publicProperties[property] = defaultValue;
+
+    return model;
   }
 
-  // Constructs the object to be passed into reactive function callbacks.
-  // Returns an object with values for each inProperty of the given reactive function.
-  function inPropertyValues(λ){
-    var d = {};
-    λ.inProperties.forEach(function (inProperty){
-      d[inProperty] = simpleModel.get(inProperty);
-    });
-    return d;
+  function getDefaultValue(property){
+    return publicProperties[property];
   }
 
-  // Returns true if all elements of the given array are defined, false otherwise.
-  function allAreDefined(arr){
-    return !arr.some(function (d) {
-      return typeof d === "undefined" || d === null;
-    });
-  }
-  
-  function shouldVisit(node){
-
-    // If the node is for a reactive function,
-    if(node in reactiveFunctions){
-      var λ = reactiveFunctions[node];
-
-      // only visit the node if all input properties are defined,
-      var inPropertyDefs = λ.inProperties.map(function (inProperty){
-
-        // or if they are computed as output by reactive functions previously 
-        // visited within the current digest.
-        if(inProperty in computedProperties){
-          return true;
-        } else {
-          return simpleModel.get(inProperty);
-        }
-      });
-
-      var willVisit = allAreDefined(inPropertyDefs);
-      
-      if(willVisit){
-        computedProperties[λ.outProperty] = true;
-      }
-
-      return willVisit;
-    } else {
-
-      // Visit all property nodes.
-      return true;
+  function finalize(){
+    if(isFinalized){
+      throw new Error("model.finalize() is being invoked " +
+        "more than once, but this function should only be invoked once.");
     }
-  }
+    isFinalized = true;
 
-  // TODO move this logic to global dependency graph,
-  // should not live inside the model instance.
-  var digest = debounce(function (){
-    var properties = Object.keys(changedProperties);
-    var sourceNodes = properties.map(getPropertyNode);
-    var topologicallySorted = dependencyGraph
-      .DFS(sourceNodes, shouldVisit)
-      .reverse();
-
-    topologicallySorted.forEach(function (node){
-      if(node in reactiveFunctions){
-        var λ = reactiveFunctions[node];
-        var outPropertyValue = λ.callback(inPropertyValues(λ));
-        simpleModel.setSilently(λ.outProperty, outPropertyValue);
-      }
+    Object.keys(publicProperties).forEach(function(property){
+      track(property);
+      model[property](getDefaultValue(property));
     });
 
-    // TODO add a test that fails if this line is not present.
-    changedProperties = {};
-  });
+    return model;
+  }
 
-  // Tracks a property if it is not already tracked.
+  function getState(){
+    var state = {};
+    Object.keys(publicProperties).forEach( function (publicProperty){
+      state[publicProperty] = values[publicProperty];
+    });
+    return state;
+  }
+
+  function setState(state){
+
+    // TODO throw an error if some property in state
+    // is not in publicProperties
+    //Object.keys(state).forEach(function (property){
+    //  if(!property in publicProperties){
+    //    throw new Error("Attempting to set a property that has not" +
+    //      " been added as a public property in model.setState()");
+    //  }
+    //});
+
+    // Reset state to default values.
+    Object.keys(publicProperties).forEach(function (property){
+      var defaultValue = publicProperties[property];
+      model[property](defaultValue);
+    });
+
+    // Apply values included in the new state.
+    Object.keys(state).forEach(function (property){
+      var newValue = state[property]
+      model[property](newValue);
+    });
+
+    return model;
+  }
+
+  function react(options){
+    var reactiveFunctions = ReactiveFunction.parse(options);
+    reactiveFunctions.forEach(function (reactiveFunction){
+      assignNodes(reactiveFunction);
+      addReactiveFunction(reactiveFunction);
+    });
+  }
+
   function track(property){
-    if(!(property in trackedProperties)){
-      trackedProperties[property] = true;
+    if(property in trackedProperties){
+      return trackedProperties[property];
+    } else {
+      var getterSetter = createGetterSetter(property);
 
-      if(property in model){
-        simpleModel.set(property, model[property]);
-      }
+      model[property] = getterSetter;
 
-      Object.defineProperty(model, property, {
-        get: function () {
-          return simpleModel.get(property);
-        },
-        set: function(value) {
-          return simpleModel.set(property, value);
-        }
-      });
+      var propertyNode = makePropertyNode(getterSetter);
+      trackedProperties[property] = propertyNode;
+
+      return propertyNode;
     }
   }
 
-  model.react = function (options){
+  function createGetterSetter(property){
+    return function (value){
+      if (!arguments.length) {
+        return values[property];
+      }
+      values[property] = value;
+      propertyDidChange(property);
+      return model;
+    };
+  }
 
-    ReactiveFunction.parse(options).forEach(function (λ){
+  function propertyDidChange(property){
+    var propertyNode = trackedProperties[property];
+    propertyNodeDidChange(propertyNode);
+  }
 
-      var λNode = makeNode();
-      var outNode = getPropertyNode(λ.outProperty);
+  function assignNodes(reactiveFunction){
+    reactiveFunction.inNodes = reactiveFunction.inProperties.map(track);
+    reactiveFunction.node = makeReactiveFunctionNode(reactiveFunction);
+    reactiveFunction.outNode = track(reactiveFunction.outProperty);
+  }
 
-      reactiveFunctions[λNode] = λ;
-      dependencyGraph.addEdge(λNode, outNode);
-      track(λ.outProperty);
-
-      λ.inProperties.forEach(function (inProperty){
-
-        var inNode = getPropertyNode(inProperty);
-        dependencyGraph.addEdge(inNode, λNode);
-
-        simpleModel.on(inProperty, function (){
-          changedProperties[inProperty] = true;
-          digest();
-        });
-
-        track(inProperty);
-      });
-    });
-
-    return reactiveFunctions;
-  };
-
-  return model;
+  model.addPublicProperty = addPublicProperty;
+  model.finalize = finalize;
+  model.getState = getState;
+  model.setState = setState;
+  model.react = react;
 }
 
-exports.ReactiveModel = ReactiveModel;
-exports.SimpleModel = SimpleModel;
-exports.Graph = Graph;
-exports.nextFrame = _nextFrame;
+ReactiveModel.digest = reactiveGraph.digest;
+
+// Export these internal modules for unit testing via Rollup CommonJS build.
+ReactiveModel.Graph = Graph;
+ReactiveModel.ReactiveGraph = ReactiveGraph;
+ReactiveModel.ReactiveFunction = ReactiveFunction;
+
+var reactiveModel = ReactiveModel;
+
+module.exports = reactiveModel;
