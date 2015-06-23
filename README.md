@@ -44,18 +44,21 @@ console.log(model.fullName());
 Constructs a new reactive model. The `new` keyword is optional.
 
 Example use:
-`var model = new ReactiveModel();`
+
+```javascript
+var model = new ReactiveModel();
+```
 
 <a name="react" href="#react">#</a> <i>react</i>(<i>options</i>)
 
-Adds the given set of reactive functions to the data dependency graph. The `options` argument is an object where:
+Adds the given set of reactive functions to the data dependency graph. In the `options` object:
 
  * keys are output property names
  * values are arrays where:
-   * all elements except the last one represent a list of input property names
+   * all elements except the last one are input property names
    * the last element is the reactive function callback
 
-For example, here is an invocation of `react` that sets the "b" property to be one greater than "a":
+For example, here is an invocation of `react` that sets the `b` property to be `a + 1`:
 
 ```javascript
 model.react({
@@ -77,15 +80,17 @@ model.react({
 });
 ```
 
-<a name="getter-setters" href="#getter-setters">#</a> getter-setters
+<a name="getter-setters" href="#getter-setters">#</a> <i>getter-setters</i>
 
-Every tracked property is made available on the model object as a [chainable getter-setter function](http://bost.ocks.org/mike/chart/#reconfiguration). A property is considered "tracked" after it is
+Every tracked property is made available on the model object as a [chainable getter-setter function](http://bost.ocks.org/mike/chart/#reconfiguration).
+
+A property is considered "tracked" after it is
 
  * used as an input property to a reactive function,
  * used as an output property to a reactive function, or
  * added as a public property.
 
-Assuming there is a tracked property `a`, we can set its value to 5 like this:
+Assuming there is a tracked property `a`, we can set it to 5 like this:
 
 ```javascript
 model.a(5);
@@ -97,7 +102,9 @@ The value can then be retreived by invoking the function with no arguments:
 console.log(model.a()); // Prints 5`
 ```
 
-When the setter form is used, the model is returned. This enables method chaining. Assuming there are tracked properties `a`, `b`, and `c`, their values can all be set simultaneously like this:
+When the setter form is used, the `model` object is returned. This enables method chaining.
+
+Assuming there are tracked properties `a`, `b`, and `c`, their values can be set like this:
 
 ```javascript
 model
@@ -107,11 +114,22 @@ model
 ```
 
 <a name="add-public-property" href="#add-public-property">#</a> <i>addPublicProperty</i>(<i>property</i>, <i>defaultValue</i>)
-...
+
+Adds a public property with the given default value.
+
+<a name="finalize" href="#finalize">#</a> <i>finalize</i>()
+
+Calling this function causes public properties to be tracked and made available as [getter-setter](#getter-setters). After invoking `finalize()`, no more public properties may be added. This guarantees predictable serialization and deserialization behavior.
+
 <a name="get-state" href="#get-state">#</a> <i>getState</i>()
-...
+
+Returns a serialized form of the model that can later be passed into `setState()`. This is an object that only contains public properties that have values other than their defaults.
+
+This function may only be invoked after invoking `model.finalize()`.
+
 <a name="set-state" href="#set-state">#</a> <i>setState</i>(<i>state</i>)
-...
+
+Sets the state of the model from its serialized form. The `state` argument object is expected to contain values for public properties that have values other than their defaults. Public properties not included in `state` will be set to their default values. Properties not previously added as public properties may not be included in the `state` object.
 
 ## Glossary
 
