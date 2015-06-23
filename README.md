@@ -4,7 +4,7 @@ A library for reactive models.
 
 ## Example
 
-<a href="http://bl.ocks.org/curran/5905182da50a4667dc00"> <img src="http://curran.github.io/images/reactive-model/firstLastFlow.png"> </a>
+[![http://curran.github.io/images/reactive-model/firstLastFlow.png]](http://bl.ocks.org/curran/5905182da50a4667dc00)
 
 ```javascript
 var model = new ReactiveModel();
@@ -29,17 +29,52 @@ console.log(model.fullName());
 
 ## API Reference
 
-<a name="reactive-model" href="#reactive-model">#</a> <b>new ReactiveModel</b>()
+<a name="reactive-model" href="#reactive-model">#</a> <b>ReactiveModel</b>()
 
-Constructs a new reactive function.
+Constructs a new reactive model. The `new` keyword is optional. Example:
 
-## Glossary of Terms
+`var model = new ReactiveModel();`
+
+<a name="react" href="#react">#</a> <i>ReactiveModel</i>(<i>options</i>)
+
+Adds the given set of reactive functions to the data dependency graph. The `options` argument is an object where:
+
+ * keys are output property names
+ * values are arrays where:
+   * all elements except the last one represent a list of input property names
+   * the last element is the reactive function callback
+
+For example, here is an invocation of `react` that sets the "b" property to be one greater than "a":
+
+```javascript
+model.react({
+  b: ["a", function (a){
+    return a + 1;
+  }]
+});
+```
+
+The reactive function callback is invoked with the values of input properties during a digest. This callback is only invoked if all input properties have defined values. If any of the input properties change, this callback will be invoked again in the next digest after the change.
+
+The return value from the callback is assigned to the output property during a digest, which may be used as an input property to another reactive function. For example, here is a collection of two reactive functions that assign `b = a +1` and `c = b + 1`:
+
+```javascript
+  function increment(x){ return x + 1; }
+  model.react({
+    b: ["a", increment],
+    c: ["b", increment]
+  });
+```
+
+If `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
+
+## Glossary
 
  * "reactive model" The result of `new ReactiveModel()`.
  * "reactive function" A callback function and metadata that describes its input and output properties. A representation of set of reactive functions is passed into `model.react`.
  * "reactive function callback" The callback function portion of a reactive function.
- * "digest" A cycle of the algorithm that evaluates the data dependency graph. This occurst at most once per animation frame.
- * "evaluate" A term to denote complete resolution of the data dependency graph. After the complete data dependency graph has been **evaluated** by a digest, the state of the model is consistent, and all reactive functions that are transitively dependent on any changed property have been executed in the proper order, with their output values assigned to model properties.
+ * "digest" An execution of the algorithm that evaluates the data dependency graph.
+ * "evaluate" A term to denote complete resolution of the data dependency graph. After the complete data dependency graph has been **evaluated** by a digest, the state of the model is consistent with regard to its reactive functions, and all reactive functions that are transitively dependent on any changed property have been executed in the proper order, with their output values assigned to model properties.
 
 ## Development Flow
 
