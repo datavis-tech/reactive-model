@@ -2,8 +2,17 @@
 
 A library for reactive models.
 
-## Example
+## Usage
 
+Install via [NPM](https://www.npmjs.com/package/reactive-model):
+
+`npm install reactive-model`
+
+Require the package in your code:
+
+`var ReactiveModel = require("reactive-model");`
+
+Here is an example that demonstrates most of the features of this library.
 [![](http://curran.github.io/images/reactive-model/firstLastFlow.png)](http://bl.ocks.org/curran/5905182da50a4667dc00)
 
 ```javascript
