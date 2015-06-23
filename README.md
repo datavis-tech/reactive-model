@@ -1,101 +1,39 @@
 # reactive-model
 
-An unfinished library for building reactive models. This is an experiment that may be thrown away.
+A library for reactive models.
 
-# usage
-Aspirational, not yet implemented. Following [readme-driven development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html).
+## Example
+
+<a href="http://bl.ocks.org/curran/5905182da50a4667dc00"> <img src="http://curran.github.io/images/reactive-model/firstLastFlow.png"> </a>
 
 ```javascript
 var model = new ReactiveModel();
 
 model.react({
-
-  // The output property, assigned by reacting to input properties.
   fullName: [
-  
-    // A comma delimited list of input property names,
-    // followed by the reactive function callback.
-    "firstName", "lastName", function (d){
-    
-      // Following a popular convention from the D3 community,
-      // "d" is used as the variable name for objects that contain many properties.
-      // "d" contains values for each input property, in this case "firstName" and "lastName".
-      
-      // This function is only invoked if all input properties are defined.
-
-      // Return the computed value for the output property, "fullName".
-      return d.firstName + " " + d.lastName;
+    "firstName", "lastName", function (firstName, lastName){
+      return firstName + " " + lastName;
     }
   ]
 });
 
-// Setting properties like this queues a digest to occur at the next animation frame,
-// where changed properties are propagated through the data dependency graph.
-model.firstName = "Jane";
-model.lastName = "Smith";
+model
+  .firstName("Jane")
+  .lastName("Smith");
 
-// Using requestAnimationFrame, we can queue this callback to run
-// directly after the upcoming digest completes,
-requestAnimationFrame(function (){
+ReactiveModel.digest();
 
-  // so here, we can expect that the dependency graph has been fully evaluated.
-  expect(model.fullName).to.equal("John Smith");
-});
+// Prints "Jane Smith"
+console.log(model.fullName());
 ```
 
-## Asynchronous Reactive Runctions
+## API Reference
 
-For asynchronouos operations, the API supports returning a Promise from the reactive function. Here's an example that uses this API to fetch a CSV file using [d3.csv](https://github.com/mbostock/d3/wiki/CSV):
+<a name="reactive-model" href="#reactive-model">#</a> <b>new ReactiveModel</b>()
 
-```javascript
-var model = new ReactiveModel();
+Constructs a new reactive function.
 
-model.react({
-  data: ["url", function (d){
-    return new Promise(function (resolve, reject){
-      d3.csv(d.url, function (error, data){
-        if(error) {
-          reject(error);
-        } else {
-          resolve(data);
-        }
-      });
-    });
-  ]
-});
-```
-
-When the data flow graph has reactive functions that use asynchronous operations, `requestAnimationFrame` is no longer a valid way to detect when the complete data dependency graph has been evaluated. This is because the asynchronous operation may take longer than a single animation frame to complete.
-
-In this situation, you can use `model.set()`, which returns a Promise that is resolved only after the complete data dependency graph has been evaluated, including asynchronous reactive functions.
-
-```javascript
-model.set({
-  url: "http://curran.github.io/data/iris/iris.csv"
-}).then(function (){
-  // At this point, model.data should be populated with parsed CSV data.
-});
-```
-
-A special default value `model.NONE` refers to a value that is defined, but represents that the property is optional and has not been speficied (similar conceptually to [Scala's Option Type](http://danielwestheide.com/blog/2012/12/19/the-neophytes-guide-to-scala-part-5-the-option-type.html).
-
-
-# Overview
-
-This library maintains internally a graph data structure (the data dependency graph) in which
-
- * vertices may be either properties or reactive functions
- * edges represent a data dependency
-<figure>
-  <a href="http://bl.ocks.org/curran/5905182da50a4667dc00">
-   <img src="http://curran.github.io/images/reactive-model/firstLastFlow.png" alt="Caption to image">
-  </a>
-  <figcaption style="text-align: center;">
-    An example of a data dependency graph.
-  </figcaption>
-</figure>
-
-These terms have a specific meaning within this project:
+## Glossary of Terms
 
  * "reactive model" The result of `new ReactiveModel()`.
  * "reactive function" A callback function and metadata that describes its input and output properties. A representation of set of reactive functions is passed into `model.react`.
@@ -103,13 +41,17 @@ These terms have a specific meaning within this project:
  * "digest" A cycle of the algorithm that evaluates the data dependency graph. This occurst at most once per animation frame.
  * "evaluate" A term to denote complete resolution of the data dependency graph. After the complete data dependency graph has been **evaluated** by a digest, the state of the model is consistent, and all reactive functions that are transitively dependent on any changed property have been executed in the proper order, with their output values assigned to model properties.
 
-# Development Flow
+## Development Flow
 
 This project uses [Rollup](https://github.com/rollup/rollup) for bundling ES6 modules into a CommonJS build. The unit tests use the bundle. To re-generate the bundle and run the unit tests, execute
 
 `make test`
 
-# Background
+To list all source files, run
+
+`make tree`
+
+## Background
 
 This is a re-design of [model.js](https://github.com/curran/model) that addresses the following issues:
 
@@ -124,3 +66,11 @@ The core ideas of this redesign are:
  * changes are processed (or "digested") using an explicit topological sort algorithm on the data dependency graph.
 
 See also [ZJONSSON/clues](https://github.com/ZJONSSON/clues), which is a very similar library.
+
+## How it Works
+
+This library maintains a graph data structure internally, called the "data dependency graph", in which
+
+ * vertices represent either properties or reactive functions, and
+ * edges represent a data dependency;
+

@@ -22,5 +22,5 @@ reactive-model.min.js: reactive-model.js
 clean:
 	rm -f -- $(GENERATED_FILES)
 
-list:
+tree:
 	tree -I node_modules
