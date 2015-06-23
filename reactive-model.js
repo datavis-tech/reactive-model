@@ -121,7 +121,10 @@ function ReactiveGraph(){
       }
     });
 
-    sourceNodes.forEach(function (node){
+    // Not using sourceNodes.forEach() here,
+    // because shouldVisit mutates changedPropertyNodes,
+    // adding output property nodes for visited reactive functions.
+    Object.keys(changedPropertyNodes).forEach(function(node){
       delete changedPropertyNodes[node];
     });
 
