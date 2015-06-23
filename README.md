@@ -4,7 +4,7 @@ A library for reactive models.
 
 ## Example
 
-[![http://curran.github.io/images/reactive-model/firstLastFlow.png]](http://bl.ocks.org/curran/5905182da50a4667dc00)
+[![](http://curran.github.io/images/reactive-model/firstLastFlow.png)](http://bl.ocks.org/curran/5905182da50a4667dc00)
 
 ```javascript
 var model = new ReactiveModel();
