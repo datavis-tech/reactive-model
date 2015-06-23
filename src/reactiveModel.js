@@ -45,9 +45,12 @@ function ReactiveModel(){
     }
 
     publicProperties[property] = defaultValue;
-    values[property]           = defaultValue;
 
     return model;
+  }
+
+  function getDefaultValue(property){
+    return publicProperties[property];
   }
 
   function finalize(){
@@ -57,7 +60,10 @@ function ReactiveModel(){
     }
     isFinalized = true;
 
-    Object.keys(publicProperties).map(track);
+    Object.keys(publicProperties).forEach(function(property){
+      track(property);
+      model[property](getDefaultValue(property));
+    });
 
     return model;
   }
@@ -92,7 +98,6 @@ function ReactiveModel(){
     reactiveFunctions.forEach(function (reactiveFunction){
       assignNodes(reactiveFunction);
       addReactiveFunction(reactiveFunction);
-      reactiveFunction.inProperties.forEach(propertyDidChange);
     });
   }
 

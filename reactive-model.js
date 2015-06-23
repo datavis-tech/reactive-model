@@ -99,26 +99,20 @@ function ReactiveGraph(){
     reactiveGraph.addEdge(reactiveFunction.node, reactiveFunction.outNode);
   }
 
-  //function isDefined(value){
-  //  return typeof d === "undefined" || d === null;
-  //}
-
   function evaluate(reactiveFunction){
-
-    var inValues = reactiveFunction.inNodes.map(function (node){
-      return getterSetters[node]();
-    });
-
+    var inValues = reactiveFunction.inNodes.map(getPropertyNodeValue);
     var outValue = reactiveFunction.callback.apply(null, inValues);
-
     getterSetters[reactiveFunction.outNode](outValue);
+  }
 
+  function getPropertyNodeValue(node){
+    return getterSetters[node]();
   }
 
   function digest(){
   
     var sourceNodes = Object.keys(changedPropertyNodes);
-    var visitedNodes = reactiveGraph.DFS(sourceNodes);
+    var visitedNodes = reactiveGraph.DFS(sourceNodes, shouldVisit);
     var topologicallySorted = visitedNodes.reverse();
 
     topologicallySorted.forEach(function (node){
@@ -132,6 +126,36 @@ function ReactiveGraph(){
     });
 
   }
+
+  function shouldVisit(node){
+
+    // Only visit reactive function whose inputs are all defined.
+    if(node in reactiveFunctions){
+      var reactiveFunction = reactiveFunctions[node];
+      var willVisit = reactiveFunction.inNodes.every(function (node){
+        var defined = isDefined(getPropertyNodeValue(node));
+
+        // TODO test this, required for multiple hops
+        //var changed = node in changedPropertyNodes;
+        return defined; //|| changed;
+      });
+
+      // TODO test this, required for multiple hops
+      //if(willVisit){
+      //  propertyNodeDidChange(reactiveFunction.outNode);
+      //}
+      return willVisit;
+    } else {
+     
+      // Visit all property nodes regardless.
+      return true;
+    }
+  }
+
+  function isDefined(value){
+    return !(typeof value === "undefined" || value === null);
+  }
+
 
   function propertyNodeDidChange(node){
     changedPropertyNodes[node] = true;
@@ -227,9 +251,12 @@ function ReactiveModel(){
     }
 
     publicProperties[property] = defaultValue;
-    values[property]           = defaultValue;
 
     return model;
+  }
+
+  function getDefaultValue(property){
+    return publicProperties[property];
   }
 
   function finalize(){
@@ -239,7 +266,10 @@ function ReactiveModel(){
     }
     isFinalized = true;
 
-    Object.keys(publicProperties).map(track);
+    Object.keys(publicProperties).forEach(function(property){
+      track(property);
+      model[property](getDefaultValue(property));
+    });
 
     return model;
   }
@@ -274,7 +304,6 @@ function ReactiveModel(){
     reactiveFunctions.forEach(function (reactiveFunction){
       assignNodes(reactiveFunction);
       addReactiveFunction(reactiveFunction);
-      reactiveFunction.inProperties.forEach(propertyDidChange);
     });
   }
 

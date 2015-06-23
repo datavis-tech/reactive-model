@@ -201,26 +201,78 @@ describe("ReactiveModel", function (){
     assert.equal(model.fullName(), "Jane Smith");
   });
 
-  //it("should not react when only one of two input properties is defined", function (){
+  it("should not react when only one of two input properties is defined", function (){
+
+    var model = new ReactiveModel();
+    var counter = 0;
+
+    model.react({
+      fullName: [
+        "firstName", "lastName", function (firstName, lastName){
+          counter++;
+          return firstName + " " + lastName;
+        }
+      ]
+    });
+
+    model.firstName("Jane");
+
+    ReactiveModel.digest();
+
+    assert.equal(counter, 0);
+    assert.equal(model.fullName(), undefined);
+  });
+
+  // TODO add test for multiple hops
+  //
+  //it("should propagate two hops in a single digest", function (done){
+
+  //  var model = new ReactiveModel();
+
+  //  model.react({
+  //    b: ["a", increment],
+  //    c: ["b", increment]
+  //  });
+
+  //  model.a(1);
+  //  ReactiveModel.digest();
+
+  //  assert.equal(model.a(), 1);
+  //  assert.equal(model.b(), 2);
+  //  assert.equal(model.c(), 3);
+  //  done();
+  //});
+
+  //it("should evaluate consecutive digests independently", function (done){
 
   //  var model = new ReactiveModel();
   //  var counter = 0;
 
   //  model.react({
   //    fullName: [
-  //      "firstName", "lastName", function (firstName, lastName){
+  //      "firstName", "lastName", function (d){
   //        counter++;
-  //        return firstName + " " + lastName;
+  //        return d.firstName + " " + d.lastName;
   //      }
-  //    ]
+  //    ],
+  //    b: ["a", function (d){ return d.a + 1; }]
   //  });
 
-  //  model.firstName("Jane");
+  //  model.firstName = "Jane";
+  //  model.lastName = "Smith";
 
-  //  ReactiveModel.digest();
+  //  nextFrame(function (){
+  //    assert.equal(model.fullName, "Jane Smith");
+  //    assert.equal(counter, 1);
 
-  //  assert.equal(counter, 0);
-  //  assert.equal(model.fullName(), undefined);
+  //    model.a = 5;
+
+  //    nextFrame(function (){
+  //      assert.equal(model.b, 6);
+  //      assert.equal(counter, 1);
+  //      done();
+  //    });
+  //  });
   //});
 
 });
