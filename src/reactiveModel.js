@@ -97,7 +97,7 @@ function ReactiveModel(){
       createGetterSetters(reactiveFunction.inProperties);
       createGetterSetters([reactiveFunction.outProperty]);
 
-      reactiveGraph.assignNodes(reactiveFunction, model);
+      assignNodes(reactiveFunction);
 
       reactiveGraph.addReactiveFunction(reactiveFunction);
 
@@ -105,6 +105,22 @@ function ReactiveModel(){
         reactiveGraph.changedPropertyNodes[node] = true;
       });
     });
+  }
+
+  function getOrCreatePropertyNode(property){
+    if(property in propertyNodes){
+      return propertyNodes[property];
+    } else {
+      var propertyNode = reactiveGraph.makePropertyNode(model[property]);
+      propertyNodes[property] = propertyNode;
+      return propertyNode;
+    }
+  }
+
+  function assignNodes(reactiveFunction){
+    reactiveFunction.inNodes = reactiveFunction.inProperties.map(getOrCreatePropertyNode);
+    reactiveFunction.node = reactiveGraph.makeReactiveFunctionNode(reactiveFunction);
+    reactiveFunction.outNode = getOrCreatePropertyNode(reactiveFunction.outProperty);
   }
 
   model.addPublicProperty = addPublicProperty;

@@ -2,7 +2,6 @@ import Graph from "./graph";
 
 function ReactiveGraph(){
   var reactiveGraph = new Graph();
-  var nodeCounter = 0;
 
   // { node -> getterSetter }
   var getterSetters = {};
@@ -12,6 +11,8 @@ function ReactiveGraph(){
 
   // { node -> true }
   var changedPropertyNodes = {};
+  
+  var nodeCounter = 0;
 
   function makeNode(){
     return nodeCounter++;
@@ -29,22 +30,9 @@ function ReactiveGraph(){
     return node;
   }
 
-  function assignNodes(reactiveFunction, getterSettersByProperty){
-
-    // TODO move into reactiveModel
-    function getPropertyNode(property){
-      var getterSetter = getterSettersByProperty[property];
-      return makePropertyNode(getterSetter);
-    }
-
-    reactiveFunction.inNodes = reactiveFunction.inProperties.map(getPropertyNode)
-    reactiveFunction.node = makeReactiveFunctionNode(reactiveFunction);
-    reactiveFunction.outNode = getPropertyNode(reactiveFunction.outProperty);
-  }
-
   function addReactiveFunction(reactiveFunction){
-    if( (reactiveFunction.inNodes === undefined) ||
-        (reactiveFunction.outNode === undefined)){
+
+    if( (reactiveFunction.inNodes === undefined) || (reactiveFunction.outNode === undefined) ){
         throw new Error("Attempting to add a reactive function that " +
           "doesn't have inNodes or outNode defined first.");
     }
@@ -54,33 +42,22 @@ function ReactiveGraph(){
     });
 
     reactiveGraph.addEdge(reactiveFunction.node, reactiveFunction.outNode);
-
-    //reactiveFunction.inNodes.forEach(function (inNode){
-    //  if(isDefined(getterSetters[inNode]))
-    //    changedNodes
   }
 
   function isDefined(value){
     return typeof d === "undefined" || d === null;
   }
 
-
-  // Constructs the object to be passed into reactive function callbacks.
-  // Returns an object with values for each inProperty of the given reactive function.
-  function inPropertyValues(λ){
-    var d = {};
-    reactiveFunction.inProperties.forEach(function (inProperty){
-      d[inProperty] = simpleModel.get(inProperty);
-    });
-    return d;
-  }
-
   function evaluate(reactiveFunction){
+
     var inValues = reactiveFunction.inNodes.map(function (node){
       return getterSetters[node]();
     });
+
     var outValue = reactiveFunction.callback.apply(null, inValues);
+
     getterSetters[reactiveFunction.outNode](outValue);
+
   }
 
   function digest(){
@@ -99,12 +76,14 @@ function ReactiveGraph(){
   }
 
   reactiveGraph.addReactiveFunction = addReactiveFunction;
-  reactiveGraph.assignNodes = assignNodes;
   reactiveGraph.makeNode = makeNode;
   reactiveGraph.digest = digest;
 
   // This is exposed for unit testing only.
   reactiveGraph.changedPropertyNodes = changedPropertyNodes;
+
+  reactiveGraph.makePropertyNode = makePropertyNode;
+  reactiveGraph.makeReactiveFunctionNode = makeReactiveFunctionNode;
 
   return reactiveGraph;
 }

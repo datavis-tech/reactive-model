@@ -46,26 +46,21 @@ describe("ReactiveGraph", function (){
     };
   }
 
-  it("should assign nodes", function (){
-    var reactiveGraph = new ReactiveGraph();
-    var reactiveFunction = new ReactiveFunction(["a"], "b", increment);
-    var getterSettersByProperty = createGetterSetters();
-
-    reactiveGraph.assignNodes(reactiveFunction, getterSettersByProperty);
-
-    assert.equal(reactiveFunction.inNodes.length, 1);
-    assert.equal(reactiveFunction.inNodes[0], 0);
-    assert.equal(reactiveFunction.node, 1);
-    assert.equal(reactiveFunction.outNode, 2);
-  });
+  function assignNodes(reactiveGraph, reactiveFunction, getterSettersByProperty){
+    reactiveFunction.inNodes = reactiveFunction.inProperties.map(function (property){
+      return reactiveGraph.makePropertyNode(getterSettersByProperty[property]);
+    });
+    reactiveFunction.node = reactiveGraph.makeReactiveFunctionNode(reactiveFunction);
+    reactiveFunction.outNode = reactiveGraph
+      .makePropertyNode(getterSettersByProperty[reactiveFunction.outProperty]);
+  }
 
   it("should add edges to the dependency graph", function (){
     var reactiveGraph = new ReactiveGraph();
     var reactiveFunction = new ReactiveFunction(["a"], "b", increment);
     var getterSettersByProperty = createGetterSetters();
 
-    reactiveGraph.assignNodes(reactiveFunction, getterSettersByProperty);
-
+    assignNodes(reactiveGraph, reactiveFunction, getterSettersByProperty);
     reactiveGraph.addReactiveFunction(reactiveFunction);
 
     var inNode = reactiveFunction.inNodes[0];
@@ -83,7 +78,7 @@ describe("ReactiveGraph", function (){
     var reactiveFunction = new ReactiveFunction(["a"], "b", increment);
     var getterSettersByProperty = createGetterSetters();
 
-    reactiveGraph.assignNodes(reactiveFunction, getterSettersByProperty);
+    assignNodes(reactiveGraph, reactiveFunction, getterSettersByProperty);
     reactiveGraph.addReactiveFunction(reactiveFunction);
 
     var inNode = reactiveFunction.inNodes[0];
@@ -101,7 +96,7 @@ describe("ReactiveGraph", function (){
     var reactiveFunction = new ReactiveFunction(["a"], "b", increment);
     var getterSettersByProperty = createGetterSetters();
 
-    reactiveGraph.assignNodes(reactiveFunction, getterSettersByProperty);
+    assignNodes(reactiveGraph, reactiveFunction, getterSettersByProperty);
     reactiveGraph.addReactiveFunction(reactiveFunction);
 
     var inNode = reactiveFunction.inNodes[0];

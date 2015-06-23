@@ -20,7 +20,7 @@
   "homepage": "https://github.com/curran/reactive-model",
   "devDependencies": {
     "mocha": "^2.2.5",
-    "rollup": "^0.7.6",
+    "rollup": "^0.8.1",
     "source-map-support": "^0.3.1",
     "uglifyjs": "^2.4.10"
   }
