@@ -279,4 +279,33 @@ describe("ReactiveModel", function (){
     assert.equal(model.b(), 2);
     assert.equal(model.fullName(), "John Doe");
   });
+
+  function add(a, b){
+    console.log(a);
+    console.log(b);
+    return a + b;
+  }
+
+  it("should evaluate tricky case", function (){
+
+    var model = new ReactiveModel();
+
+    // a - b
+    //       \
+    //        e
+    //       /
+    // c - d
+
+    model.react({
+      b: ["a", increment],
+      d: ["c", increment],
+      e: ["b", "d", add]
+    });
+
+    model.a(1).c(2);
+
+    ReactiveModel.digest();
+
+    assert.equal(model.e(), (1 + 1) + (2 + 1));
+  });
 });
