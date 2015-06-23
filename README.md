@@ -127,6 +127,7 @@ See also:
  * [ZJONSSON/clues](https://github.com/ZJONSSON/clues) A very similar library based on Promises.
  * [AngularJS Dependency Injection](https://docs.angularjs.org/guide/di) Inspired the API for reactive functions.
  * [AMD](http://requirejs.org/docs/whyamd.html#amd) Also inspired the API for reactive functions.
+ * [Notes on Graph Algorithms Used in Optimizing Compilers](http://www.cs.umb.edu/~offner/files/flow_graph.pdf) Similar algorithms for flow graph analysis.
 
 ## Future Plans
 
