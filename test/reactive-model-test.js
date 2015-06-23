@@ -2,6 +2,14 @@ var ReactiveModel = require("../reactive-model.js");
 var assert = require("assert");
 require("source-map-support").install();
 
+function increment(x){
+  return x + 1;
+}
+
+function add(a, b){
+  return a + b;
+}
+
 describe("ReactiveModel", function (){
 
   it("should be a function", function (){
@@ -222,10 +230,6 @@ describe("ReactiveModel", function (){
     assert.equal(model.fullName(), undefined);
   });
 
-  function increment(x){
-    return x + 1;
-  }
-
   it("should propagate two hops in a single digest", function (){
 
     var model = new ReactiveModel();
@@ -279,12 +283,6 @@ describe("ReactiveModel", function (){
     assert.equal(model.b(), 2);
     assert.equal(model.fullName(), "John Doe");
   });
-
-  function add(a, b){
-    console.log(a);
-    console.log(b);
-    return a + b;
-  }
 
   it("should evaluate tricky case", function (){
 

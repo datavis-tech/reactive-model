@@ -101,8 +101,14 @@ function ReactiveGraph(){
 
   function evaluate(reactiveFunction){
     var inValues = reactiveFunction.inNodes.map(getPropertyNodeValue);
-    var outValue = reactiveFunction.callback.apply(null, inValues);
-    getterSetters[reactiveFunction.outNode](outValue);
+    if(inValues.every(isDefined)){
+      var outValue = reactiveFunction.callback.apply(null, inValues);
+      getterSetters[reactiveFunction.outNode](outValue);
+    }
+  }
+
+  function isDefined(value){
+    return !(typeof value === "undefined" || value === null);
   }
 
   function getPropertyNodeValue(node){
@@ -112,7 +118,7 @@ function ReactiveGraph(){
   function digest(){
   
     var sourceNodes = Object.keys(changedPropertyNodes);
-    var visitedNodes = reactiveGraph.DFS(sourceNodes, shouldVisit);
+    var visitedNodes = reactiveGraph.DFS(sourceNodes);
     var topologicallySorted = visitedNodes.reverse();
 
     topologicallySorted.forEach(function (node){
@@ -121,42 +127,10 @@ function ReactiveGraph(){
       }
     });
 
-    // Not using sourceNodes.forEach() here,
-    // because shouldVisit mutates changedPropertyNodes,
-    // adding output property nodes for visited reactive functions.
-    Object.keys(changedPropertyNodes).forEach(function(node){
+    sourceNodes.forEach(function(node){
       delete changedPropertyNodes[node];
     });
-
   }
-
-  function shouldVisit(node){
-
-    // Only visit reactive function whose inputs are all defined.
-    if(node in reactiveFunctions){
-      var reactiveFunction = reactiveFunctions[node];
-      var willVisit = reactiveFunction.inNodes.every(function (node){
-        var defined = isDefined(getPropertyNodeValue(node));
-        var changed = node in changedPropertyNodes;
-        return defined || changed;
-      });
-
-      if(willVisit){
-        propertyNodeDidChange(reactiveFunction.outNode);
-      }
-
-      return willVisit;
-    } else {
-     
-      // Visit all property nodes regardless.
-      return true;
-    }
-  }
-
-  function isDefined(value){
-    return !(typeof value === "undefined" || value === null);
-  }
-
 
   function propertyNodeDidChange(node){
     changedPropertyNodes[node] = true;

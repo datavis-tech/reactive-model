@@ -127,3 +127,29 @@ See also:
  * [ZJONSSON/clues](https://github.com/ZJONSSON/clues) A very similar library based on Promises.
  * [AngularJS Dependency Injection](https://docs.angularjs.org/guide/di) Inspired the API for reactive functions.
  * [AMD](http://requirejs.org/docs/whyamd.html#amd) Also inspired the API for reactive functions.
+
+## Future Plans
+
+This part is aspirational, not yet implemented. Following [readme-driven development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html).
+
+For asynchronouos operations, the API should support returning a Promise from the reactive function callback. Here's an example that uses this API to fetch a CSV file using [d3.csv](https://github.com/mbostock/d3/wiki/CSV):
+
+```javascript
+var model = new ReactiveModel();
+
+model.react({
+  data: ["url", function (url){
+    return new Promise(function (resolve, reject){
+      d3.csv(url, function (error, data){
+        if(error) {
+          reject(error);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  ]
+});
+```
+
+A special default value `model.NONE` refers to a value that is defined, but represents that the property is optional and has not been speficied (similar conceptually to [Scala's Option Type](http://danielwestheide.com/blog/2012/12/19/the-neophytes-guide-to-scala-part-5-the-option-type.html).
