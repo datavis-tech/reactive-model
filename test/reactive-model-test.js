@@ -202,7 +202,6 @@ describe("ReactiveModel", function (){
   });
 
   it("should not react when only one of two input properties is defined", function (){
-
     var model = new ReactiveModel();
     var counter = 0;
 
@@ -227,7 +226,7 @@ describe("ReactiveModel", function (){
     return x + 1;
   }
 
-  it("should propagate two hops in a single digest", function (done){
+  it("should propagate two hops in a single digest", function (){
 
     var model = new ReactiveModel();
 
@@ -242,39 +241,42 @@ describe("ReactiveModel", function (){
     assert.equal(model.a(), 1);
     assert.equal(model.b(), 2);
     assert.equal(model.c(), 3);
-    done();
   });
+  
+  it("should evaluate digests independently", function (){
+    var model = new ReactiveModel();
 
-  //it("should evaluate consecutive digests independently", function (done){
+    var counterFullName = 0;
+    var counterB = 0;
 
-  //  var model = new ReactiveModel();
-  //  var counter = 0;
+    model.react({
+      fullName: [
+        "firstName", "lastName", function (firstName, lastName){
+          counterFullName++;
+          return firstName + " " + lastName;
+        }
+      ],
+      b: ["a", function (a){
+        counterB++;
+        return a + 1;
+      }]
+    });
 
-  //  model.react({
-  //    fullName: [
-  //      "firstName", "lastName", function (d){
-  //        counter++;
-  //        return d.firstName + " " + d.lastName;
-  //      }
-  //    ],
-  //    b: ["a", function (d){ return d.a + 1; }]
-  //  });
+    model.firstName("John");
+    model.lastName("Doe");
+    ReactiveModel.digest();
 
-  //  model.firstName = "Jane";
-  //  model.lastName = "Smith";
+    assert.equal(counterFullName, 1);
+    assert.equal(counterB, 0);
+    assert.equal(model.fullName(), "John Doe");
 
-  //  nextFrame(function (){
-  //    assert.equal(model.fullName, "Jane Smith");
-  //    assert.equal(counter, 1);
+    model.a(1);
+    ReactiveModel.digest();
 
-  //    model.a = 5;
-
-  //    nextFrame(function (){
-  //      assert.equal(model.b, 6);
-  //      assert.equal(counter, 1);
-  //      done();
-  //    });
-  //  });
-  //});
-
+    assert.equal(counterFullName, 1);
+    assert.equal(counterB, 1);
+    assert.equal(model.a(), 1);
+    assert.equal(model.b(), 2);
+    assert.equal(model.fullName(), "John Doe");
+  });
 });
