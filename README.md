@@ -1,4 +1,5 @@
 # reactive-model
+[![Build Status](https://travis-ci.org/curran/reactive-model.svg)](https://travis-ci.org/curran/reactive-model)
 
 A library for reactive models.
 
