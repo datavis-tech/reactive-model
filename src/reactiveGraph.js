@@ -89,16 +89,14 @@ function ReactiveGraph(){
       var reactiveFunction = reactiveFunctions[node];
       var willVisit = reactiveFunction.inNodes.every(function (node){
         var defined = isDefined(getPropertyNodeValue(node));
-
-        // TODO test this, required for multiple hops
-        //var changed = node in changedPropertyNodes;
-        return defined; //|| changed;
+        var changed = node in changedPropertyNodes;
+        return defined || changed;
       });
 
-      // TODO test this, required for multiple hops
-      //if(willVisit){
-      //  propertyNodeDidChange(reactiveFunction.outNode);
-      //}
+      if(willVisit){
+        propertyNodeDidChange(reactiveFunction.outNode);
+      }
+
       return willVisit;
     } else {
      

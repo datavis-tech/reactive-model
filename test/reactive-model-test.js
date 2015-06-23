@@ -223,25 +223,27 @@ describe("ReactiveModel", function (){
     assert.equal(model.fullName(), undefined);
   });
 
-  // TODO add test for multiple hops
-  //
-  //it("should propagate two hops in a single digest", function (done){
+  function increment(x){
+    return x + 1;
+  }
 
-  //  var model = new ReactiveModel();
+  it("should propagate two hops in a single digest", function (done){
 
-  //  model.react({
-  //    b: ["a", increment],
-  //    c: ["b", increment]
-  //  });
+    var model = new ReactiveModel();
 
-  //  model.a(1);
-  //  ReactiveModel.digest();
+    model.react({
+      b: ["a", increment],
+      c: ["b", increment]
+    });
 
-  //  assert.equal(model.a(), 1);
-  //  assert.equal(model.b(), 2);
-  //  assert.equal(model.c(), 3);
-  //  done();
-  //});
+    model.a(1);
+    ReactiveModel.digest();
+
+    assert.equal(model.a(), 1);
+    assert.equal(model.b(), 2);
+    assert.equal(model.c(), 3);
+    done();
+  });
 
   //it("should evaluate consecutive digests independently", function (done){
 
