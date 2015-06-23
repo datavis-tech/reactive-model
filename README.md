@@ -13,7 +13,6 @@ Require the package in your code:
 `var ReactiveModel = require("reactive-model");`
 
 Here is an example that demonstrates most of the features of this library.
-[![](http://curran.github.io/images/reactive-model/firstLastFlow.png)](http://bl.ocks.org/curran/5905182da50a4667dc00)
 
 ```javascript
 var model = new ReactiveModel();
@@ -36,15 +35,19 @@ ReactiveModel.digest();
 console.log(model.fullName());
 ```
 
+Here is a visual representation of the data dependency graph constructed in this example.
+[![](http://curran.github.io/images/reactive-model/firstLastFlow.png)](http://bl.ocks.org/curran/5905182da50a4667dc00)
+
 ## API Reference
 
 <a name="reactive-model" href="#reactive-model">#</a> <b>ReactiveModel</b>()
 
-Constructs a new reactive model. The `new` keyword is optional. Example:
+Constructs a new reactive model. The `new` keyword is optional.
 
+Example use:
 `var model = new ReactiveModel();`
 
-<a name="react" href="#react">#</a> <i>ReactiveModel</i>(<i>options</i>)
+<a name="react" href="#react">#</a> <i>react</i>(<i>options</i>)
 
 Adds the given set of reactive functions to the data dependency graph. The `options` argument is an object where:
 
@@ -68,11 +71,11 @@ The reactive function callback is invoked with the values of input properties du
 The return value from the callback is assigned to the output property during a digest, which may be used as an input property to another reactive function. For example, here is a collection of two reactive functions that assign `b = a +1` and `c = b + 1`:
 
 ```javascript
-  function increment(x){ return x + 1; }
-  model.react({
-    b: ["a", increment],
-    c: ["b", increment]
-  });
+function increment(x){ return x + 1; }
+model.react({
+  b: ["a", increment],
+  c: ["b", increment]
+});
 ```
 
 If `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
@@ -95,11 +98,21 @@ To list all source files, run
 
 `make tree`
 
+## How it Works
+
+This library maintains a graph data structure internally, called the "data dependency graph", in which
+
+ * vertices represent either properties or reactive functions, and
+ * edges represent a data dependency.
+
+Whenever `react()` is called, nodes and edges are added to this data structure. Whenever a property is changed (via its getter-setter), that property is marked as changed.
+
+The digest algorithm performs a depth first search using the changed property nodes as sources for the search. When visiting each reactive function node, a check is performed that ensures all of its input properties are defined. The resulting list of nodes visited by the depth first search algorithm is then reversed to obtain the topologically sorted order in which the reactive functions must be executed. After computing this ordering, each reactive function is executed, and its output value is assigned to its output property.
+
 ## Background
 
 This is a re-design of [model.js](https://github.com/curran/model) that addresses the following issues:
 
- * The model.js syntax forces you to type each dependency property twice.
  * The model.js syntax does not encode the data dependency graph explicitly, it is expressed implicitly by setting model property values within reactive functions (`model.when` callbacks).
  * The execution model of model.js uses `setTimeout` to queue evaluation of every single edge in the data dependency graph. This can have a performance impact, and can lead to inconsistent system state while the dependency graph is being evaluated. Let's say `setTimeout` takes about 4 ms to resolve. This means it would take 4 * d ms to evaluate any full data dependency graph, where d is the number of hops required through the data dependency graph (there must be some graph theory term for this..).
 
@@ -109,12 +122,8 @@ The core ideas of this redesign are:
  * processing of changes is delayed until the next animation frame, so updates are synchronized with rendering
  * changes are processed (or "digested") using an explicit topological sort algorithm on the data dependency graph.
 
-See also [ZJONSSON/clues](https://github.com/ZJONSSON/clues), which is a very similar library.
+See also:
 
-## How it Works
-
-This library maintains a graph data structure internally, called the "data dependency graph", in which
-
- * vertices represent either properties or reactive functions, and
- * edges represent a data dependency;
-
+ * [ZJONSSON/clues](https://github.com/ZJONSSON/clues) A very similar library based on Promises.
+ * [AngularJS Dependency Injection](https://docs.angularjs.org/guide/di) Inspired the API for reactive functions.
+ * [AMD](http://requirejs.org/docs/whyamd.html#amd) Also inspired the API for reactive functions.
