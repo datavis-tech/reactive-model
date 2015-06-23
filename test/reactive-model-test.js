@@ -158,27 +158,69 @@ describe("ReactiveModel", function (){
     assert.equal(model.b(), 8);
   });
 
-  //it("should track when values change", function (){
-  //  var model = new ReactiveModel()
-  //    .addPublicProperty("a", 5)
-  //    .finalize();
+  it("should track when values change", function (){
+    var model = new ReactiveModel()
+      .addPublicProperty("a", 5)
+      .finalize();
+
+    model.react({
+      b: ["a", function (a){
+        return a + 1;
+      }]
+    });
+
+    model.a(7);
+    ReactiveModel.digest();
+    assert.equal(model.b(), 8);
+
+    model.a(8);
+    model.a(9);
+    model.a(10);
+    ReactiveModel.digest();
+    assert.equal(model.b(), 11);
+  });
+
+  it("should react with two input properties", function (){
+
+    var model = new ReactiveModel();
+
+    model.react({
+      fullName: [
+        "firstName", "lastName", function (firstName, lastName){
+          return firstName + " " + lastName;
+        }
+      ]
+    });
+
+    model
+      .firstName("Jane")
+      .lastName("Smith");
+
+    ReactiveModel.digest();
+
+    assert.equal(model.fullName(), "Jane Smith");
+  });
+
+  //it("should not react with one of two input properties defined", function (){
+
+  //  var model = new ReactiveModel();
+  //  var counter = 0;
 
   //  model.react({
-  //    b: ["a", function (a){
-  //      return a + 1;
-  //    }]
+  //    fullName: [
+  //      "firstName", "lastName", function (firstName, lastName){
+  //        counter++;
+  //        return firstName + " " + lastName;
+  //      }
+  //    ]
   //  });
 
-  //  model.a(7);
-  //  ReactiveModel.digest();
-  //  assert.equal(model.b(), 8);
+  //  model.firstName("Jane");
 
-  //  model.a(8);
-  //  model.a(9);
-  //  model.a(10);
   //  ReactiveModel.digest();
-  //  assert.equal(model.b(), 11);
+
+  //  assert.equal(counter, 0);
+  //  assert.equal(model.fullName(), undefined);
   //});
-
 
 });

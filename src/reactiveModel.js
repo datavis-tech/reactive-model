@@ -3,6 +3,10 @@ import ReactiveGraph from "./reactiveGraph";
 import ReactiveFunction from "./reactiveFunction";
 
 var reactiveGraph = new ReactiveGraph();
+var changedPropertyNodes     = reactiveGraph.changedPropertyNodes;
+var addReactiveFunction      = reactiveGraph.addReactiveFunction;
+var makePropertyNode         = reactiveGraph.makePropertyNode;
+var makeReactiveFunctionNode = reactiveGraph.makeReactiveFunctionNode;
 
 function ReactiveModel(){
   
@@ -19,14 +23,17 @@ function ReactiveModel(){
 
   var isFinalized = false;
 
+  // { property -> value }
   var values = {};
 
   // { property -> node }
-  var propertyNodes = {};
+  var trackedProperties = {};
 
   function addPublicProperty(property, defaultValue){
     if(isFinalized){
-      throw new Error("model.addPublicProperty() is being invoked after model.finalize, but this is not allowed. Public properties may only be added before the model is finalized.");
+      throw new Error("model.addPublicProperty() is being " +
+        "invoked after model.finalize, but this is not allowed. "+
+        "Public properties may only be added before the model is finalized.");
     }
 
     publicProperties[property] = defaultValue;
@@ -35,20 +42,18 @@ function ReactiveModel(){
     return model;
   }
 
-  function createGetterSetters(properties){
-    properties.forEach(function (property){
-      model[property] = function (value){
-        if (!arguments.length) {
-          return values[property];
-        }
-        values[property] = value;
+  function createGetterSetter(property){
+    return function (value){
+      if (!arguments.length) {
+        return values[property];
+      }
+      values[property] = value;
 
-        var node = propertyNodes[property]
-        reactiveGraph.changedPropertyNodes[node] = true;
+      var propertyNode = trackedProperties[property];
+      changedPropertyNodes[propertyNode] = true;
 
-        return model;
-      };
-    });
+      return model;
+    };
   }
 
   function finalize(){
@@ -58,7 +63,7 @@ function ReactiveModel(){
     }
     isFinalized = true;
 
-    createGetterSetters(Object.keys(publicProperties));
+    Object.keys(publicProperties).map(track);
 
     return model;
   }
@@ -92,35 +97,35 @@ function ReactiveModel(){
     var reactiveFunctions = ReactiveFunction.parse(options);
     reactiveFunctions.forEach(function (reactiveFunction){
 
-      // TODO refactor this into "track()",
-      // and only create getter-setters once for each property
-      createGetterSetters(reactiveFunction.inProperties);
-      createGetterSetters([reactiveFunction.outProperty]);
-
       assignNodes(reactiveFunction);
 
-      reactiveGraph.addReactiveFunction(reactiveFunction);
+      addReactiveFunction(reactiveFunction);
 
       reactiveFunction.inNodes.forEach(function (node){
-        reactiveGraph.changedPropertyNodes[node] = true;
+        changedPropertyNodes[node] = true;
       });
     });
   }
 
-  function getOrCreatePropertyNode(property){
-    if(property in propertyNodes){
-      return propertyNodes[property];
+  function track(property){
+    if(property in trackedProperties){
+      return trackedProperties[property];
     } else {
-      var propertyNode = reactiveGraph.makePropertyNode(model[property]);
-      propertyNodes[property] = propertyNode;
+      var getterSetter = createGetterSetter(property);
+
+      model[property] = getterSetter;
+
+      var propertyNode = makePropertyNode(getterSetter);
+      trackedProperties[property] = propertyNode;
+
       return propertyNode;
     }
   }
 
   function assignNodes(reactiveFunction){
-    reactiveFunction.inNodes = reactiveFunction.inProperties.map(getOrCreatePropertyNode);
-    reactiveFunction.node = reactiveGraph.makeReactiveFunctionNode(reactiveFunction);
-    reactiveFunction.outNode = getOrCreatePropertyNode(reactiveFunction.outProperty);
+    reactiveFunction.inNodes = reactiveFunction.inProperties.map(track);
+    reactiveFunction.node = makeReactiveFunctionNode(reactiveFunction);
+    reactiveFunction.outNode = track(reactiveFunction.outProperty);
   }
 
   model.addPublicProperty = addPublicProperty;
