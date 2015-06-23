@@ -193,11 +193,9 @@ describe("ReactiveModel", function (){
     var model = new ReactiveModel();
 
     model.react({
-      fullName: [
-        "firstName", "lastName", function (firstName, lastName){
-          return firstName + " " + lastName;
-        }
-      ]
+      fullName: ["firstName", "lastName", function (firstName, lastName){
+        return firstName + " " + lastName;
+      }]
     });
 
     model
@@ -214,12 +212,10 @@ describe("ReactiveModel", function (){
     var counter = 0;
 
     model.react({
-      fullName: [
-        "firstName", "lastName", function (firstName, lastName){
-          counter++;
-          return firstName + " " + lastName;
-        }
-      ]
+      fullName: ["firstName", "lastName", function (firstName, lastName){
+        counter++;
+        return firstName + " " + lastName;
+      }]
     });
 
     model.firstName("Jane");
@@ -254,12 +250,10 @@ describe("ReactiveModel", function (){
     var counterB = 0;
 
     model.react({
-      fullName: [
-        "firstName", "lastName", function (firstName, lastName){
-          counterFullName++;
-          return firstName + " " + lastName;
-        }
-      ],
+      fullName: ["firstName", "lastName", function (firstName, lastName){
+        counterFullName++;
+        return firstName + " " + lastName;
+      }],
       b: ["a", function (a){
         counterB++;
         return a + 1;

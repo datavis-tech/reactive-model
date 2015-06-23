@@ -19,11 +19,9 @@ Here is an example that demonstrates most of the features of this library.
 var model = new ReactiveModel();
 
 model.react({
-  fullName: [
-    "firstName", "lastName", function (firstName, lastName){
-      return firstName + " " + lastName;
-    }
-  ]
+  fullName: ["firstName", "lastName", function (firstName, lastName){
+    return firstName + " " + lastName;
+  }]
 });
 
 model
@@ -69,7 +67,7 @@ model.react({
 
 The reactive function callback is invoked with the values of input properties during a digest. This callback is only invoked if all input properties have defined values. If any of the input properties change, this callback will be invoked again in the next digest after the change.
 
-The return value from the callback is assigned to the output property during a digest, which may be used as an input property to another reactive function. For example, here is a collection of two reactive functions that assign `b = a +1` and `c = b + 1`:
+The return value from the callback is assigned to the output property during a digest, which may be used as an input property to another reactive function. For example, here is a collection of two reactive functions that assign `b = a +1` and `c = b + 1`. In this example, if `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
 
 ```javascript
 function increment(x){ return x + 1; }
@@ -79,7 +77,41 @@ model.react({
 });
 ```
 
-If `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
+<a name="getter-setters" href="#getter-setters">#</a> getter-setters
+
+Every tracked property is made available on the model object as a [chainable getter-setter function](http://bost.ocks.org/mike/chart/#reconfiguration). A property is considered "tracked" after it is
+
+ * used as an input property to a reactive function,
+ * used as an output property to a reactive function, or
+ * added as a public property.
+
+Assuming there is a tracked property `a`, we can set its value to 5 like this:
+
+```javascript
+model.a(5);
+```
+
+The value can then be retreived by invoking the function with no arguments:
+
+```javascript
+console.log(model.a()); // Prints 5`
+```
+
+When the setter form is used, the model is returned. This enables method chaining. Assuming there are tracked properties `a`, `b`, and `c`, their values can all be set simultaneously like this:
+
+```javascript
+model
+  .a(3)
+  .b(4)
+  .c(5);
+```
+
+<a name="add-public-property" href="#add-public-property">#</a> <i>addPublicProperty</i>(<i>property</i>, <i>defaultValue</i>)
+...
+<a name="get-state" href="#get-state">#</a> <i>getState</i>()
+...
+<a name="set-state" href="#set-state">#</a> <i>setState</i>(<i>state</i>)
+...
 
 ## Glossary
 
