@@ -13,7 +13,10 @@ Require the package in your code:
 
 `var ReactiveModel = require("reactive-model");`
 
-Here is an example that demonstrates most of the features of this library.
+## Example
+
+[![](http://curran.github.io/images/reactive-model/firstLastFlow.png)](http://bl.ocks.org/curran/5905182da50a4667dc00)
+A visual representation of the data dependency graph constructed in this example.
 
 ```javascript
 var model = new ReactiveModel();
@@ -33,9 +36,6 @@ ReactiveModel.digest();
 // Prints "Jane Smith"
 console.log(model.fullName());
 ```
-
-Here is a visual representation of the data dependency graph constructed in this example.
-[![](http://curran.github.io/images/reactive-model/firstLastFlow.png)](http://bl.ocks.org/curran/5905182da50a4667dc00)
 
 ## API Reference
 
