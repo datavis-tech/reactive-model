@@ -201,7 +201,7 @@ describe("ReactiveModel", function (){
     assert.equal(model.fullName(), "Jane Smith");
   });
 
-  //it("should not react with one of two input properties defined", function (){
+  //it("should not react when only one of two input properties is defined", function (){
 
   //  var model = new ReactiveModel();
   //  var counter = 0;

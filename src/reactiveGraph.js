@@ -85,12 +85,19 @@ function ReactiveGraph(){
 
   }
 
+  function propertyNodeDidChange(node){
+    changedPropertyNodes[node] = true;
+
+    // TODO add this:
+    // scheduleDigestOnNextFrame();
+  }
+
   reactiveGraph.addReactiveFunction      = addReactiveFunction;
   reactiveGraph.makeNode                 = makeNode;
   reactiveGraph.digest                   = digest;
   reactiveGraph.makePropertyNode         = makePropertyNode;
   reactiveGraph.makeReactiveFunctionNode = makeReactiveFunctionNode;
-  reactiveGraph.changedPropertyNodes     = changedPropertyNodes;
+  reactiveGraph.propertyNodeDidChange    = propertyNodeDidChange;
 
   return reactiveGraph;
 }

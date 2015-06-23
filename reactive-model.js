@@ -133,19 +133,29 @@ function ReactiveGraph(){
 
   }
 
+  function propertyNodeDidChange(node){
+    changedPropertyNodes[node] = true;
+
+    // TODO add this:
+    // scheduleDigestOnNextFrame();
+  }
+
   reactiveGraph.addReactiveFunction      = addReactiveFunction;
   reactiveGraph.makeNode                 = makeNode;
   reactiveGraph.digest                   = digest;
   reactiveGraph.makePropertyNode         = makePropertyNode;
   reactiveGraph.makeReactiveFunctionNode = makeReactiveFunctionNode;
-  reactiveGraph.changedPropertyNodes     = changedPropertyNodes;
+  reactiveGraph.propertyNodeDidChange    = propertyNodeDidChange;
 
   return reactiveGraph;
 }
 
 var reactiveGraph = new ReactiveGraph();
 
-var changedPropertyNodes     = reactiveGraph.changedPropertyNodes;
+var addReactiveFunction      = reactiveGraph.addReactiveFunction;
+var makePropertyNode         = reactiveGraph.makePropertyNode;
+var makeReactiveFunctionNode = reactiveGraph.makeReactiveFunctionNode;
+var propertyNodeDidChange    = reactiveGraph.propertyNodeDidChange;
 
 
 // This file serves to document the reactive function data structure,
@@ -188,10 +198,6 @@ ReactiveFunction.parse = function (options){
   });
 };
 
-var addReactiveFunction      = reactiveGraph.addReactiveFunction;
-var makePropertyNode         = reactiveGraph.makePropertyNode;
-var makeReactiveFunctionNode = reactiveGraph.makeReactiveFunctionNode;
-
 function ReactiveModel(){
   
   // Enforce use of new, so instanceof and typeof checks will always work.
@@ -224,20 +230,6 @@ function ReactiveModel(){
     values[property]           = defaultValue;
 
     return model;
-  }
-
-  function createGetterSetter(property){
-    return function (value){
-      if (!arguments.length) {
-        return values[property];
-      }
-      values[property] = value;
-
-      var propertyNode = trackedProperties[property];
-      changedPropertyNodes[propertyNode] = true;
-
-      return model;
-    };
   }
 
   function finalize(){
@@ -280,14 +272,9 @@ function ReactiveModel(){
   function react(options){
     var reactiveFunctions = ReactiveFunction.parse(options);
     reactiveFunctions.forEach(function (reactiveFunction){
-
       assignNodes(reactiveFunction);
-
       addReactiveFunction(reactiveFunction);
-
-      reactiveFunction.inNodes.forEach(function (node){
-        changedPropertyNodes[node] = true;
-      });
+      reactiveFunction.inProperties.forEach(propertyDidChange);
     });
   }
 
@@ -304,6 +291,22 @@ function ReactiveModel(){
 
       return propertyNode;
     }
+  }
+
+  function createGetterSetter(property){
+    return function (value){
+      if (!arguments.length) {
+        return values[property];
+      }
+      values[property] = value;
+      propertyDidChange(property);
+      return model;
+    };
+  }
+
+  function propertyDidChange(property){
+    var propertyNode = trackedProperties[property];
+    propertyNodeDidChange(propertyNode);
   }
 
   function assignNodes(reactiveFunction){

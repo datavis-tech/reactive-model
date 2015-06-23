@@ -73,24 +73,6 @@ describe("ReactiveGraph", function (){
     assert.equal(reactiveGraph.adjacent(reactiveFunction.node)[0], outNode);
   });
 
-  it("should clear changed property nodes on digest", function (){
-    var reactiveGraph = new ReactiveGraph();
-    var reactiveFunction = new ReactiveFunction(["a"], "b", increment);
-    var getterSettersByProperty = createGetterSetters();
-
-    assignNodes(reactiveGraph, reactiveFunction, getterSettersByProperty);
-    reactiveGraph.addReactiveFunction(reactiveFunction);
-
-    var inNode = reactiveFunction.inNodes[0];
-    reactiveGraph.changedPropertyNodes[inNode] = true;
-
-    assert.equal(inNode in reactiveGraph.changedPropertyNodes, true);
-
-    reactiveGraph.digest();
-
-    assert.equal(inNode in reactiveGraph.changedPropertyNodes, false);
-  });
-
   it("should set computed values on digest", function (){
     var reactiveGraph = new ReactiveGraph();
     var reactiveFunction = new ReactiveFunction(["a"], "b", increment);
@@ -100,7 +82,7 @@ describe("ReactiveGraph", function (){
     reactiveGraph.addReactiveFunction(reactiveFunction);
 
     var inNode = reactiveFunction.inNodes[0];
-    reactiveGraph.changedPropertyNodes[inNode] = true;
+    reactiveGraph.propertyNodeDidChange(inNode);
 
     reactiveGraph.digest();
 
