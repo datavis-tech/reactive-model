@@ -94,6 +94,8 @@ model.react({
 
 Synchronously evaluates the data dependency graph.
 
+This function is exposed on the `ReactiveModel` constructor function rather than the `ReactiveModel` instance, because there is a singleton data dependency graph shared by all reactive model instances. This approach was taken to enable reactive functions that take input from one model and yield output on another (via [bind](#bind)).
+
 <a name="getter-setters" href="#getter-setters">#</a> <i>getter-setters</i>
 
 Every tracked property is made available on the model object as a [chainable getter-setter function](http://bost.ocks.org/mike/chart/#reconfiguration).
@@ -212,6 +214,17 @@ model.react({
 ```
 
 A special default value `model.NONE` refers to a value that is defined, but represents that the property is optional and has not been speficied (similar conceptually to [Scala's Option Type](http://danielwestheide.com/blog/2012/12/19/the-neophytes-guide-to-scala-part-5-the-option-type.html).
+
+<a name="bind" href="#bind">#</a> <i>bind</i>(<i>arr</i>)
+
+Establish bidirectional data binding between properties from different models.
+
+The `arr` argument is expected to be an array of objects with the following properties:
+
+ * `model` A reference to an instance of `ReactiveModel`.
+ * `property` A property name on that model.
+
+Invoking `bind()` adds a cycle of pass-through reactive functions to the data dependency graph such that all specified properties will be synchronized, handling the fact that they are from different model instances.
 
 ## Related Work
 
