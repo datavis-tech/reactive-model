@@ -232,6 +232,6 @@ Invoking `bind()` adds a cycle of pass-through reactive functions to the data de
  * [ZJONSSON/clues](https://github.com/ZJONSSON/clues) A very similar library based on Promises.
  * [AngularJS Dependency Injection](https://docs.angularjs.org/guide/di) Inspired the API for reactive functions.
  * [AMD](http://requirejs.org/docs/whyamd.html#amd) Also inspired the API for reactive functions.
- * [Notes on Graph Algorithms Used in Optimizing Compilers](http://www.cs.umb.edu/~offner/files/flow_graph.pdf) Similar algorithms for flow graph analysis.
+ * [Notes on Graph Algorithms Used in Optimizing Compilers](http://www.cs.umb.edu/~offner/files/flow_graph.pdf) Algorithms for flow graph analysis.
  * [d3-scale](https://github.com/d3/d3-scale) Inspired documentation style.
  * [d3-bundler](https://github.com/d3/d3-bundler) Inspired approach for bundling with [Rollup](https://github.com/rollup/rollup).
