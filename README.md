@@ -97,6 +97,8 @@ Synchronously evaluates the data dependency graph.
 
 This function is exposed on the `ReactiveModel` constructor function rather than the `ReactiveModel` instance, because there is a singleton data dependency graph shared by all reactive model instances. This approach was taken to enable reactive functions that take input from one model and yield output on another (via [bind](#bind)).
 
+The term "digest" was chosen because it is already in common use within the AngularJS community and refers to almost exactly the same operation - see [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest).
+
 <a name="getter-setters" href="#getter-setters">#</a> <i>getter-setters</i>
 
 Every tracked property is made available on the model object as a [chainable getter-setter function](http://bost.ocks.org/mike/chart/#reconfiguration).
@@ -231,6 +233,7 @@ Invoking `bind()` adds a cycle of pass-through reactive functions to the data de
 
  * [ZJONSSON/clues](https://github.com/ZJONSSON/clues) A very similar library based on Promises.
  * [AngularJS Dependency Injection](https://docs.angularjs.org/guide/di) Inspired the API for reactive functions.
+ * [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest) Inspired the "digest" term.
  * [AMD](http://requirejs.org/docs/whyamd.html#amd) Also inspired the API for reactive functions.
  * [Notes on Graph Algorithms Used in Optimizing Compilers](http://www.cs.umb.edu/~offner/files/flow_graph.pdf) Algorithms for flow graph analysis.
  * [d3-scale](https://github.com/d3/d3-scale) Inspired documentation style.
