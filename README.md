@@ -43,7 +43,7 @@ console.log(model.fullName()); // Prints "Jane Smith"
 
 ## API Reference
 
- * [ReactiveModel()](#reactive-model)
+ * [ReactiveModel()](#reactive-model-constructor)
  * [react(options)](#react)
  * [getter-setters](#getter-setters)
  * [addPublicProperty(property, defaultValue)](#add-public-property)
@@ -51,7 +51,7 @@ console.log(model.fullName()); // Prints "Jane Smith"
  * [getState()](#get-state)
  * [setState()](#set-state)
 
-<a name="reactive-model" href="#reactive-model">#</a> <b>ReactiveModel</b>()
+<a name="reactive-model" href="#reactive-model-constructor">#</a> <b>ReactiveModel</b>()
 
 Constructs a new reactive model. The `new` keyword is optional.
 
@@ -188,13 +188,6 @@ The state-related functions (addPublicProperty, finalize, getState, and setState
 
 Moving the publicProperty and serialization/deserialization semantics into the model abstraction seemed like a logical move. This will simplify the implementation of an engine like Chiasm, and will provide consistent serialization behavior for any users of reactive-model.
 
-See also:
-
- * [ZJONSSON/clues](https://github.com/ZJONSSON/clues) A very similar library based on Promises.
- * [AngularJS Dependency Injection](https://docs.angularjs.org/guide/di) Inspired the API for reactive functions.
- * [AMD](http://requirejs.org/docs/whyamd.html#amd) Also inspired the API for reactive functions.
- * [Notes on Graph Algorithms Used in Optimizing Compilers](http://www.cs.umb.edu/~offner/files/flow_graph.pdf) Similar algorithms for flow graph analysis.
-
 ## Future Plans
 
 This part is aspirational, not yet implemented. Following [readme-driven development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html).
@@ -220,3 +213,12 @@ model.react({
 ```
 
 A special default value `model.NONE` refers to a value that is defined, but represents that the property is optional and has not been speficied (similar conceptually to [Scala's Option Type](http://danielwestheide.com/blog/2012/12/19/the-neophytes-guide-to-scala-part-5-the-option-type.html).
+
+## Related Work
+
+ * [ZJONSSON/clues](https://github.com/ZJONSSON/clues) A very similar library based on Promises.
+ * [AngularJS Dependency Injection](https://docs.angularjs.org/guide/di) Inspired the API for reactive functions.
+ * [AMD](http://requirejs.org/docs/whyamd.html#amd) Also inspired the API for reactive functions.
+ * [Notes on Graph Algorithms Used in Optimizing Compilers](http://www.cs.umb.edu/~offner/files/flow_graph.pdf) Similar algorithms for flow graph analysis.
+ * [d3-scale](https://github.com/d3/d3-scale) Inspired documentation style.
+ * [d3-bundler](https://github.com/d3/d3-bundler) Inspired approach for bundling with [Rollup](https://github.com/rollup/rollup).
