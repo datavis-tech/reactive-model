@@ -43,6 +43,14 @@ console.log(model.fullName()); // Prints "Jane Smith"
 
 ## API Reference
 
+ * [ReactiveModel()](#reactive-model)
+ * [react(options)](#react)
+ * [getter-setters](#getter-setters)
+ * [addPublicProperty(property, defaultValue)](#add-public-property)
+ * [finalize()](#finalize)
+ * [getState()](#get-state)
+ * [setState()](#set-state)
+
 <a name="reactive-model" href="#reactive-model">#</a> <b>ReactiveModel</b>()
 
 Constructs a new reactive model. The `new` keyword is optional.
@@ -77,7 +85,10 @@ The reactive function callback is invoked with the values of input properties du
 The return value from the callback is assigned to the output property during a digest, which may be used as an input property to another reactive function. For example, here is a collection of two reactive functions that assign `b = a +1` and `c = b + 1`. In this example, if `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
 
 ```javascript
-function increment(x){ return x + 1; }
+function increment(x){
+  return x + 1;
+}
+
 model.react({
   b: ["a", increment],
   c: ["b", increment]
@@ -169,13 +180,18 @@ The digest algorithm performs a depth first search using the changed property no
 This is a re-design of [model.js](https://github.com/curran/model) that addresses the following issues:
 
  * The model.js syntax does not encode the data dependency graph explicitly, it is expressed implicitly by setting model property values within reactive functions (`model.when` callbacks).
- * The execution model of model.js uses `setTimeout` to queue evaluation of every single edge in the data dependency graph. This can have a performance impact, and can lead to inconsistent system state while the dependency graph is being evaluated. Let's say `setTimeout` takes about 4 ms to resolve. This means it would take 4 * d ms to evaluate any full data dependency graph, where d is the number of hops required through the data dependency graph (there must be some graph theory term for this..).
+ * The execution model of model.js uses `setTimeout` to queue evaluation of every single edge in the data dependency graph. This can have a performance impact, and can lead to inconsistent system state while the dependency graph is being evaluated. Let's say `setTimeout` takes about 4 ms to resolve. This means it would take 4 * d ms to evaluate any full data dependency graph, where d is the number of hops required through the data dependency graph.
 
 The core ideas of this redesign are:
 
  * data dependency graphs are specified explicitly (a lot like [Make](http://en.wikipedia.org/wiki/Make_%28software%29))
+ * changes are digested using an explicit topological sort algorithm on the data dependency graph
+ * digests are synchronous (avoiding poor performance and inconsistent system state)
  * processing of changes is delayed until the next animation frame, so updates are synchronized with rendering
- * changes are processed (or "digested") using an explicit topological sort algorithm on the data dependency graph.
+
+The state-related functions (addPublicProperty, finalize, getState, and setState) were informed by work on the [Chiasm project](https://github.com/curran/chiasm/). Chiasm manages synchronization of interactive visualizations with a dynamic application state configuration. In order to achieve predictable behavior, Chiasm introduces the notion of "public properties" and the requirement that they have default values. This is essential to achieve the goal of reversability for every action resulting from configuration changes (required to support undo/redo and history navigation, one of the goals of the Chiasm project).
+
+Moving the publicProperty and serialization/deserialization semantics into the model abstraction seemed like a logical move. This will simplify the implementation of an engine like Chiasm, and will provide consistent serialization behavior for any users of reactive-model.
 
 See also:
 
