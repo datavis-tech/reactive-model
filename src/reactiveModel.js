@@ -44,6 +44,15 @@ function ReactiveModel(){
         "Public properties may only be added before the model is finalized.");
     }
 
+    // TODO test this
+    // if(isDefined(defaultValue)){
+    //  throw new Error("model.addPublicProperty() is being " +
+    //    "invoked with an undefined default value. Default values for public properties " +
+    //    "must be defined, to guarantee predictable behavior. For public properties that " +
+    //    "are optional and should have the semantics of an undefined value, " +
+    //    "use ReactiveModel.NONE as the default value.");
+    //}
+
     publicProperties[property] = defaultValue;
 
     return model;
