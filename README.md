@@ -1,4 +1,5 @@
 # reactive-model
+
 [![Build Status](https://travis-ci.org/curran/reactive-model.svg)](https://travis-ci.org/curran/reactive-model)
 
 A library for reactive models.
@@ -90,7 +91,7 @@ model.react({
 });
 ```
 
-<a name="digest" href="#digest">#</a> <i>ReactiveModel.digest</i>()
+<a name="digest" href="#digest">#</a> <b>ReactiveModel</b><i>.digest</i>()
 
 Synchronously evaluates the data dependency graph.
 
