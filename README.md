@@ -15,8 +15,11 @@ Require the package in your code:
 
 ## Example
 
-[![](http://curran.github.io/images/reactive-model/firstLastFlow.png)](http://bl.ocks.org/curran/5905182da50a4667dc00)
-A visual representation of the data dependency graph constructed in this example.
+
+<p align="center">
+  [![](http://curran.github.io/images/reactive-model/firstLastFlow.png)](http://bl.ocks.org/curran/5905182da50a4667dc00)
+  A visual representation of the data dependency graph constructed in this example.
+</p>
 
 ```javascript
 var model = new ReactiveModel();
