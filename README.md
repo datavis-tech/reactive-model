@@ -28,9 +28,7 @@ model.react({
   }]
 });
 
-model
-  .firstName("Jane")
-  .lastName("Smith");
+model.firstName("Jane").lastName("Smith");
 
 ReactiveModel.digest();
 
