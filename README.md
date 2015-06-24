@@ -105,7 +105,7 @@ A property is considered "tracked" after it is
  * used as an output property to a reactive function, or
  * added as a public property.
 
-Assuming there is a tracked property `a`, we can set it to 5 like this:
+Assuming there is a tracked property `a`, we can set it using its getter-setter like this:
 
 ```javascript
 model.a(5);
@@ -114,18 +114,13 @@ model.a(5);
 The value can then be retreived by invoking the function with no arguments:
 
 ```javascript
-console.log(model.a()); // Prints 5`
+console.log(model.a()); // Prints 5
 ```
 
-When the setter form is used, the `model` object is returned. This enables method chaining.
-
-Assuming there are tracked properties `a`, `b`, and `c`, their values can be set like this:
+When the setter form is used, the `model` object is returned. This enables method chaining. Assuming there are tracked properties `a`, `b`, and `c`, their values can be set like this:
 
 ```javascript
-model
-  .a(3)
-  .b(4)
-  .c(5);
+model.a(3).b(4).c(5);
 ```
 
 <a name="add-public-property" href="#add-public-property">#</a> <i>addPublicProperty</i>(<i>property</i>, <i>defaultValue</i>)
