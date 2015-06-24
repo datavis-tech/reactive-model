@@ -62,11 +62,11 @@ var model = new ReactiveModel();
 Adds the given set of reactive functions to the data dependency graph. In the `options` object:
 
  * keys are output property names
- * values are arrays where:
-   * all elements except the last one are input property names
-   * the last element is the reactive function callback
+ * values are arrays where
+   * all elements except the last one are input property names, and
+   * the last element is the reactive function callback.
 
-For example, here is an invocation of `react` that sets the `b` property to be `a + 1`:
+Here is an example invocation of `react` that sets the `b` property to be `a + 1` whenever `a` changes:
 
 ```javascript
 model.react({
@@ -76,7 +76,9 @@ model.react({
 });
 ```
 
-The reactive function callback is invoked with the values of input properties during a digest. This callback is only invoked if all input properties have defined values. If any of the input properties change, this callback will be invoked again in the next digest after the change.
+The reactive function callback is invoked with the values of input properties during a [digest](#digest).
+
+After invocation of `react`, the reactive function callback is invoked in the next digest if all of its input properties are defined. If not all of its input properties are defined, then it will not be invoked in the next digest. When any input properties change, then the reactive function callback will be invoked in the next digest after the change.
 
 The return value from the callback is assigned to the output property during a digest, which may be used as an input property to another reactive function. For example, here is a collection of two reactive functions that assign `b = a +1` and `c = b + 1`. In this example, if `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
 
@@ -148,8 +150,10 @@ Sets the state of the model from its serialized form. The `state` argument objec
 ## Glossary
 
  * "reactive model" The result of `new ReactiveModel()`.
- * "reactive function" A callback function and metadata that describes its input and output properties. A representation of set of reactive functions is passed into `model.react`.
- * "reactive function callback" The callback function portion of a reactive function.
+ * "reactive function" A callback function and metadata that describes its input and output properties. A representation of set of reactive functions is passed into `model.react`. Any reactive function has:
+   * input properties
+   * output properties
+   * callback(input values) -> output value (the "reactive function callback")
  * "digest" An execution of the algorithm that evaluates the data dependency graph.
  * "evaluate" A term to denote complete resolution of the data dependency graph. After the complete data dependency graph has been **evaluated** by a digest, the state of the model is consistent with regard to its reactive functions, and all reactive functions that are transitively dependent on any changed property have been executed in the proper order, with their output values assigned to model properties.
 
