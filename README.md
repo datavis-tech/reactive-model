@@ -180,6 +180,8 @@ Sets the state of the model from its serialized form. The `state` argument objec
 
 This function may only be invoked after invoking `model.finalize()`.
 
+Internally, `setState()` sets public properties to the specified values via their getter-setters, causing the changes to be propagated through all reactive functions that depend on them.
+
 ## Glossary
 
  * "reactive model" The result of `new ReactiveModel()`.
