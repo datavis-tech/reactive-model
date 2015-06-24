@@ -172,7 +172,7 @@ This library maintains a graph data structure internally, called the "data depen
 
 Whenever `react()` is called, nodes and edges are added to this data structure. Whenever a property is changed (via its getter-setter), that property is marked as changed.
 
-The digest algorithm performs a depth first search using the changed property nodes as sources for the search. When visiting each reactive function node, a check is performed that ensures all of its input properties are defined. The resulting list of nodes visited by the depth first search algorithm is then reversed to obtain the topologically sorted order in which the reactive functions must be executed. After computing this ordering, each reactive function is executed, and its output value is assigned to its output property.
+The digest algorithm performs a depth first search using the changed property nodes as sources for the search. The resulting list of nodes visited by the depth first search algorithm is then reversed to obtain the topologically sorted order in which the reactive functions must be executed. After computing this ordering, each reactive function is executed, and its output value is assigned to its output property. Before executing each reactive function, a check is performed that ensures all of its input properties are defined.
 
 ## Background
 
