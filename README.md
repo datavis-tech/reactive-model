@@ -38,14 +38,21 @@ console.log(model.fullName()); // Prints "Jane Smith"
 
 ## API Reference
 
+Constructing & Evaluating Data Dependency Graphs
+
  * [ReactiveModel()](#reactive-model-constructor)
  * [model.react(options)](#react)
  * [ReactiveModel.digest()](#digest)
  * [getter-setters](#getter-setters)
+
+Serialization & Deserialization
+
  * [model.addPublicProperty(property, defaultValue)](#add-public-property)
  * [model.finalize()](#finalize)
  * [model.getState()](#get-state)
  * [model.setState()](#set-state)
+
+### Constructing & Evaluating Data Dependency Graphs
 
 <a name="reactive-model-constructor" href="#reactive-model-constructor">#</a> <b>ReactiveModel</b>()
 
@@ -133,6 +140,8 @@ For example, assuming there are tracked properties `a`, `b`, and `c`, their valu
 ```javascript
 model.a(3).b(4).c(5);
 ```
+
+### Serialization & Deserialization
 
 <a name="add-public-property" href="#add-public-property">#</a> <i>model</i>.<b>addPublicProperty</b>(<i>property</i>, <i>defaultValue</i>)
 
