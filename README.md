@@ -39,13 +39,13 @@ console.log(model.fullName()); // Prints "Jane Smith"
 ## API Reference
 
  * [ReactiveModel()](#reactive-model-constructor)
- * [react(options)](#react)
+ * [model.react(options)](#react)
  * [ReactiveModel.digest()](#digest)
  * [getter-setters](#getter-setters)
- * [addPublicProperty(property, defaultValue)](#add-public-property)
- * [finalize()](#finalize)
- * [getState()](#get-state)
- * [setState()](#set-state)
+ * [model.addPublicProperty(property, defaultValue)](#add-public-property)
+ * [model.finalize()](#finalize)
+ * [model.getState()](#get-state)
+ * [model.setState()](#set-state)
 
 <a name="reactive-model-constructor" href="#reactive-model-constructor">#</a> <b>ReactiveModel</b>()
 
@@ -57,7 +57,7 @@ Example use:
 var model = new ReactiveModel();
 ```
 
-<a name="react" href="#react">#</a> <i>react</i>(<i>options</i>)
+<a name="react" href="#react">#</a> <i>model</i>.<b>react</b>(<i>options</i>)
 
 Adds the given set of reactive functions to the data dependency graph. In the `options` object:
 
@@ -91,7 +91,7 @@ model.react({
 });
 ```
 
-<a name="digest" href="#digest">#</a> <b>ReactiveModel</b><i>.digest</i>()
+<a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
 Synchronously evaluates the data dependency graph.
 
@@ -125,21 +125,21 @@ When the setter form is used, the `model` object is returned. This enables metho
 model.a(3).b(4).c(5);
 ```
 
-<a name="add-public-property" href="#add-public-property">#</a> <i>addPublicProperty</i>(<i>property</i>, <i>defaultValue</i>)
+<a name="add-public-property" href="#add-public-property">#</a> <i>model</i>.<b>addPublicProperty</b>(<i>property</i>, <i>defaultValue</i>)
 
 Adds a public property with the given default value.
 
-<a name="finalize" href="#finalize">#</a> <i>finalize</i>()
+<a name="finalize" href="#finalize">#</a> <i>model</i>.<b>finalize</b>()
 
 Calling this function causes public properties to be tracked and made available as [getter-setter](#getter-setters). After invoking `finalize()`, no more public properties may be added. This guarantees predictable serialization and deserialization behavior.
 
-<a name="get-state" href="#get-state">#</a> <i>getState</i>()
+<a name="get-state" href="#get-state">#</a> <i>model</i>.<b>getState</b>()
 
 Returns a serialized form of the model that can later be passed into `setState()`. This is an object that only contains public properties that have values other than their defaults.
 
 This function may only be invoked after invoking `model.finalize()`.
 
-<a name="set-state" href="#set-state">#</a> <i>setState</i>(<i>state</i>)
+<a name="set-state" href="#set-state">#</a> <i>model</i>.<b>setState</b>(<i>state</i>)
 
 Sets the state of the model from its serialized form. The `state` argument object is expected to contain values for public properties that have values other than their defaults. Public properties not included in `state` will be set to their default values. Properties not previously added as public properties may not be included in the `state` object.
 
