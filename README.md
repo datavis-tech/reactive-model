@@ -235,6 +235,9 @@ Moving the publicProperty and serialization/deserialization semantics into the m
 
 This part is aspirational, not yet implemented. Following [readme-driven development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html).
 
+
+### Asynchronous Operations
+
 For asynchronouos operations, the API should support returning a Promise from the reactive function callback. Here's an example that uses this API to fetch a CSV file using [d3.csv](https://github.com/mbostock/d3/wiki/CSV):
 
 ```javascript
@@ -255,7 +258,11 @@ model.react({
 });
 ```
 
+### NONE
+
 A special default value `model.NONE` refers to a value that is defined, but represents that the property is optional and has not been speficied (similar conceptually to [Scala's Option Type](http://danielwestheide.com/blog/2012/12/19/the-neophytes-guide-to-scala-part-5-the-option-type.html).
+
+### BIND
 
 <a name="bind" href="#bind">#</a> <i>bind</i>(<i>arr</i>)
 
@@ -267,6 +274,18 @@ The `arr` argument is expected to be an array of objects with the following prop
  * `property` A property name on that model.
 
 Invoking `bind()` adds a cycle of pass-through reactive functions to the data dependency graph such that all specified properties will be synchronized, handling the fact that they are from different model instances.
+
+### Cleaning Up
+
+This library currently has memory leaks, and once a reactive function is added, it cannot be removed.
+
+<a name="unreact" href="#unreact">#</a> <i>model</i>.<b>unreact</b>(<i>reactiveFunctions</i>)
+
+Removes the reactive functions added by `model.react()` or `model.bind()`.
+
+<a name="destroy" href="#destroy">#</a> <i>model</i>.<b>destroy</b>()
+
+Removes all reactive functions added to this model by `model.react()`, and frees all memory allocated internally for this model. This includes removing references to all tracked property values.
 
 ## Related Work
 
