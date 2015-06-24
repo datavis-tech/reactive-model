@@ -41,6 +41,7 @@ console.log(model.fullName()); // Prints "Jane Smith"
 
  * [ReactiveModel()](#reactive-model-constructor)
  * [react(options)](#react)
+ * [ReactiveModel.digest()](#digest)
  * [getter-setters](#getter-setters)
  * [addPublicProperty(property, defaultValue)](#add-public-property)
  * [finalize()](#finalize)
@@ -90,6 +91,10 @@ model.react({
   c: ["b", increment]
 });
 ```
+
+<a name="digest" href="#digest">#</a> <i>ReactiveModel.digest</i>()
+
+Synchronously evaluates the data dependency graph.
 
 <a name="getter-setters" href="#getter-setters">#</a> <i>getter-setters</i>
 
