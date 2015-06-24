@@ -15,9 +15,10 @@ Require the package in your code:
 
 ## Example
 
-
 <p align="center">
-  <a href="http://bl.ocks.org/curran/5905182da50a4667dc00"><img src="http://curran.github.io/images/reactive-model/firstLastFlow.png">
+  <a href="http://bl.ocks.org/curran/5905182da50a4667dc00">
+    <img src="http://curran.github.io/images/reactive-model/firstLastFlow.png">
+  </a>
   <br>
   <small>A visual representation of the data dependency graph constructed in this example.</small>
 </p>
@@ -37,8 +38,7 @@ model
 
 ReactiveModel.digest();
 
-// Prints "Jane Smith"
-console.log(model.fullName());
+console.log(model.fullName()); // Prints "Jane Smith"
 ```
 
 ## API Reference
