@@ -5,13 +5,9 @@ A library for reactive models.
 
 ## Usage
 
-Install via [NPM](https://www.npmjs.com/package/reactive-model):
+Install via [NPM](https://www.npmjs.com/package/reactive-model): `npm install reactive-model`
 
-`npm install reactive-model`
-
-Require the package in your code:
-
-`var ReactiveModel = require("reactive-model");`
+Require the module in your code: `var ReactiveModel = require("reactive-model");`
 
 ## Example
 
@@ -51,7 +47,7 @@ console.log(model.fullName()); // Prints "Jane Smith"
  * [getState()](#get-state)
  * [setState()](#set-state)
 
-<a name="reactive-model" href="#reactive-model-constructor">#</a> <b>ReactiveModel</b>()
+<a name="reactive-model-constructor" href="#reactive-model-constructor">#</a> <b>ReactiveModel</b>()
 
 Constructs a new reactive model. The `new` keyword is optional.
 
