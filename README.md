@@ -78,9 +78,11 @@ model.react({
 
 The reactive function callback is invoked with the values of input properties during a [digest](#digest).
 
-After invocation of `react`, the reactive function callback is invoked in the next digest if all of its input properties are defined. If not all of its input properties are defined, then it will not be invoked in the next digest. When any input properties change, then the reactive function callback will be invoked in the next digest after the change.
+After invocation of `react`, the reactive function callback is invoked in the next digest if all of its input properties are defined. If not all of its input properties are defined, then it will not be invoked in the next digest. When any input properties change, the reactive function callback will be invoked in the next digest after the change.
 
-The return value from the callback is assigned to the output property during a digest, which may be used as an input property to another reactive function. For example, here is a collection of two reactive functions that assign `b = a +1` and `c = b + 1`. In this example, if `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
+The return value from the callback is assigned to the output property during a digest, which may be used as an input property to other reactive functions.
+
+Here's an example that assign `b = a + 1` and `c = b + 1`:
 
 ```javascript
 function increment(x){
@@ -92,26 +94,27 @@ model.react({
   c: ["b", increment]
 });
 ```
+In this example, if `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
 
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
 Synchronously evaluates the data dependency graph.
 
-This function is exposed on the `ReactiveModel` constructor function rather than the `ReactiveModel` instance, because there is a singleton data dependency graph shared by all reactive model instances. This approach was taken to enable reactive functions that take input from one model and yield output on another (via [bind](#bind)).
+This function is exposed on the `ReactiveModel` constructor function rather than the `ReactiveModel` instance because there is a singleton data dependency graph shared by all reactive model instances. This approach was taken to enable reactive functions that take input from one model and yield output on another (via [bind](#bind)).
 
 The term "digest" was chosen because it is already in common use within the AngularJS community and refers to almost exactly the same operation - see [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest).
 
-<a name="getter-setters" href="#getter-setters">#</a> <i>getter-setters</i>
+<a name="getter-setters" href="#getter-setters">#</a> getter-setters
 
 Every tracked property is made available on the model object as a [chainable getter-setter function](http://bost.ocks.org/mike/chart/#reconfiguration).
 
 A property is considered "tracked" after it is
 
- * used as an input property to a reactive function,
- * used as an output property to a reactive function, or
+ * used as an input property of a reactive function,
+ * used as an output property of a reactive function, or
  * added as a public property.
 
-Assuming there is a tracked property `a`, we can set it using its getter-setter like this:
+For example, assuming there is a tracked property `a`, we can set it using its getter-setter like this:
 
 ```javascript
 model.a(5);
@@ -123,7 +126,9 @@ The value can then be retreived by invoking the function with no arguments:
 model.a(); // 5
 ```
 
-When the setter form is used, the `model` object is returned. This enables method chaining. Assuming there are tracked properties `a`, `b`, and `c`, their values can be set like this:
+When the setter form is used, the `model` object is returned. This enables method chaining.
+
+For example, assuming there are tracked properties `a`, `b`, and `c`, their values can be set like this:
 
 ```javascript
 model.a(3).b(4).c(5);
@@ -133,9 +138,26 @@ model.a(3).b(4).c(5);
 
 Adds a public property with the given default value.
 
+Returns the `model` object, so is chainable, like this:
+
+```javascript
+var model = new ReactiveModel()
+  .addPublicProperty("x", 5)
+  .addPublicProperty("y", 6);
+```
+
 <a name="finalize" href="#finalize">#</a> <i>model</i>.<b>finalize</b>()
 
 Calling this function causes public properties to be tracked and made available as [getter-setter](#getter-setters). After invoking `finalize()`, no more public properties may be added. This guarantees predictable serialization and deserialization behavior.
+
+Returns the `model` object, so is chainable, like this:
+
+```javascript
+var model = new ReactiveModel()
+  .addPublicProperty("x", 5)
+  .addPublicProperty("y", 6)
+  .finalize();
+```
 
 <a name="get-state" href="#get-state">#</a> <i>model</i>.<b>getState</b>()
 
@@ -146,6 +168,8 @@ This function may only be invoked after invoking `model.finalize()`.
 <a name="set-state" href="#set-state">#</a> <i>model</i>.<b>setState</b>(<i>state</i>)
 
 Sets the state of the model from its serialized form. The `state` argument object is expected to contain values for public properties that have values other than their defaults. Public properties not included in `state` will be set to their default values. Properties not previously added as public properties may not be included in the `state` object.
+
+This function may only be invoked after invoking `model.finalize()`.
 
 ## Glossary
 
