@@ -116,7 +116,7 @@ model.a(5);
 The value can then be retreived by invoking the function with no arguments:
 
 ```javascript
-console.log(model.a()); // Prints 5
+model.a(); // 5
 ```
 
 When the setter form is used, the `model` object is returned. This enables method chaining. Assuming there are tracked properties `a`, `b`, and `c`, their values can be set like this:
