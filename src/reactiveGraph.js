@@ -13,7 +13,7 @@ function ReactiveGraph(){
   // { node -> getterSetter }
   var getterSetters = {};
 
-  // { node -> reactiveFunction }
+  // { node -> λ }
   var reactiveFunctions = {};
 
   // { node -> true }
@@ -31,31 +31,31 @@ function ReactiveGraph(){
     return node;
   }
 
-  function makeReactiveFunctionNode(reactiveFunction){
+  function makeReactiveFunctionNode(λ){
     var node = makeNode();
-    reactiveFunctions[node] = reactiveFunction;
+    reactiveFunctions[node] = λ;
     return node;
   }
 
-  function addReactiveFunction(reactiveFunction){
+  function addReactiveFunction(λ){
 
-    if( (reactiveFunction.inNodes === undefined) || (reactiveFunction.outNode === undefined) ){
+    if( (λ.inNodes === undefined) || (λ.outNode === undefined) ){
         throw new Error("Attempting to add a reactive function that " +
           "doesn't have inNodes or outNode defined first.");
     }
 
-    reactiveFunction.inNodes.forEach(function (inNode){
-      reactiveGraph.addEdge(inNode, reactiveFunction.node);
+    λ.inNodes.forEach(function (inNode){
+      reactiveGraph.addEdge(inNode, λ.node);
     });
 
-    reactiveGraph.addEdge(reactiveFunction.node, reactiveFunction.outNode);
+    reactiveGraph.addEdge(λ.node, λ.outNode);
   }
 
-  function evaluate(reactiveFunction){
-    var inValues = reactiveFunction.inNodes.map(getPropertyNodeValue);
+  function evaluate(λ){
+    var inValues = λ.inNodes.map(getPropertyNodeValue);
     if(inValues.every(isDefined)){
-      var outValue = reactiveFunction.callback.apply(null, inValues);
-      getterSetters[reactiveFunction.outNode](outValue);
+      var outValue = λ.callback.apply(null, inValues);
+      getterSetters[λ.outNode](outValue);
     }
   }
 

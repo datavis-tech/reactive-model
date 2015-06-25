@@ -112,11 +112,16 @@ function ReactiveModel(){
   }
 
   function react(options){
-    var reactiveFunctions = ReactiveFunction.parse(options);
-    reactiveFunctions.forEach(function (reactiveFunction){
-      assignNodes(reactiveFunction);
-      addReactiveFunction(reactiveFunction);
+    ReactiveFunction.parse(options).forEach(function (λ){
+      assignNodes(λ);
+      addReactiveFunction(λ);
     });
+  }
+
+  function assignNodes(λ){
+    λ.inNodes = λ.inProperties.map(track);
+    λ.node = makeReactiveFunctionNode(λ);
+    λ.outNode = track(λ.outProperty);
   }
 
   function track(property){
@@ -124,12 +129,9 @@ function ReactiveModel(){
       return trackedProperties[property];
     } else {
       var getterSetter = createGetterSetter(property);
-
-      model[property] = getterSetter;
-
       var propertyNode = makePropertyNode(getterSetter);
+      model[property] = getterSetter;
       trackedProperties[property] = propertyNode;
-
       return propertyNode;
     }
   }
@@ -148,12 +150,6 @@ function ReactiveModel(){
   function propertyDidChange(property){
     var propertyNode = trackedProperties[property];
     propertyNodeDidChange(propertyNode);
-  }
-
-  function assignNodes(reactiveFunction){
-    reactiveFunction.inNodes = reactiveFunction.inProperties.map(track);
-    reactiveFunction.node = makeReactiveFunctionNode(reactiveFunction);
-    reactiveFunction.outNode = track(reactiveFunction.outProperty);
   }
 
   model.addPublicProperty = addPublicProperty;

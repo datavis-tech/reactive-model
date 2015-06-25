@@ -1,7 +1,7 @@
 // This file serves to document the reactive function data structure,
 // and contains a utility function for parsing the options passed to model.react().
 function ReactiveFunction(inProperties, outProperty, callback){
-  return {
+  var λ = {
 
     // An array of input property names.
     inProperties: inProperties,
@@ -25,6 +25,8 @@ function ReactiveFunction(inProperties, outProperty, callback){
     // The node id string corresponding to the output property.
     outNode: undefined
   };
+
+  return λ;
 }
 
 // This function parses the options object passed into `model.react(options)`,

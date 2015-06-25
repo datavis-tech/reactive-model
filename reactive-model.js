@@ -61,7 +61,7 @@ function ReactiveGraph(){
   // { node -> getterSetter }
   var getterSetters = {};
 
-  // { node -> reactiveFunction }
+  // { node -> λ }
   var reactiveFunctions = {};
 
   // { node -> true }
@@ -79,31 +79,31 @@ function ReactiveGraph(){
     return node;
   }
 
-  function makeReactiveFunctionNode(reactiveFunction){
+  function makeReactiveFunctionNode(λ){
     var node = makeNode();
-    reactiveFunctions[node] = reactiveFunction;
+    reactiveFunctions[node] = λ;
     return node;
   }
 
-  function addReactiveFunction(reactiveFunction){
+  function addReactiveFunction(λ){
 
-    if( (reactiveFunction.inNodes === undefined) || (reactiveFunction.outNode === undefined) ){
+    if( (λ.inNodes === undefined) || (λ.outNode === undefined) ){
         throw new Error("Attempting to add a reactive function that " +
           "doesn't have inNodes or outNode defined first.");
     }
 
-    reactiveFunction.inNodes.forEach(function (inNode){
-      reactiveGraph.addEdge(inNode, reactiveFunction.node);
+    λ.inNodes.forEach(function (inNode){
+      reactiveGraph.addEdge(inNode, λ.node);
     });
 
-    reactiveGraph.addEdge(reactiveFunction.node, reactiveFunction.outNode);
+    reactiveGraph.addEdge(λ.node, λ.outNode);
   }
 
-  function evaluate(reactiveFunction){
-    var inValues = reactiveFunction.inNodes.map(getPropertyNodeValue);
+  function evaluate(λ){
+    var inValues = λ.inNodes.map(getPropertyNodeValue);
     if(inValues.every(isDefined)){
-      var outValue = reactiveFunction.callback.apply(null, inValues);
-      getterSetters[reactiveFunction.outNode](outValue);
+      var outValue = λ.callback.apply(null, inValues);
+      getterSetters[λ.outNode](outValue);
     }
   }
 
@@ -160,7 +160,7 @@ var propertyNodeDidChange    = reactiveGraph.propertyNodeDidChange;
 // This file serves to document the reactive function data structure,
 // and contains a utility function for parsing the options passed to model.react().
 function ReactiveFunction(inProperties, outProperty, callback){
-  return {
+  var λ = {
 
     // An array of input property names.
     inProperties: inProperties,
@@ -184,6 +184,8 @@ function ReactiveFunction(inProperties, outProperty, callback){
     // The node id string corresponding to the output property.
     outNode: undefined
   };
+
+  return λ;
 }
 
 // This function parses the options object passed into `model.react(options)`,
@@ -224,6 +226,15 @@ function ReactiveModel(){
         "invoked after model.finalize, but this is not allowed. "+
         "Public properties may only be added before the model is finalized.");
     }
+
+    // TODO test this
+    // if(isDefined(defaultValue)){
+    //  throw new Error("model.addPublicProperty() is being " +
+    //    "invoked with an undefined default value. Default values for public properties " +
+    //    "must be defined, to guarantee predictable behavior. For public properties that " +
+    //    "are optional and should have the semantics of an undefined value, " +
+    //    "use ReactiveModel.NONE as the default value.");
+    //}
 
     publicProperties[property] = defaultValue;
 
@@ -284,11 +295,16 @@ function ReactiveModel(){
   }
 
   function react(options){
-    var reactiveFunctions = ReactiveFunction.parse(options);
-    reactiveFunctions.forEach(function (reactiveFunction){
-      assignNodes(reactiveFunction);
-      addReactiveFunction(reactiveFunction);
+    ReactiveFunction.parse(options).forEach(function (λ){
+      assignNodes(λ);
+      addReactiveFunction(λ);
     });
+  }
+
+  function assignNodes(λ){
+    λ.inNodes = λ.inProperties.map(track);
+    λ.node = makeReactiveFunctionNode(λ);
+    λ.outNode = track(λ.outProperty);
   }
 
   function track(property){
@@ -296,12 +312,9 @@ function ReactiveModel(){
       return trackedProperties[property];
     } else {
       var getterSetter = createGetterSetter(property);
-
-      model[property] = getterSetter;
-
       var propertyNode = makePropertyNode(getterSetter);
+      model[property] = getterSetter;
       trackedProperties[property] = propertyNode;
-
       return propertyNode;
     }
   }
@@ -320,12 +333,6 @@ function ReactiveModel(){
   function propertyDidChange(property){
     var propertyNode = trackedProperties[property];
     propertyNodeDidChange(propertyNode);
-  }
-
-  function assignNodes(reactiveFunction){
-    reactiveFunction.inNodes = reactiveFunction.inProperties.map(track);
-    reactiveFunction.node = makeReactiveFunctionNode(reactiveFunction);
-    reactiveFunction.outNode = track(reactiveFunction.outProperty);
   }
 
   model.addPublicProperty = addPublicProperty;
