@@ -1,7 +1,6 @@
 {
   "name": "reactive-model",
   "main": "reactive-model.js",
-  "version": "0.0.5",
   "homepage": "https://github.com/curran/reactive-model",
   "authors": [
     "curran <curran.kelleher@gmail.com>"
