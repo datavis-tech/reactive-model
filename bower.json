@@ -1,0 +1,21 @@
+{
+  "name": "reactive-model",
+  "main": "reactive-model.js",
+  "version": "0.0.5",
+  "homepage": "https://github.com/curran/reactive-model",
+  "authors": [
+    "curran <curran.kelleher@gmail.com>"
+  ],
+  "description": "A library for reactive models.",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node",
+    "es6"
+  ],
+  "keywords": [
+    "reactive"
+  ],
+  "license": "MIT",
+  "ignore": [ ]
+}
