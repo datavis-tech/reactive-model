@@ -123,11 +123,11 @@ In this example, if `a` is assigned to the value 1 and a digest occurs, the valu
 
 Synchronously evaluates the data dependency graph.
 
+Whenever any property changes, the `digest()` function is automatically scheduled to be invoked on the next animation frame after the change was made.
+
 This function is exposed on the `ReactiveModel` constructor function rather than the `ReactiveModel` instance because there is a singleton data dependency graph shared by all reactive model instances. This approach was taken to enable reactive functions that take input from one model and yield output on another (via [bind](#bind)).
 
 The term "digest" was chosen because it is already in common use within the AngularJS community and refers to almost exactly the same operation - see [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest).
-
-Whenever any property changes, the `digest()` function is automatically scheduled to be invoked on the next animation frame after the change was made.
 
 <a name="getter-setters" href="#getter-setters">#</a> getter-setters
 
@@ -145,15 +145,15 @@ For example, assuming there is a tracked property `a`, we can set it using its g
 model.a(5);
 ```
 
+Whenever any property is set in this way, the `digest()` function is automatically scheduled to be invoked on the next animation frame after the change was made.
+
 The value can then be retreived by invoking the function with no arguments:
 
 ```javascript
-model.a(); // 5
+model.a(); // returns 5
 ```
 
-When the setter form is used, the `model` object is returned. This enables method chaining.
-
-For example, assuming there are tracked properties `a`, `b`, and `c`, their values can be set like this:
+When the setter form is used, the `model` object is returned. This enables method chaining. For example, assuming there are tracked properties `a`, `b`, and `c`, their values can be set like this:
 
 ```javascript
 model.a(3).b(4).c(5);
