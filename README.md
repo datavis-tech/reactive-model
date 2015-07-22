@@ -6,7 +6,7 @@ A library for reactive models.
 
 ## Usage
 
-### CommonJS
+### NPM
 
 Install via [NPM](https://www.npmjs.com/package/reactive-model): `npm install reactive-model`
 
@@ -16,7 +16,7 @@ Require the module in your code: `var ReactiveModel = require("reactive-model");
 
 Install via [Bower](http://bower.io/search/?q=reactive-model): `bower install reactive-model`
 
-The file `reactive-model.js` contains a [UMD](https://github.com/umdjs/umd) bundle. You can load this file as an AMD module with [RequireJS](http://requirejs.org/).
+The file `reactive-model.js` contains a [UMD](https://github.com/umdjs/umd) bundle. You can load this module with [RequireJS](http://requirejs.org/).
 
 Alternatively, you can load this file with a script tag like this:
 
