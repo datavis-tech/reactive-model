@@ -322,4 +322,23 @@ describe("ReactiveModel", function (){
       });
     });
   });
+
+  it("should work with booleans", function (){
+    var model = new ReactiveModel()
+      .addPublicProperty("a", false)
+      .finalize();
+
+    model.react({
+      b: ["a", function (a){
+        return !a;
+      }]
+    });
+
+    ReactiveModel.digest();
+    assert.equal(model.b(), true);
+
+    model.a(true);
+    ReactiveModel.digest();
+    assert.equal(model.b(), false);
+  });
 });
