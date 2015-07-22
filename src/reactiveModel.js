@@ -8,6 +8,7 @@
 import Graph from "./graph";
 import ReactiveGraph from "./reactiveGraph";
 import ReactiveFunction from "./reactiveFunction";
+import { nextFrame, animationFrameDebounce } from "./animationFrameDebounce";
 
 var reactiveGraph = new ReactiveGraph();
 
@@ -15,6 +16,8 @@ var addReactiveFunction      = reactiveGraph.addReactiveFunction;
 var makePropertyNode         = reactiveGraph.makePropertyNode;
 var makeReactiveFunctionNode = reactiveGraph.makeReactiveFunctionNode;
 var propertyNodeDidChange    = reactiveGraph.propertyNodeDidChange;
+
+var scheduleDigest = animationFrameDebounce(reactiveGraph.digest);
 
 function ReactiveModel(){
   
@@ -150,6 +153,7 @@ function ReactiveModel(){
   function propertyDidChange(property){
     var propertyNode = trackedProperties[property];
     propertyNodeDidChange(propertyNode);
+    scheduleDigest();
   }
 
   model.addPublicProperty = addPublicProperty;
@@ -165,5 +169,6 @@ ReactiveModel.digest = reactiveGraph.digest;
 ReactiveModel.Graph = Graph;
 ReactiveModel.ReactiveGraph = ReactiveGraph;
 ReactiveModel.ReactiveFunction = ReactiveFunction;
+ReactiveModel.nextFrame = nextFrame;
 
 export default ReactiveModel;

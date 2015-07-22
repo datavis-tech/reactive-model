@@ -6,9 +6,25 @@ A library for reactive models.
 
 ## Usage
 
+### CommonJS
+
 Install via [NPM](https://www.npmjs.com/package/reactive-model): `npm install reactive-model`
 
 Require the module in your code: `var ReactiveModel = require("reactive-model");`
+
+### Bower
+
+Install via [Bower](http://bower.io/search/?q=reactive-model): `bower install reactive-model`
+
+The file `reactive-model.js` contains a [UMD](https://github.com/umdjs/umd) bundle. You can load this file as an AMD module with [RequireJS](http://requirejs.org/).
+
+Alternatively, you can load this file with a script tag like this:
+
+```html
+<script src="bower_components/reactive-model/reactive-model.js"></script>
+```
+
+Loading the library this way introduces a global variable `ReactiveModel`.
 
 ## Example
 
@@ -110,6 +126,8 @@ Synchronously evaluates the data dependency graph.
 This function is exposed on the `ReactiveModel` constructor function rather than the `ReactiveModel` instance because there is a singleton data dependency graph shared by all reactive model instances. This approach was taken to enable reactive functions that take input from one model and yield output on another (via [bind](#bind)).
 
 The term "digest" was chosen because it is already in common use within the AngularJS community and refers to almost exactly the same operation - see [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest).
+
+Whenever any property changes, the `digest()` function is automatically scheduled to be invoked on the next animation frame after the change was made.
 
 <a name="getter-setters" href="#getter-setters">#</a> getter-setters
 

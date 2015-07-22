@@ -300,4 +300,26 @@ describe("ReactiveModel", function (){
 
     assert.equal(model.e(), (1 + 1) + (2 + 1));
   });
+
+  it("should auto-digest", function (done){
+    var model = new ReactiveModel()
+      .addPublicProperty("a", 5)
+      .finalize();
+
+    model.react({
+      b: ["a", function (a){
+        return a + 1;
+      }]
+    });
+
+    ReactiveModel.nextFrame(function(){
+      assert.equal(model.b(), 6);
+      model.a(10);
+      assert.equal(model.b(), 6);
+      ReactiveModel.nextFrame(function(){
+        assert.equal(model.b(), 11);
+        done();
+      });
+    });
+  });
 });
