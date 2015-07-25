@@ -324,9 +324,7 @@ describe("ReactiveModel", function (){
   });
 
   it("should work with booleans", function (){
-    var model = new ReactiveModel()
-      .addPublicProperty("a", false)
-      .finalize();
+    var model = new ReactiveModel();
 
     model.react({
       b: ["a", function (a){
@@ -334,11 +332,33 @@ describe("ReactiveModel", function (){
       }]
     });
 
+    model.a(false);
     ReactiveModel.digest();
     assert.equal(model.b(), true);
 
     model.a(true);
     ReactiveModel.digest();
     assert.equal(model.b(), false);
+  });
+
+  it("should work with promises", function (done){
+    var model = new ReactiveModel();
+
+    model.react({
+      b: ["a", function (a){
+        return new Promise(function (resolve, reject){
+          setTimeout(function (){
+            resolve(a + 1);
+          }, 50);
+        });
+      }],
+      c: ["b", function (b){
+        assert.equal(b, 2);
+        done();
+      }]
+    });
+
+    model.a(1);
+
   });
 });
