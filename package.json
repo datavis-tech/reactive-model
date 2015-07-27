@@ -1,6 +1,6 @@
 {
   "name": "reactive-model",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A library for reactive models.",
   "main": "reactive-model.js",
   "jsnext:main": "src/reactiveModel.js",
