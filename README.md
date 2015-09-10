@@ -4,6 +4,8 @@
 
 A library for reactive models.
 
+This project is an experimental variation on [Model.js](https://github.com/curran/model) that takes a different (and more complex) approach to managing reactive data flows (and uses ES6). For a more lightweight and battle-hardened solution, use Model.js.
+
 ## Usage
 
 ### NPM
