@@ -89,8 +89,10 @@ function ReactiveModel(){
     Object.keys(publicProperties).forEach(function (propertyName){
 
       var value = publicProperties[propertyName]();
+
       // TODO throw an error if the property is missing.
 
+      // Omit default values.
       if(value !== defaultValues[propertyName]){
         state[propertyName] = value;
       }
@@ -111,8 +113,18 @@ function ReactiveModel(){
 
     // Reset state to default values.
     Object.keys(publicProperties).forEach(function (propertyName){
-      var defaultValue = publicProperties[propertyName];
-      model[propertyName](defaultValue);
+      var oldValue = model[propertyName]();
+
+      var newValue;
+      if(propertyName in state){
+        newValue = state[propertyName];
+      } else {
+        newValue = defaultValues[propertyName];
+      }
+
+      if(oldValue !== newValue){
+        model[propertyName](newValue);
+      }
     });
 
     // Apply values included in the new state.

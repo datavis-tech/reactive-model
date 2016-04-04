@@ -65,9 +65,9 @@ describe("ReactiveModel", function (){
     var model = ReactiveModel()
       .addPublicProperty("x", 5)
       .addPublicProperty("y", 10)
-      .finalize();
-
-    model.x(10).y(20);
+      .finalize()
+      .x(10)
+      .y(20);
 
     var state = model.getState();
     assert.equal(Object.keys(state).length, 2);
@@ -85,42 +85,40 @@ describe("ReactiveModel", function (){
     assert.equal(Object.keys(state).length, 0);
   });
 
-  //it("should get state after modification with getter-setters", function (){
-  //  var model = new ReactiveModel();
-  //  model.addPublicProperty("x", 5);
-  //  model.addPublicProperty("y", 10);
-  //  model.finalize();
 
-  //  model.x(10).y(20)
+  it("Should set state.", function (){
 
-  //  var state = model.getState();
-  //  assert.equal(state.x, 10);
-  //  assert.equal(state.y, 20);
-  //});
-  //
-  //function createModel(){
-  //  return new ReactiveModel()
-  //    .addPublicProperty("x", 5)
-  //    .addPublicProperty("y", 6)
-  //    .finalize();
-  //}
+    var model = ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 10)
+      .finalize();
 
-  //it("should set state", function (){
-  //  var modelA = createModel().x(10).y(20);
-  //  var modelB = createModel();
+    model.setState({
+      x: 20,
+      y: 50
+    });
 
-  //  modelB.setState(modelA.getState());
+    assert.equal(model.x(), 20);
+    assert.equal(model.y(), 50);
 
-  //  assert.equal(modelB.x(), 10);
-  //  assert.equal(modelB.y(), 20);
-  //});
+  });
 
-  //it("should set state that omits default values", function (){
-  //  var model = createModel().x(10).y(20);
-  //  model.setState({});
-  //  assert.equal(model.x(), 5);
-  //  assert.equal(model.y(), 6);
-  //});
+  it("Should set state with default values for omitted properties.", function (){
+    var model = ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 10)
+      .finalize()
+      .x(20)
+      .y(50);
+
+    assert.equal(model.x(), 20);
+    assert.equal(model.y(), 50);
+
+    model.setState({});
+
+    assert.equal(model.x(), 5);
+    assert.equal(model.y(), 10);
+  });
 
   //it("should chain setState", function (){
 
