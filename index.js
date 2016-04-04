@@ -85,12 +85,15 @@ function ReactiveModel(){
   }
 
   function getState(){
-    //var state = {};
-    //Object.keys(publicProperties).forEach( function (publicProperty){
-    //  TODO omit default values.
-    //  state[publicProperty] = values[publicProperty];
-    //});
-    //return state;
+    var state = {};
+    Object.keys(publicProperties).forEach(function (propertyName){
+
+      // TODO omit default values.
+      // TODO throw an error if the property is missing.
+
+      state[propertyName] = publicProperties[propertyName]();
+    });
+    return state;
   }
 
   function setState(state){

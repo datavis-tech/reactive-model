@@ -61,18 +61,19 @@ describe("ReactiveModel", function (){
     assert.equal(model.x(), 5);
   });
 
-  //it("should get state", function (){
-  //  var model = ReactiveModel()
-  //    .addPublicProperty("x", 5)
-  //    .addPublicProperty("y", 10)
-  //    .finalize();
+  it("should get state", function (){
+    var model = ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 10)
+      .finalize();
 
-  //  model.x(10).y(20);
+    model.x(10).y(20);
 
-  //  var state = model.getState();
-  //  assert.equal(state.x, 10);
-  //  assert.equal(state.y, 20);
-  //});
+    var state = model.getState();
+    assert.equal(Object.keys(state).length, 2);
+    assert.equal(state.x, 10);
+    assert.equal(state.y, 20);
+  });
 
   //it("Should get state and omit default values.", function (){
   //  var model = new ReactiveModel();
