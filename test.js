@@ -184,11 +184,13 @@ describe("ReactiveModel", function (){
 
   it("should propagate two hops in a single digest", function (){
 
-    var model = ReactiveModel();
+    var model = ReactiveModel()
+      .addPublicProperty("a", 0)
+      .finalize();
 
     model({
-      b: ["a", increment],
-      c: ["b", increment]
+      b: [increment, "a"],
+      c: [increment, "b"]
     });
 
     model.a(1);
@@ -198,86 +200,52 @@ describe("ReactiveModel", function (){
     assert.equal(model.b(), 2);
     assert.equal(model.c(), 3);
   });
-  //
-  //it("should evaluate digests independently", function (){
-  //  var model = ReactiveModel();
 
-  //  var counterFullName = 0;
-  //  var counterB = 0;
+  it("should evaluate tricky case", function (){
 
-  //  model({
-  //    fullName: ["firstName", "lastName", function (firstName, lastName){
-  //      counterFullName++;
-  //      return firstName + " " + lastName;
-  //    }],
-  //    b: ["a", function (a){
-  //      counterB++;
-  //      return a + 1;
-  //    }]
-  //  });
+    var model = ReactiveModel()
+      .addPublicProperty("a", 1)
+      .addPublicProperty("c", 2)
+      .finalize();
 
-  //  model.firstName("John");
-  //  model.lastName("Doe");
-  //  ReactiveModel.digest();
+    // a - b
+    //       \
+    //        e
+    //       /
+    // c - d
 
-  //  assert.equal(counterFullName, 1);
-  //  assert.equal(counterB, 0);
-  //  assert.equal(model.fullName(), "John Doe");
+    model({
+      b: [increment, "a"],
+      d: [increment, "c"],
+      e: [add, "b, d"]
+    });
 
-  //  model.a(1);
-  //  ReactiveModel.digest();
+    ReactiveModel.digest();
 
-  //  assert.equal(counterFullName, 1);
-  //  assert.equal(counterB, 1);
-  //  assert.equal(model.a(), 1);
-  //  assert.equal(model.b(), 2);
-  //  assert.equal(model.fullName(), "John Doe");
-  //});
+    assert.equal(model.e(), (1 + 1) + (2 + 1));
+  });
 
-  //it("should evaluate tricky case", function (){
+  it("should auto-digest", function (done){
+    var model = ReactiveModel()
+      .addPublicProperty("a", 5)
+      .finalize();
 
-  //  var model = ReactiveModel();
+    model({
+      b: [function (a){
+        return a + 1;
+      }, "a"]
+    });
 
-  //  // a - b
-  //  //       \
-  //  //        e
-  //  //       /
-  //  // c - d
-
-  //  model({
-  //    b: ["a", increment],
-  //    d: ["c", increment],
-  //    e: ["b", "d", add]
-  //  });
-
-  //  model.a(1).c(2);
-
-  //  ReactiveModel.digest();
-
-  //  assert.equal(model.e(), (1 + 1) + (2 + 1));
-  //});
-
-  //it("should auto-digest", function (done){
-  //  var model = ReactiveModel()
-  //    .addPublicProperty("a", 5)
-  //    .finalize();
-
-  //  model({
-  //    b: ["a", function (a){
-  //      return a + 1;
-  //    }]
-  //  });
-
-  //  ReactiveModel.nextFrame(function(){
-  //    assert.equal(model.b(), 6);
-  //    model.a(10);
-  //    assert.equal(model.b(), 6);
-  //    ReactiveModel.nextFrame(function(){
-  //      assert.equal(model.b(), 11);
-  //      done();
-  //    });
-  //  });
-  //});
+    setTimeout(function(){
+      assert.equal(model.b(), 6);
+      model.a(10);
+      assert.equal(model.b(), 6);
+      setTimeout(function(){
+        assert.equal(model.b(), 11);
+        done();
+      });
+    });
+  });
 
   //it("should work with booleans", function (){
   //  var model = ReactiveModel();
