@@ -47,24 +47,24 @@ describe("ReactiveModel", function (){
     assert.throws(model.finalize, Error);
   });
 
-  //it("should throw an error if adding public property after finalize", function (){
-  //  var model = new ReactiveModel();
-  //  model.addPublicProperty("x", 5);
-  //  model.finalize();
-  //  assert.throws(model.addPublicProperty, Error);
-  //});
+  it("Should throw an error when attempting to add a public property after finalize.", function (){
+    var model = new ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.finalize();
+    assert.throws(model.addPublicProperty, Error);
+  });
 
-  //it("should chain addPublicProperty and finalize", function (){
-  //  var model = new ReactiveModel()
-  //    .addPublicProperty("x", 5)
-  //    .addPublicProperty("y", 6)
-  //    .finalize();
+  it("should chain addPublicProperty and finalize", function (){
+    var model = new ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 6)
+      .finalize();
 
-  //  model.y(20);
+    model.y(20);
 
-  //  assert.equal(model.x(), 5);
-  //  assert.equal(model.y(), 20);
-  //});
+    assert.equal(model.x(), 5);
+    assert.equal(model.y(), 20);
+  });
 
   //it("should get state", function (){
   //  var model = new ReactiveModel();

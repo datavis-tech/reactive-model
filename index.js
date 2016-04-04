@@ -38,12 +38,13 @@ function ReactiveModel(){
   // The property name is required and will be used to reference this property.
   // The default value is required to guarantee predictable behavior of setState and getState.
   function addPublicProperty(propertyName, defaultValue, metadata){
-    // TODO test this
-    //if(isFinalized){
-    //  throw new Error("model.addPublicProperty() is being " +
-    //    "invoked after model.finalize, but this is not allowed. "+
-    //    "Public properties may only be added before the model is finalized.");
-    //}
+
+    if(isFinalized){
+      throw new Error("model.addPublicProperty() is being " +
+        "invoked after model.finalize(), but this is not allowed. " +
+        "Public properties may only be added before the model is finalized. " +
+        "This is required to guarantee predictable behavior of setState and getState.");
+    }
 
     // TODO test this
     // if(!isDefined(defaultValue)){
@@ -57,6 +58,7 @@ function ReactiveModel(){
     publicProperties[propertyName] = ReactiveProperty(defaultValue);
     defaultValues[propertyName] = defaultValue;
 
+    // Support method chaining.
     return model;
   }
 
@@ -78,7 +80,7 @@ function ReactiveModel(){
       model[propertyName] = publicProperties[propertyName];
     });
 
-    // Support chaining.
+    // Support method chaining.
     return model;
   }
 
@@ -114,6 +116,7 @@ function ReactiveModel(){
       model[propertyName](newValue);
     });
 
+    // Support method chaining.
     return model;
   }
 
