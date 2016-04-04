@@ -75,15 +75,15 @@ describe("ReactiveModel", function (){
     assert.equal(state.y, 20);
   });
 
-  //it("Should get state and omit default values.", function (){
-  //  var model = new ReactiveModel();
-  //  model.addPublicProperty("x", 5);
-  //  model.addPublicProperty("y", 10);
-  //  model.finalize();
+  it("Should get state and omit default values.", function (){
+    var model = ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 10)
+      .finalize();
 
-  //  var state = model.getState();
-  //  assert.equal(Object.keys(state).length, 0);
-  //});
+    var state = model.getState();
+    assert.equal(Object.keys(state).length, 0);
+  });
 
   //it("should get state after modification with getter-setters", function (){
   //  var model = new ReactiveModel();
