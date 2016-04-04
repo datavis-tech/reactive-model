@@ -139,7 +139,7 @@ describe("ReactiveModel", function (){
       .addPublicProperty("a", 5)
       .finalize();
 
-    model.react({
+    model({
       b: ["a", function (a){
         return a + 1;
       }]
@@ -155,7 +155,7 @@ describe("ReactiveModel", function (){
       .addPublicProperty("a", 5)
       .finalize();
 
-    model.react({
+    model({
       b: ["a", function (a){
         return a + 1;
       }]
@@ -171,7 +171,7 @@ describe("ReactiveModel", function (){
       .addPublicProperty("a", 5)
       .finalize();
 
-    model.react({
+    model({
       b: ["a", function (a){
         return a + 1;
       }]
@@ -192,7 +192,7 @@ describe("ReactiveModel", function (){
 
     var model = new ReactiveModel();
 
-    model.react({
+    model({
       fullName: ["firstName", "lastName", function (firstName, lastName){
         return firstName + " " + lastName;
       }]
@@ -211,7 +211,7 @@ describe("ReactiveModel", function (){
     var model = new ReactiveModel();
     var counter = 0;
 
-    model.react({
+    model({
       fullName: ["firstName", "lastName", function (firstName, lastName){
         counter++;
         return firstName + " " + lastName;
@@ -230,7 +230,7 @@ describe("ReactiveModel", function (){
 
     var model = new ReactiveModel();
 
-    model.react({
+    model({
       b: ["a", increment],
       c: ["b", increment]
     });
@@ -249,7 +249,7 @@ describe("ReactiveModel", function (){
     var counterFullName = 0;
     var counterB = 0;
 
-    model.react({
+    model({
       fullName: ["firstName", "lastName", function (firstName, lastName){
         counterFullName++;
         return firstName + " " + lastName;
@@ -288,7 +288,7 @@ describe("ReactiveModel", function (){
     //       /
     // c - d
 
-    model.react({
+    model({
       b: ["a", increment],
       d: ["c", increment],
       e: ["b", "d", add]
@@ -306,7 +306,7 @@ describe("ReactiveModel", function (){
       .addPublicProperty("a", 5)
       .finalize();
 
-    model.react({
+    model({
       b: ["a", function (a){
         return a + 1;
       }]
@@ -326,7 +326,7 @@ describe("ReactiveModel", function (){
   it("should work with booleans", function (){
     var model = new ReactiveModel();
 
-    model.react({
+    model({
       b: ["a", function (a){
         return !a;
       }]
@@ -344,7 +344,7 @@ describe("ReactiveModel", function (){
   it("should work with promises", function (done){
     var model = new ReactiveModel();
 
-    model.react({
+    model({
       b: ["a", function (a){
         return new Promise(function (resolve, reject){
           setTimeout(function (){
