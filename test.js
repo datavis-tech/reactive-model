@@ -130,21 +130,21 @@ describe("ReactiveModel", function (){
     assert.equal(model.y(), 10);
   });
 
-  //it("should react", function (){
-  //  var model = new ReactiveModel()
-  //    .addPublicProperty("a", 5)
-  //    .finalize();
+  it("should react", function (){
+    var model = new ReactiveModel()
+      .addPublicProperty("a", 5)
+      .finalize();
 
-  //  model({
-  //    b: [function (a){
-  //      return a + 1;
-  //    }, "a"]
-  //  });
+    model({
+      b: [function (a){
+        return a + 1;
+      }, "a"]
+    });
 
-  //  ReactiveFunction.digest();
+    ReactiveModel.digest();
 
-  //  assert.equal(model.b(), 6);
-  //});
+    assert.equal(model.b(), 6);
+  });
 
   //it("should react and use newly set value", function (){
   //  var model = new ReactiveModel()

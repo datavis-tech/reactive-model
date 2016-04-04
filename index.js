@@ -9,13 +9,32 @@ function ReactiveModel(){
   // The model instance object.
   // This is the value returned from the constructor.
   var model = function (options){
+
     //console.log("Invoking model as a function");
-    //return Object.keys(options).map(function (outProperty){
-    //  var array = options[outProperty];
-    //  var callback = array.splice(array.length - 1)[0];
-    //  var inProperties = array;
-    //  return ReactiveFunction(inProperties, outProperty, callback);
-    //});
+    Object.keys(options).forEach(function (outputPropertyName){
+      var arr = options[outputPropertyName];
+      var inputsStr = arr.pop();
+      var callback = arr.pop();
+
+      // Convert the comma separated list of property names
+      // into an array of reactive properties.
+      var inputs = inputsStr.split(",").map(function (propertyName){
+        propertyName = propertyName.trim();
+        return model[propertyName];
+      });
+
+      // Create a new reactive property for the output and assign it to the model.
+      var output = ReactiveProperty();
+      model[outputPropertyName] = output;
+
+      // TODO throw an error if the output property is already defined on the model.
+
+      ReactiveFunction({
+        inputs: inputs,
+        output: output,
+        callback: callback
+      });
+    });
     //ReactiveFunction.parse(options).forEach(function (λ){
     //  assignNodes(λ);
     //  addReactiveFunction(λ);
@@ -144,5 +163,7 @@ function ReactiveModel(){
 
   return model;
 }
+
+ReactiveModel.digest = ReactiveFunction.digest;
 
 module.exports = ReactiveModel;
