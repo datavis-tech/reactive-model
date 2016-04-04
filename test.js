@@ -130,7 +130,7 @@ describe("ReactiveModel", function (){
     assert.equal(model.y(), 10);
   });
 
-  it("should react", function (){
+  it("Should react.", function (){
     var model = new ReactiveModel()
       .addPublicProperty("a", 5)
       .finalize();
@@ -146,62 +146,41 @@ describe("ReactiveModel", function (){
     assert.equal(model.b(), 6);
   });
 
-  //it("should react and use newly set value", function (){
-  //  var model = new ReactiveModel()
-  //    .addPublicProperty("a", 5)
-  //    .finalize();
+  it("Should react and use newly set value.", function (){
+    var model = new ReactiveModel()
+      .addPublicProperty("a", 5)
+      .finalize();
 
-  //  model({
-  //    b: ["a", function (a){
-  //      return a + 1;
-  //    }]
-  //  });
+    model({
+      b: [function (a){
+        return a + 1;
+      }, "a"]
+    });
 
-  //  model.a(7);
-  //  ReactiveModel.digest();
-  //  assert.equal(model.b(), 8);
-  //});
+    model.a(10);
 
-  //it("should track when values change", function (){
-  //  var model = new ReactiveModel()
-  //    .addPublicProperty("a", 5)
-  //    .finalize();
+    ReactiveModel.digest();
 
-  //  model({
-  //    b: ["a", function (a){
-  //      return a + 1;
-  //    }]
-  //  });
+    assert.equal(model.b(), 11);
+  });
 
-  //  model.a(7);
-  //  ReactiveModel.digest();
-  //  assert.equal(model.b(), 8);
+  it("Should react with two public input properties.", function (){
+    var model = new ReactiveModel()
+      .addPublicProperty("firstName", "Jane")
+      .addPublicProperty("lastName", "Smith")
+      .finalize();
 
-  //  model.a(8);
-  //  model.a(9);
-  //  model.a(10);
-  //  ReactiveModel.digest();
-  //  assert.equal(model.b(), 11);
-  //});
+    model({
+      fullName: [function (firstName, lastName){
+        return firstName + " " + lastName;
+      }, "firstName, lastName"]
+    });
 
-  //it("should react with two input properties", function (){
+    ReactiveModel.digest();
 
-  //  var model = new ReactiveModel();
+    assert.equal(model.fullName(), "Jane Smith");
 
-  //  model({
-  //    fullName: ["firstName", "lastName", function (firstName, lastName){
-  //      return firstName + " " + lastName;
-  //    }]
-  //  });
-
-  //  model
-  //    .firstName("Jane")
-  //    .lastName("Smith");
-
-  //  ReactiveModel.digest();
-
-  //  assert.equal(model.fullName(), "Jane Smith");
-  //});
+  });
 
   //it("should not react when only one of two input properties is defined", function (){
   //  var model = new ReactiveModel();
