@@ -131,7 +131,7 @@ describe("ReactiveModel", function (){
   });
 
   it("Should react.", function (){
-    var model = new ReactiveModel()
+    var model = ReactiveModel()
       .addPublicProperty("a", 5)
       .finalize();
 
@@ -147,7 +147,7 @@ describe("ReactiveModel", function (){
   });
 
   it("Should react and use newly set value.", function (){
-    var model = new ReactiveModel()
+    var model = ReactiveModel()
       .addPublicProperty("a", 5)
       .finalize();
 
@@ -165,7 +165,7 @@ describe("ReactiveModel", function (){
   });
 
   it("Should react with two public input properties.", function (){
-    var model = new ReactiveModel()
+    var model = ReactiveModel()
       .addPublicProperty("firstName", "Jane")
       .addPublicProperty("lastName", "Smith")
       .finalize();
@@ -182,44 +182,25 @@ describe("ReactiveModel", function (){
 
   });
 
-  //it("should not react when only one of two input properties is defined", function (){
-  //  var model = new ReactiveModel();
-  //  var counter = 0;
+  it("should propagate two hops in a single digest", function (){
 
-  //  model({
-  //    fullName: ["firstName", "lastName", function (firstName, lastName){
-  //      counter++;
-  //      return firstName + " " + lastName;
-  //    }]
-  //  });
+    var model = ReactiveModel();
 
-  //  model.firstName("Jane");
+    model({
+      b: ["a", increment],
+      c: ["b", increment]
+    });
 
-  //  ReactiveModel.digest();
+    model.a(1);
+    ReactiveModel.digest();
 
-  //  assert.equal(counter, 0);
-  //  assert.equal(model.fullName(), undefined);
-  //});
-
-  //it("should propagate two hops in a single digest", function (){
-
-  //  var model = new ReactiveModel();
-
-  //  model({
-  //    b: ["a", increment],
-  //    c: ["b", increment]
-  //  });
-
-  //  model.a(1);
-  //  ReactiveModel.digest();
-
-  //  assert.equal(model.a(), 1);
-  //  assert.equal(model.b(), 2);
-  //  assert.equal(model.c(), 3);
-  //});
+    assert.equal(model.a(), 1);
+    assert.equal(model.b(), 2);
+    assert.equal(model.c(), 3);
+  });
   //
   //it("should evaluate digests independently", function (){
-  //  var model = new ReactiveModel();
+  //  var model = ReactiveModel();
 
   //  var counterFullName = 0;
   //  var counterB = 0;
@@ -255,7 +236,7 @@ describe("ReactiveModel", function (){
 
   //it("should evaluate tricky case", function (){
 
-  //  var model = new ReactiveModel();
+  //  var model = ReactiveModel();
 
   //  // a - b
   //  //       \
@@ -277,7 +258,7 @@ describe("ReactiveModel", function (){
   //});
 
   //it("should auto-digest", function (done){
-  //  var model = new ReactiveModel()
+  //  var model = ReactiveModel()
   //    .addPublicProperty("a", 5)
   //    .finalize();
 
@@ -299,7 +280,7 @@ describe("ReactiveModel", function (){
   //});
 
   //it("should work with booleans", function (){
-  //  var model = new ReactiveModel();
+  //  var model = ReactiveModel();
 
   //  model({
   //    b: ["a", function (a){
