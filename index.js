@@ -65,18 +65,20 @@ function ReactiveModel(){
   }
 
   function finalize(){
+
     if(isFinalized){
       throw new Error("model.finalize() is being invoked " +
         "more than once, but this function should only be invoked once.");
     }
+
     isFinalized = true;
 
+    // Expose the public properties on the model instance.
     Object.keys(publicProperties).forEach(function(propertyName){
-      // TODO 
-      //track(propertyName);
-      //model[propertyName](getDefaultValue(propertyName));
+      model[propertyName] = publicProperties[propertyName];
     });
 
+    // Support chaining.
     return model;
   }
 
