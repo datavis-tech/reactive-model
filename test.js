@@ -12,14 +12,14 @@ function add(a, b){
 describe("ReactiveModel", function (){
 
   it("Should add a public property and get its value.", function (){
-    var model = new ReactiveModel();
+    var model = ReactiveModel();
     model.addPublicProperty("x", 5);
     model.finalize();
     assert.equal(model.x(), 5);
   });
 
   it("Should add a public property and set its value.", function (){
-    var model = new ReactiveModel();
+    var model = ReactiveModel();
     model.addPublicProperty("x", 5);
     model.finalize();
     model.x(10);
@@ -27,7 +27,7 @@ describe("ReactiveModel", function (){
   });
 
   it("Should support chaining when setting multiple properties.", function (){
-    var model = new ReactiveModel();
+    var model = ReactiveModel();
     model.addPublicProperty("x", 5);
     model.addPublicProperty("y", 6);
     model.finalize();
@@ -41,37 +41,34 @@ describe("ReactiveModel", function (){
   });
 
   it("should throw an error if finalizing twice.", function (){
-    var model = new ReactiveModel();
+    var model = ReactiveModel();
     model.addPublicProperty("x", 5);
     model.finalize();
     assert.throws(model.finalize, Error);
   });
 
   it("Should throw an error when attempting to add a public property after finalize.", function (){
-    var model = new ReactiveModel();
+    var model = ReactiveModel();
     model.addPublicProperty("x", 5);
     model.finalize();
     assert.throws(model.addPublicProperty, Error);
   });
 
   it("should chain addPublicProperty and finalize", function (){
-    var model = new ReactiveModel()
+    var model = ReactiveModel()
       .addPublicProperty("x", 5)
-      .addPublicProperty("y", 6)
       .finalize();
-
-    model.y(20);
-
     assert.equal(model.x(), 5);
-    assert.equal(model.y(), 20);
   });
 
   //it("should get state", function (){
-  //  var model = new ReactiveModel();
-  //  model.addPublicProperty("x", 5);
-  //  model.addPublicProperty("y", 10);
-  //  model.finalize();
+  //  var model = ReactiveModel()
+  //    .addPublicProperty("x", 5)
+  //    .addPublicProperty("y", 10)
+  //    .finalize();
+
   //  model.x(10).y(20);
+
   //  var state = model.getState();
   //  assert.equal(state.x, 10);
   //  assert.equal(state.y, 20);
