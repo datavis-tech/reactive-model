@@ -9,7 +9,7 @@ function ReactiveModel(){
   // The model instance object.
   // This is the value returned from the constructor.
   var model = function (options){
-    console.log("Invoking model as a function");
+    //console.log("Invoking model as a function");
     //return Object.keys(options).map(function (outProperty){
     //  var array = options[outProperty];
     //  var callback = array.splice(array.length - 1)[0];

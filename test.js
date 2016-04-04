@@ -40,7 +40,7 @@ describe("ReactiveModel", function (){
     assert.equal(model.y(), 20);
   });
 
-  it("should throw an error if finalizing twice.", function (){
+  it("Should throw an error if finalizing twice.", function (){
     var model = ReactiveModel();
     model.addPublicProperty("x", 5);
     model.finalize();
@@ -54,14 +54,14 @@ describe("ReactiveModel", function (){
     assert.throws(model.addPublicProperty, Error);
   });
 
-  it("should chain addPublicProperty and finalize", function (){
+  it("Should chain addPublicProperty and finalize.", function (){
     var model = ReactiveModel()
       .addPublicProperty("x", 5)
       .finalize();
     assert.equal(model.x(), 5);
   });
 
-  it("should get state", function (){
+  it("Should get state.", function (){
     var model = ReactiveModel()
       .addPublicProperty("x", 5)
       .addPublicProperty("y", 10)
@@ -103,6 +103,16 @@ describe("ReactiveModel", function (){
 
   });
 
+  it("Should chain setState.", function (){
+    var model = ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 10)
+      .finalize()
+      .setState({ x: 20, y: 50 });
+    assert.equal(model.x(), 20);
+    assert.equal(model.y(), 50);
+  });
+
   it("Should set state with default values for omitted properties.", function (){
     var model = ReactiveModel()
       .addPublicProperty("x", 5)
@@ -120,29 +130,18 @@ describe("ReactiveModel", function (){
     assert.equal(model.y(), 10);
   });
 
-  //it("should chain setState", function (){
-
-  //  var model = createModel()
-  //    .x(10)
-  //    .y(20)
-  //    .setState({y: 45});
-
-  //  assert.equal(model.x(), 5);
-  //  assert.equal(model.y(), 45);
-  //});
-
   //it("should react", function (){
   //  var model = new ReactiveModel()
   //    .addPublicProperty("a", 5)
   //    .finalize();
 
   //  model({
-  //    b: ["a", function (a){
+  //    b: [function (a){
   //      return a + 1;
-  //    }]
+  //    }, "a"]
   //  });
 
-  //  ReactiveModel.digest();
+  //  ReactiveFunction.digest();
 
   //  assert.equal(model.b(), 6);
   //});
