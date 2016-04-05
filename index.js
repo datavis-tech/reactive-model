@@ -35,22 +35,15 @@ function ReactiveModel(){
         callback: callback
       });
     });
-    //ReactiveFunction.parse(options).forEach(function (λ){
-    //  assignNodes(λ);
-    //  addReactiveFunction(λ);
-    //});
   };
 
-  // Keys are property names.
-  // Values are reactive properties.
-  var publicProperties = {};
-
-  // Keys are property names.
+  // Keys are public property names.
   // Values are default values.
-  var defaultValues = {};
+  var publicPropertyDefaults = {};
 
-  // Whether or not model.finalize() has been called.
-  // This is required to guarantee predictable behavior of setState and getState.
+  // Set to true after model.setState() or model.getState() has been called.
+  // Public properties may not be added after this has been set to true.
+  // This is tracked to guarantee predictable behavior.
   var isFinalized = false;
 
   // Adds a public property to this model.
@@ -60,8 +53,7 @@ function ReactiveModel(){
 
     if(isFinalized){
       throw new Error("model.addPublicProperty() is being " +
-        "invoked after model.finalize(), but this is not allowed. " +
-        "Public properties may only be added before the model is finalized. " +
+        "invoked after model.setState() or model.getState(), but this is not allowed. " +
         "This is required to guarantee predictable behavior of setState and getState.");
     }
 
@@ -74,45 +66,29 @@ function ReactiveModel(){
     //    "use ReactiveModel.NONE as the default value.");
     //}
 
-    publicProperties[propertyName] = ReactiveProperty(defaultValue);
-    defaultValues[propertyName] = defaultValue;
+    model[propertyName] = ReactiveProperty(defaultValue);
+    publicPropertyDefaults[propertyName] = defaultValue;
 
     // Support method chaining.
     return model;
   }
 
   function getDefaultValue(propertyName){
-    return defaultValues[propertyName];
-  }
-
-  function finalize(){
-
-    if(isFinalized){
-      throw new Error("model.finalize() is being invoked " +
-        "more than once, but this function should only be invoked once.");
-    }
-
-    isFinalized = true;
-
-    // Expose the public properties on the model instance.
-    Object.keys(publicProperties).forEach(function(propertyName){
-      model[propertyName] = publicProperties[propertyName];
-    });
-
-    // Support method chaining.
-    return model;
+    return publicPropertyDefaults[propertyName];
   }
 
   function getState(){
+    isFinalized = true;
     var state = {};
-    Object.keys(publicProperties).forEach(function (propertyName){
+    Object.keys(publicPropertyDefaults).forEach(function (propertyName){
 
-      var value = publicProperties[propertyName]();
+      var value = model[propertyName]();
+      var defaultValue = publicPropertyDefaults[propertyName];
 
       // TODO throw an error if the property is missing.
 
       // Omit default values.
-      if(value !== defaultValues[propertyName]){
+      if(value !== defaultValue){
         state[propertyName] = value;
       }
     });
@@ -120,6 +96,7 @@ function ReactiveModel(){
   }
 
   function setState(state){
+    isFinalized = true;
 
     // TODO throw an error if some property in state
     // is not in publicProperties
@@ -131,14 +108,14 @@ function ReactiveModel(){
     //});
 
     // Reset state to default values.
-    Object.keys(publicProperties).forEach(function (propertyName){
+    Object.keys(publicPropertyDefaults).forEach(function (propertyName){
       var oldValue = model[propertyName]();
 
       var newValue;
       if(propertyName in state){
         newValue = state[propertyName];
       } else {
-        newValue = defaultValues[propertyName];
+        newValue = publicPropertyDefaults[propertyName];
       }
 
       if(oldValue !== newValue){
@@ -157,7 +134,6 @@ function ReactiveModel(){
   }
 
   model.addPublicProperty = addPublicProperty;
-  model.finalize = finalize;
   model.getState = getState;
   model.setState = setState;
 

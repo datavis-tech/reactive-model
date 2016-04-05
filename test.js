@@ -14,14 +14,12 @@ describe("ReactiveModel", function (){
   it("Should add a public property and get its value.", function (){
     var model = ReactiveModel();
     model.addPublicProperty("x", 5);
-    model.finalize();
     assert.equal(model.x(), 5);
   });
 
   it("Should add a public property and set its value.", function (){
     var model = ReactiveModel();
     model.addPublicProperty("x", 5);
-    model.finalize();
     model.x(10);
     assert.equal(model.x(), 10);
   });
@@ -30,7 +28,6 @@ describe("ReactiveModel", function (){
     var model = ReactiveModel();
     model.addPublicProperty("x", 5);
     model.addPublicProperty("y", 6);
-    model.finalize();
 
     model
       .x(10)
@@ -40,24 +37,9 @@ describe("ReactiveModel", function (){
     assert.equal(model.y(), 20);
   });
 
-  it("Should throw an error if finalizing twice.", function (){
-    var model = ReactiveModel();
-    model.addPublicProperty("x", 5);
-    model.finalize();
-    assert.throws(model.finalize, Error);
-  });
-
-  it("Should throw an error when attempting to add a public property after finalize.", function (){
-    var model = ReactiveModel();
-    model.addPublicProperty("x", 5);
-    model.finalize();
-    assert.throws(model.addPublicProperty, Error);
-  });
-
-  it("Should chain addPublicProperty and finalize.", function (){
+  it("Should chain addPublicProperty.", function (){
     var model = ReactiveModel()
       .addPublicProperty("x", 5)
-      .finalize();
     assert.equal(model.x(), 5);
   });
 
@@ -65,7 +47,6 @@ describe("ReactiveModel", function (){
     var model = ReactiveModel()
       .addPublicProperty("x", 5)
       .addPublicProperty("y", 10)
-      .finalize()
       .x(10)
       .y(20);
 
@@ -78,20 +59,17 @@ describe("ReactiveModel", function (){
   it("Should get state and omit default values.", function (){
     var model = ReactiveModel()
       .addPublicProperty("x", 5)
-      .addPublicProperty("y", 10)
-      .finalize();
+      .addPublicProperty("y", 10);
 
     var state = model.getState();
     assert.equal(Object.keys(state).length, 0);
   });
 
-
   it("Should set state.", function (){
 
     var model = ReactiveModel()
       .addPublicProperty("x", 5)
-      .addPublicProperty("y", 10)
-      .finalize();
+      .addPublicProperty("y", 10);
 
     model.setState({
       x: 20,
@@ -107,7 +85,6 @@ describe("ReactiveModel", function (){
     var model = ReactiveModel()
       .addPublicProperty("x", 5)
       .addPublicProperty("y", 10)
-      .finalize()
       .setState({ x: 20, y: 50 });
     assert.equal(model.x(), 20);
     assert.equal(model.y(), 50);
@@ -117,7 +94,6 @@ describe("ReactiveModel", function (){
     var model = ReactiveModel()
       .addPublicProperty("x", 5)
       .addPublicProperty("y", 10)
-      .finalize()
       .x(20)
       .y(50);
 
@@ -130,10 +106,39 @@ describe("ReactiveModel", function (){
     assert.equal(model.y(), 10);
   });
 
+  it("Should set state with default values and new values.", function (){
+    var model = ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 10)
+      .x(20)
+      .y(50);
+
+    assert.equal(model.x(), 20);
+    assert.equal(model.y(), 50);
+
+    model.setState({ x: 30 });
+
+    assert.equal(model.x(), 30);
+    assert.equal(model.y(), 10);
+  });
+
+  it("Should throw an error when attempting to add a public property after getState.", function (){
+    var model = ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.getState();
+    assert.throws(model.addPublicProperty, Error);
+  });
+
+  it("Should throw an error when attempting to add a public property after setState.", function (){
+    var model = ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.setState({ x: 20});
+    assert.throws(model.addPublicProperty, Error);
+  });
+
   it("Should react.", function (){
     var model = ReactiveModel()
-      .addPublicProperty("a", 5)
-      .finalize();
+      .addPublicProperty("a", 5);
 
     model({
       b: [function (a){
@@ -148,8 +153,7 @@ describe("ReactiveModel", function (){
 
   it("Should react and use newly set value.", function (){
     var model = ReactiveModel()
-      .addPublicProperty("a", 5)
-      .finalize();
+      .addPublicProperty("a", 5);
 
     model({
       b: [function (a){
@@ -167,8 +171,7 @@ describe("ReactiveModel", function (){
   it("Should react with two public input properties.", function (){
     var model = ReactiveModel()
       .addPublicProperty("firstName", "Jane")
-      .addPublicProperty("lastName", "Smith")
-      .finalize();
+      .addPublicProperty("lastName", "Smith");
 
     model({
       fullName: [function (firstName, lastName){
@@ -185,8 +188,7 @@ describe("ReactiveModel", function (){
   it("should propagate two hops in a single digest", function (){
 
     var model = ReactiveModel()
-      .addPublicProperty("a", 0)
-      .finalize();
+      .addPublicProperty("a", 0);
 
     model({
       b: [increment, "a"],
@@ -201,12 +203,11 @@ describe("ReactiveModel", function (){
     assert.equal(model.c(), 3);
   });
 
-  it("should evaluate tricky case", function (){
+  it("Should evaluate tricky case.", function (){
 
     var model = ReactiveModel()
       .addPublicProperty("a", 1)
-      .addPublicProperty("c", 2)
-      .finalize();
+      .addPublicProperty("c", 2);
 
     // a - b
     //       \
@@ -225,10 +226,9 @@ describe("ReactiveModel", function (){
     assert.equal(model.e(), (1 + 1) + (2 + 1));
   });
 
-  it("should auto-digest", function (done){
+  it("Should auto-digest.", function (done){
     var model = ReactiveModel()
-      .addPublicProperty("a", 5)
-      .finalize();
+      .addPublicProperty("a", 5);
 
     model({
       b: [function (a){
@@ -247,24 +247,26 @@ describe("ReactiveModel", function (){
     });
   });
 
-  //it("should work with booleans", function (){
-  //  var model = ReactiveModel();
+  it("should work with booleans", function (){
+    var model = ReactiveModel()
+      .addPublicProperty("a", 5);
 
-  //  model({
-  //    b: ["a", function (a){
-  //      return !a;
-  //    }]
-  //  });
+    model({
+      b: [function (a){
+        return !a;
+      }, "a"]
+    });
 
-  //  model.a(false);
-  //  ReactiveModel.digest();
-  //  assert.equal(model.b(), true);
+    model.a(false);
+    ReactiveModel.digest();
+    assert.equal(model.b(), true);
 
-  //  model.a(true);
-  //  ReactiveModel.digest();
-  //  assert.equal(model.b(), false);
-  //});
+    model.a(true);
+    ReactiveModel.digest();
+    assert.equal(model.b(), false);
+  });
 
+  // TODO decide how to work with asynchronous case.
   //it("should work with promises", function (done){
   //  var model = new ReactiveModel();
 
@@ -285,4 +287,7 @@ describe("ReactiveModel", function (){
   //  model.a(1);
 
   //});
+  // 
+  // TODO dependencies that are not defined as public properties or outputs.
+  // TODO destroy
 });
