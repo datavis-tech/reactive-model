@@ -266,28 +266,24 @@ describe("ReactiveModel", function (){
     assert.equal(model.b(), false);
   });
 
-  // TODO decide how to work with asynchronous case.
-  //it("should work with promises", function (done){
-  //  var model = new ReactiveModel();
+  it("Should work with asynchronous case.", function (done){
+    var model = new ReactiveModel()
+      .addPublicProperty("a", 5);
 
-  //  model({
-  //    b: ["a", function (a){
-  //      return new Promise(function (resolve, reject){
-  //        setTimeout(function (){
-  //          resolve(a + 1);
-  //        }, 50);
-  //      });
-  //    }],
-  //    c: ["b", function (b){
-  //      assert.equal(b, 2);
-  //      done();
-  //    }]
-  //  });
+    model({
+      b: [function (a){
+        setTimeout(function (){
+          model.b(a + 1);
+        }, 10);
+      }, "a"],
+      c: [function (b){
+        assert.equal(b, 2);
+        done();
+      }, "b"]
+    });
 
-  //  model.a(1);
-
-  //});
-  // 
+    model.a(1);
+  });
   // TODO dependencies that are not defined as public properties or outputs.
   // TODO destroy
 });
