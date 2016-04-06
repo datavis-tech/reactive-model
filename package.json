@@ -17,6 +17,10 @@
   },
   "homepage": "https://github.com/curran/reactive-model",
   "devDependencies": {
-    "mocha": "^2.2.5"
+    "mocha": "^2.4.5"
+  },
+  "dependencies": {
+    "reactive-function": "^0.6.0",
+    "reactive-property": "^0.7.0"
   }
 }

@@ -1,8 +1,7 @@
 // By Curran Kelleher April 2016
 
-// TODO change to proper modules.
-var ReactiveFunction = require("../reactive-function/index.js");
-var ReactiveProperty = require("../reactive-property/index.js");
+var ReactiveFunction = require("reactive-function");
+var ReactiveProperty = require("reactive-property");
 
 function ReactiveModel(){
 
