@@ -2,9 +2,9 @@
 
 [![Build Status](https://travis-ci.org/curran/reactive-model.svg)](https://travis-ci.org/curran/reactive-model)
 
-A library for reactive models.
+A library for authoring components that propagate changes based on data flow graphs. 
 
-This project is an experimental variation on [Model.js](https://github.com/curran/model) that takes a different (and more complex) approach to managing reactive data flows (and uses ES6). For a more lightweight and battle-hardened solution, use Model.js.
+This project is a re-implementation of the ideas in [Model.js](https://github.com/curran/model) that takes a different approach to managing reactive data flows.
 
 ## Usage
 
@@ -13,20 +13,6 @@ This project is an experimental variation on [Model.js](https://github.com/curra
 Install via [NPM](https://www.npmjs.com/package/reactive-model): `npm install reactive-model`
 
 Require the module in your code: `var ReactiveModel = require("reactive-model");`
-
-### Bower
-
-Install via [Bower](http://bower.io/search/?q=reactive-model): `bower install reactive-model`
-
-The file `reactive-model.js` contains a [UMD](https://github.com/umdjs/umd) bundle. You can load this module with [RequireJS](http://requirejs.org/).
-
-Alternatively, you can load this file with a script tag like this:
-
-```html
-<script src="bower_components/reactive-model/reactive-model.js"></script>
-```
-
-Loading the library this way introduces a global variable `ReactiveModel`.
 
 ## Example
 
@@ -39,19 +25,19 @@ Loading the library this way introduces a global variable `ReactiveModel`.
 </p>
 
 ```javascript
-var model = new ReactiveModel();
+var model = ReactiveModel()
+  .addPublicProperty("firstName", "Jane")
+  .addPublicProperty("lastName", "Smith");
 
-model.react({
-  fullName: ["firstName", "lastName", function (firstName, lastName){
+model({
+  fullName: [function (firstName, lastName){
     return firstName + " " + lastName;
-  }]
+  }, "firstName, lastName"]
 });
-
-model.firstName("Jane").lastName("Smith");
 
 ReactiveModel.digest();
 
-console.log(model.fullName()); // Prints "Jane Smith"
+assert.equal(model.fullName(), "Jane Smith");
 ```
 
 ## API Reference
