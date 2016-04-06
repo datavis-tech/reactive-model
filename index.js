@@ -18,21 +18,56 @@ function ReactiveModel(){
       // Convert the comma separated list of property names
       // into an array of reactive properties.
       var inputs = inputsStr.split(",").map(function (propertyName){
+
+        // Trim leading and trailing white space around property names.
         propertyName = propertyName.trim();
+
+        // Return the reactive property attached to the model with that name.
+        // TODO throw an error if a property is not on the model.
         return model[propertyName];
       });
 
       // Create a new reactive property for the output and assign it to the model.
       var output = ReactiveProperty();
-      model[outputPropertyName] = output;
 
       // TODO throw an error if the output property is already defined on the model.
+      model[outputPropertyName] = output;
 
-      ReactiveFunction({
-        inputs: inputs,
-        output: output,
-        callback: callback
-      });
+      // If the number of arguments expected by the callback is one greater than the
+      // number of inputs, then the last argument is the "done" callback, and this
+      // reactive function will be set up to be asynchronous. The "done" callback should
+      // be called with the new value of the output property asynchronously.
+      var isAsynchronous = (callback.length === inputs.length + 1);
+
+      if(isAsynchronous){
+        ReactiveFunction({
+          inputs: inputs,
+          callback: function (){
+
+            // Convert the arguments passed into this function into an array.
+            var args = Array.prototype.slice.call(arguments);
+
+            // Push the "done" callback onto the args array.
+            args.push(function (newValue){
+
+              // Wrap in setTimeout to guarantee that the output property is set
+              // asynchronously, outside of the current digest.
+              setTimeout(function (){
+                output(newValue);
+              });
+            });
+
+            // Invoke the original callback with the args array as arguments.
+            callback.apply(this, args);
+          }
+        });
+      } else {
+        ReactiveFunction({
+          inputs: inputs,
+          output: output,
+          callback: callback
+        });
+      }
     });
   };
 

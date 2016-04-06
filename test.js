@@ -266,19 +266,44 @@ describe("ReactiveModel", function (){
     assert.equal(model.b(), false);
   });
 
-  it("Should work with asynchronous case.", function (done){
+  it("Should work with asynchronous case.", function (testDone){
     var model = new ReactiveModel()
       .addPublicProperty("a", 5);
 
     model({
-      b: [function (a){
+
+      // Similarly to mocha, if an extra "done" argument is on the function,
+      // it is treated as an asynchronous function. The "done" callback should
+      // be invoked asynchronously with the new value for the output property.
+      b: [function (a, done){
         setTimeout(function (){
-          model.b(a + 1);
-        }, 10);
+          done(a + 1);
+        }, 20);
       }, "a"],
       c: [function (b){
         assert.equal(b, 2);
-        done();
+        testDone();
+      }, "b"]
+    });
+
+    model.a(1);
+  });
+
+  it("Should work with asynchronous case that is not actually asynchronous.", function (testDone){
+    var model = new ReactiveModel()
+      .addPublicProperty("a", 5);
+
+    model({
+      b: [function (a, done){
+
+        // The "done" callback is being invoked synchronously.
+        // This should not be done, but just in case people do it by accident,
+        // the library is set up to have the expected behavior.
+        done(a + 1);
+      }, "a"],
+      c: [function (b){
+        assert.equal(b, 2);
+        testDone();
       }, "b"]
     });
 
