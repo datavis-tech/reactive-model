@@ -154,12 +154,6 @@ function ReactiveModel(){
       }
     });
 
-    // Apply values included in the new state.
-    Object.keys(state).forEach(function (propertyName){
-      var newValue = state[propertyName]
-      model[propertyName](newValue);
-    });
-
     // Support method chaining.
     return model;
   }
