@@ -48,17 +48,14 @@ function ReactiveModel(){
             var args = Array.prototype.slice.call(arguments);
 
             // Push the "done" callback onto the args array.
-            args.push(function (newValue){
+            args.push(output);
 
-              // Wrap in setTimeout to guarantee that the output property is set
-              // asynchronously, outside of the current digest.
-              setTimeout(function (){
-                output(newValue);
-              });
+            // Wrap in setTimeout to guarantee that the output property is set
+            // asynchronously, outside of the current digest.
+            setTimeout(function (){
+              // Invoke the original callback with the args array as arguments.
+              callback.apply(this, args);
             });
-
-            // Invoke the original callback with the args array as arguments.
-            callback.apply(this, args);
           }
         });
       } else {
