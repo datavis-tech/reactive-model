@@ -312,7 +312,56 @@ describe("ReactiveModel", function (){
   });
   // TODO should throw an error if done() is called more than once.
 
-  // TODO destroy
+  it("Should remove synchronous reactive function on destroy.", function (){
+    var model = ReactiveModel()
+      .addPublicProperty("a", 5);
+
+    model({
+      b: [function (a){
+        return a + 1;
+      }, "a"]
+    });
+
+    model.a(10);
+    ReactiveModel.digest();
+    assert.equal(model.b(), 11);
+
+    model.destroy();
+    model.a(20);
+    ReactiveModel.digest();
+    assert.equal(model.b(), 11);
+
+  });
+
+  it("Should remove asynchronous reactive function on destroy.", function (done){
+    var model = ReactiveModel()
+      .addPublicProperty("a", 5);
+
+    model({
+      b: [function (a, done){
+        setTimeout(function(){
+          done(a + 1);
+        }, 5);
+      }, "a"]
+    });
+
+    model.a(10);
+    ReactiveModel.digest();
+    setTimeout(function(){
+      assert.equal(model.b(), 11);
+      model.destroy();
+      model.a(20);
+
+      setTimeout(function(){
+        assert.equal(model.b(), 11);
+        done();
+      }, 10);
+
+      assert.equal(model.b(), 11);
+    }, 10);
+
+
+  });
   // TODO dependencies that are not defined as public properties or outputs.
   // TODO bind
 });

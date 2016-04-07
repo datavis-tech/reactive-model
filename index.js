@@ -40,7 +40,8 @@ function ReactiveModel(){
       var isAsynchronous = (callback.length === inputs.length + 1);
 
       if(isAsynchronous){
-        ReactiveFunction({
+
+        reactiveFunctions.push(ReactiveFunction({
           inputs: inputs,
           callback: function (){
 
@@ -57,13 +58,13 @@ function ReactiveModel(){
               callback.apply(this, args);
             });
           }
-        });
+        }));
       } else {
-        ReactiveFunction({
+        reactiveFunctions.push(ReactiveFunction({
           inputs: inputs,
           output: output,
           callback: callback
-        });
+        }));
       }
     });
   };
@@ -76,6 +77,10 @@ function ReactiveModel(){
   // Public properties may not be added after this has been set to true.
   // This is tracked to guarantee predictable behavior.
   var isFinalized = false;
+
+  // An array of reactive functions that have been set up on this model.
+  // These are tracked only so they can be destroyed in model.destroy().
+  var reactiveFunctions = [];
 
   // Adds a public property to this model.
   // The property name is required and will be used to reference this property.
@@ -158,9 +163,20 @@ function ReactiveModel(){
     return model;
   }
 
+  function destroy(){
+    
+    // Destroy all reactive functions that have been added to the model.
+    reactiveFunctions.forEach(function (reactiveFunction){
+      reactiveFunction.destroy();
+    });
+
+    // TODO test bind case
+  }
+
   model.addPublicProperty = addPublicProperty;
   model.getState = getState;
   model.setState = setState;
+  model.destroy = destroy;
 
   return model;
 }
