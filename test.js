@@ -297,9 +297,10 @@ describe("ReactiveModel", function (){
       b: [function (a, done){
 
         // The "done" callback is being invoked synchronously.
-        // This should not be done, but just in case people do it by accident,
+        // This kind of code should not be written, but just in case people do it by accident,
         // the library is set up to have the expected behavior.
         done(a + 1);
+
       }, "a"],
       c: [function (b){
         assert.equal(b, 2);
@@ -309,7 +310,9 @@ describe("ReactiveModel", function (){
 
     model.a(1);
   });
-  // TODO dependencies that are not defined as public properties or outputs.
+  // TODO should throw an error if done() is called more than once.
+
   // TODO destroy
+  // TODO dependencies that are not defined as public properties or outputs.
   // TODO bind
 });

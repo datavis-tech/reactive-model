@@ -113,6 +113,18 @@ model({
 
 In this example, if `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
 
+Asynchronous reactive functions are supported using an additional argument, the `done` callback, which should be called asynchronously with the new value for the output property. This is inspired by the [asynchronous tests in Mocha](https://mochajs.org/#asynchronous-code). Here's an asynchronous example:
+
+```javascript
+model({
+  b: [function (a, done){
+    setTimeout(function (){
+      done(a + 1);
+    }, 500);
+  }, "a"]
+});
+```
+
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
 Synchronously evaluates the data dependency graph.
