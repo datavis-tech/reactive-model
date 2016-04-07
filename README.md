@@ -45,14 +45,13 @@ assert.equal(model.fullName(), "Jane Smith");
 Constructing & Evaluating Data Dependency Graphs
 
  * [ReactiveModel()](#reactive-model-constructor)
- * [model.react(options)](#react)
+ * [model(options)](#react)
  * [ReactiveModel.digest()](#digest)
- * [getter-setters](#getter-setters)
+ * [reactive-properties](#reactive-properties)
 
 Serialization & Deserialization
 
  * [model.addPublicProperty(property, defaultValue)](#add-public-property)
- * [model.finalize()](#finalize)
  * [model.getState()](#get-state)
  * [model.setState()](#set-state)
 
@@ -60,38 +59,44 @@ Serialization & Deserialization
 
 <a name="reactive-model-constructor" href="#reactive-model-constructor">#</a> <b>ReactiveModel</b>()
 
-Constructs a new reactive model. The `new` keyword is optional.
+Constructs a new reactive model.
 
 Example use:
 
 ```javascript
-var model = new ReactiveModel();
+var model = ReactiveModel();
 ```
 
-<a name="react" href="#react">#</a> <i>model</i>.<b>react</b>(<i>options</i>)
+<a name="react" href="#react">#</a> <i>model</i>(<i>options</i>)
 
 Adds the given set of reactive functions to the data dependency graph. In the `options` object:
 
  * keys are output property names
  * values are arrays where
-   * all elements except the last one are input property names, and
-   * the last element is the reactive function callback.
+   * the first element is the reactive function callback,
+   * the second element is a comma delimited string of input property names.
 
-Here is an example invocation of `react` that sets the `b` property to be `a + 1` whenever `a` changes:
+The motivation behind setting it up this way is:
+
+ * The dependencies could be inferred from the argument names of the callback, but this approach would break under minification (since argument names may be changed). Therefore, an explicit representation of the list of property names in string literal form is required.
+ * A comma-delimited list was chosen as the representation because one can copy-and-paste the arguments list of the callback directly and simply add quotes around it. From the perspective of developers, this is more convenient than the array-of-strings approach taken by Model.js in representing dependencies.
+ * The dependencies list is the second argument so it does not make the first line of the expression very long. With Model.js, the dependencies list comes first, followed by the callback, so the repetition of dependencies falls on the same line. With the dependencies list as the second argument, it fits nicely onto its own line after the definition of the callback function.
+
+Here is an example invocation that sets the `b` property to be `a + 1` whenever `a` changes:
 
 ```javascript
-model.react({
-  b: ["a", function (a){
+model({
+  b: [function (a){
     return a + 1;
-  }]
+  }, "a"]
 });
 ```
 
 The reactive function callback is invoked with the values of input properties during a [digest](#digest).
 
-After invocation of `react`, the reactive function callback is invoked in the next digest if all of its input properties are defined. If not all of its input properties are defined, then it will not be invoked in the next digest. When any input properties change, the reactive function callback will be invoked in the next digest after the change.
+After setting up the reactive function like this, the callback is invoked in the next digest if all of its input properties are defined. If not all of its input properties are defined, then it will not be invoked in the next digest. When any input properties change, the reactive function callback will be invoked in the next digest after the change (only if all inputs are defined).
 
-The return value from the callback is assigned to the output property during a digest, which may be used as an input property to other reactive functions.
+The return value from the callback is assigned to the output property during a digest. The output of one reactive function may be used as an input to other reactive functions. This is how you can construct complex data flow graphs. Note that during each digest, changes are propagated through the dependency graph synchronously, within a single tick of the event loop.
 
 Here's an example that assign `b = a + 1` and `c = b + 1`:
 
@@ -100,40 +105,31 @@ function increment(x){
   return x + 1;
 }
 
-model.react({
-  b: ["a", increment],
-  c: ["b", increment]
+model({
+  b: [increment, "a"],
+  c: [increment, "b"]
 });
 ```
+
 In this example, if `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
 
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
 Synchronously evaluates the data dependency graph.
 
-Whenever any property changes, the `digest()` function is automatically scheduled to be invoked on the next animation frame after the change was made.
-
 This function is exposed on the `ReactiveModel` constructor function rather than the `ReactiveModel` instance because there is a singleton data dependency graph shared by all reactive model instances. This approach was taken to enable reactive functions that take input from one model and yield output on another (via [bind](#bind)).
 
 The term "digest" was chosen because it is already in common use within the AngularJS community and refers to almost exactly the same operation - see [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest).
 
-<a name="getter-setters" href="#getter-setters">#</a> getter-setters
+<a name="reactive-properties" href="#reactive-properties">#</a> reactive-properties
 
-Every tracked property is made available on the model object as a [chainable getter-setter function](http://bost.ocks.org/mike/chart/#reconfiguration).
+Every property is made available on the model object as a [chainable getter-setter function](http://bost.ocks.org/mike/chart/#reconfiguration). These properties are instances of another module, [reactive-property](https://github.com/curran/reactive-property).
 
-A property is considered "tracked" after it is
-
- * used as an input property of a reactive function,
- * used as an output property of a reactive function, or
- * added as a public property.
-
-For example, assuming there is a tracked property `a`, we can set it using its getter-setter like this:
+For example, assuming there is a [public property](#add-public-property) `a`, we can set its value like this:
 
 ```javascript
 model.a(5);
 ```
-
-Whenever any property is set in this way, the `digest()` function is automatically scheduled to be invoked on the next animation frame after the change was made.
 
 The value can then be retreived by invoking the function with no arguments:
 
@@ -146,6 +142,8 @@ When the setter form is used, the `model` object is returned. This enables metho
 ```javascript
 model.a(3).b(4).c(5);
 ```
+
+Whenever any public property used as an input to a reactive function is set, the [`digest()`](#digest) function is automatically scheduled to be invoked on the next tick.
 
 ### Serialization & Deserialization
 
@@ -161,24 +159,11 @@ var model = new ReactiveModel()
   .addPublicProperty("y", 6);
 ```
 
-<a name="finalize" href="#finalize">#</a> <i>model</i>.<b>finalize</b>()
-
-Calling this function causes public properties to be tracked and made available as [getter-setter](#getter-setters). After invoking `finalize()`, no more public properties may be added. This guarantees predictable serialization and deserialization behavior.
-
-Returns the `model` object, so is chainable, like this:
-
-```javascript
-var model = new ReactiveModel()
-  .addPublicProperty("x", 5)
-  .addPublicProperty("y", 6)
-  .finalize();
-```
+Public properties may not be added after `setState()` or `getState()` have been invoked. This is to guarantee predictable serialization and deserialization behavior.
 
 <a name="get-state" href="#get-state">#</a> <i>model</i>.<b>getState</b>()
 
 Returns a serialized form of the model that can later be passed into `setState()`. This is an object that only contains public properties that have values other than their defaults.
-
-This function may only be invoked after invoking `model.finalize()`.
 
 <a name="set-state" href="#set-state">#</a> <i>model</i>.<b>setState</b>(<i>state</i>)
 
@@ -186,7 +171,7 @@ Sets the state of the model from its serialized form. The `state` argument objec
 
 This function may only be invoked after invoking `model.finalize()`.
 
-Internally, `setState()` sets public properties to the specified values via their getter-setters, causing the changes to be propagated through all reactive functions that depend on them.
+Internally, `setState()` sets public properties to the specified values via their reactive-properties, causing the changes to be propagated through all reactive functions that depend on them.
 
 ## Glossary
 
@@ -200,24 +185,18 @@ Internally, `setState()` sets public properties to the specified values via thei
 
 ## Development Flow
 
-This project uses [Rollup](https://github.com/rollup/rollup) for bundling ES6 modules into a CommonJS build. The unit tests use the bundle. To re-generate the bundle and run the unit tests, execute
-
-`make test`
-
-To list all source files, run
-
-`make tree`
+Run `npm test` to run the unit tests.
 
 ## How it Works
 
-This library maintains a graph data structure internally, called the "data dependency graph", in which
+This library maintains an instance of [graph-data-structure](https://github.com/curran/graph-data-structure) internally, called the "data dependency graph", in which
 
- * vertices represent either properties or reactive functions, and
- * edges represent a data dependency.
+ * vertices represent reactive properties, and
+ * edges represent dependencies.
 
-Whenever `react()` is called, nodes and edges are added to this data structure. Whenever a property is changed (via its getter-setter), that property is marked as changed.
+Whenever reactive functions are added to the model, nodes and edges are added to this data structure. Whenever a property is changed, that property is marked as changed.
 
-The digest algorithm performs a depth first search using the changed property nodes as sources for the search. The resulting list of nodes visited by the depth first search algorithm is then reversed to obtain the topologically sorted order in which the reactive functions must be executed. After computing this ordering, each reactive function is executed, and its output value is assigned to its output property. Before executing each reactive function, a check is performed that ensures all of its input properties are defined.
+The digest algorithm performs a topological sort using the changed property nodes as sources. The resulting list of nodes is in the sorted order in which the reactive functions must be executed. After computing this ordering, each reactive function is executed, and its output value is assigned to its output property. Before executing each reactive function, a check is performed that ensures all of its input properties are defined.
 
 ## Background
 
@@ -237,38 +216,15 @@ The state-related functions (addPublicProperty, finalize, getState, and setState
 
 Moving the publicProperty and serialization/deserialization semantics into the model abstraction seemed like a logical move. This will simplify the implementation of an engine like Chiasm, and will provide consistent serialization behavior for any users of reactive-model.
 
-## Future Plans
-
-This part is aspirational, not yet implemented. Following [readme-driven development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html).
-
-
-### Asynchronous Operations
-
-For asynchronouos operations, the API should support returning a Promise from the reactive function callback. Here's an example that uses this API to fetch a CSV file using [d3.csv](https://github.com/mbostock/d3/wiki/CSV):
-
-```javascript
-var model = new ReactiveModel();
-
-model.react({
-  data: ["url", function (url){
-    return new Promise(function (resolve, reject){
-      d3.csv(url, function (error, data){
-        if(error) {
-          reject(error);
-        } else {
-          resolve(data);
-        }
-      });
-    });
-  ]
-});
-```
-
 ### NONE
 
 A special default value `model.NONE` refers to a value that is defined, but represents that the property is optional and has not been speficied (similar conceptually to [Scala's Option Type](http://danielwestheide.com/blog/2012/12/19/the-neophytes-guide-to-scala-part-5-the-option-type.html).
 
-### BIND
+### Not Yet Implemented
+
+<a name="destroy" href="#destroy">#</a> <i>model</i>.<b>destroy</b>()
+
+Removes all reactive functions added to this model by `model.react()`, and frees all memory allocated internally for this model. This includes removing references to all tracked property values.
 
 <a name="bind" href="#bind">#</a> <i>bind</i>(<i>arr</i>)
 
@@ -280,18 +236,6 @@ The `arr` argument is expected to be an array of objects with the following prop
  * `property` A property name on that model.
 
 Invoking `bind()` adds a cycle of pass-through reactive functions to the data dependency graph such that all specified properties will be synchronized, handling the fact that they are from different model instances.
-
-### Cleaning Up
-
-This library currently has memory leaks, and once a reactive function is added, it cannot be removed.
-
-<a name="unreact" href="#unreact">#</a> <i>model</i>.<b>unreact</b>(<i>reactiveFunctions</i>)
-
-Removes the reactive functions added by `model.react()` or `model.bind()`.
-
-<a name="destroy" href="#destroy">#</a> <i>model</i>.<b>destroy</b>()
-
-Removes all reactive functions added to this model by `model.react()`, and frees all memory allocated internally for this model. This includes removing references to all tracked property values.
 
 ## Related Work
 

@@ -311,4 +311,5 @@ describe("ReactiveModel", function (){
   });
   // TODO dependencies that are not defined as public properties or outputs.
   // TODO destroy
+  // TODO bind
 });
