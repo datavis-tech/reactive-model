@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/curran/reactive-model.svg)](https://travis-ci.org/curran/reactive-model)
 
+[![NPM](https://nodei.co/npm/reactive-model.png)](https://npmjs.org/package/reactive-model)
+
 A library for authoring components that propagate changes based on data flow graphs. 
 
 This project is a re-implementation of the ideas in [Model.js](https://github.com/curran/model) that takes a different approach to managing reactive data flows.
