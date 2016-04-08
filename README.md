@@ -14,6 +14,8 @@ Install via [NPM](https://www.npmjs.com/package/reactive-model): `npm install re
 
 Require the module in your code: `var ReactiveModel = require("reactive-model");`
 
+This package depends on [reactive-property](https://github.com/curran/reactive-property) and [reactive-function](https://github.com/curran/reactive-function).
+
 ## Example
 
 <p align="center">
