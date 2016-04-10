@@ -85,46 +85,46 @@ describe("ReactiveModel", function (){
 
   });
 
-  //it("Should chain setState.", function (){
-  //  var model = ReactiveModel()
-  //    .addPublicProperty("x", 5)
-  //    .addPublicProperty("y", 10)
-  //    .setState({ x: 20, y: 50 });
-  //  assert.equal(model.x(), 20);
-  //  assert.equal(model.y(), 50);
-  //});
+  it("Should chain setState.", function (){
+    var model = ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 10)
+      .state({ x: 20, y: 50 });
+    assert.equal(model.x(), 20);
+    assert.equal(model.y(), 50);
+  });
 
-  //it("Should set state with default values for omitted properties.", function (){
-  //  var model = ReactiveModel()
-  //    .addPublicProperty("x", 5)
-  //    .addPublicProperty("y", 10)
-  //    .x(20)
-  //    .y(50);
+  it("Should set state with default values for omitted properties.", function (){
+    var model = ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 10)
+      .x(20)
+      .y(50);
 
-  //  assert.equal(model.x(), 20);
-  //  assert.equal(model.y(), 50);
+    assert.equal(model.x(), 20);
+    assert.equal(model.y(), 50);
 
-  //  model.setState({});
+    model.state({});
 
-  //  assert.equal(model.x(), 5);
-  //  assert.equal(model.y(), 10);
-  //});
+    assert.equal(model.x(), 5);
+    assert.equal(model.y(), 10);
+  });
 
-  //it("Should set state with default values and new values.", function (){
-  //  var model = ReactiveModel()
-  //    .addPublicProperty("x", 5)
-  //    .addPublicProperty("y", 10)
-  //    .x(20)
-  //    .y(50);
+  it("Should set state with default values and new values.", function (){
+    var model = ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 10)
+      .x(20)
+      .y(50);
 
-  //  assert.equal(model.x(), 20);
-  //  assert.equal(model.y(), 50);
+    assert.equal(model.x(), 20);
+    assert.equal(model.y(), 50);
 
-  //  model.setState({ x: 30 });
+    model.state({ x: 30 });
 
-  //  assert.equal(model.x(), 30);
-  //  assert.equal(model.y(), 10);
-  //});
+    assert.equal(model.x(), 30);
+    assert.equal(model.y(), 10);
+  });
 
   //it("Should throw an error when attempting to add a public property after getState.", function (){
   //  var model = ReactiveModel();

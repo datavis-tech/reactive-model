@@ -114,7 +114,10 @@ function ReactiveModel(){
     //    "use ReactiveModel.NONE as the default value.");
     //}
 
+    // Add a new reactive property to the model.
     model[propertyName] = ReactiveProperty(defaultValue);
+
+    // Store the default value for later reference.
     publicPropertyDefaults[propertyName] = defaultValue;
 
     // Destroy the previous reactive function that was listening for changes
@@ -129,7 +132,6 @@ function ReactiveModel(){
     var publicProperties = publicPropertyNames.map(function (propertyName){
       return model[propertyName];
     });
-
     stateReactiveFunction = ReactiveFunction({
       inputs: publicProperties,
       output: stateProperty,
@@ -152,38 +154,33 @@ function ReactiveModel(){
     return model;
   }
 
+  stateProperty.on(function (state){
 
-  //function setState(state){
-  //  isFinalized = true;
+    // TODO throw an error if some property in state
+    // is not in publicProperties
+    //Object.keys(state).forEach(function (property){
+    //  if(!property in publicProperties){
+    //    throw new Error("Attempting to set a property that has not" +
+    //      " been added as a public property in model.setState()");
+    //  }
+    //});
 
-  //  // TODO throw an error if some property in state
-  //  // is not in publicProperties
-  //  //Object.keys(state).forEach(function (property){
-  //  //  if(!property in publicProperties){
-  //  //    throw new Error("Attempting to set a property that has not" +
-  //  //      " been added as a public property in model.setState()");
-  //  //  }
-  //  //});
+    // Reset state to default values.
+    Object.keys(publicPropertyDefaults).forEach(function (propertyName){
+      var oldValue = model[propertyName]();
 
-  //  // Reset state to default values.
-  //  Object.keys(publicPropertyDefaults).forEach(function (propertyName){
-  //    var oldValue = model[propertyName]();
+      var newValue;
+      if(propertyName in state){
+        newValue = state[propertyName];
+      } else {
+        newValue = publicPropertyDefaults[propertyName];
+      }
 
-  //    var newValue;
-  //    if(propertyName in state){
-  //      newValue = state[propertyName];
-  //    } else {
-  //      newValue = publicPropertyDefaults[propertyName];
-  //    }
-
-  //    if(oldValue !== newValue){
-  //      model[propertyName](newValue);
-  //    }
-  //  });
-
-  //  // Support method chaining.
-  //  return model;
-  //}
+      if(oldValue !== newValue){
+        model[propertyName](newValue);
+      }
+    });
+  });
 
   function destroy(){
     
@@ -197,8 +194,6 @@ function ReactiveModel(){
 
   model.addPublicProperty = addPublicProperty;
   model.state = stateProperty;
-  //model.getState = getState;
-  //model.setState = setState;
   model.destroy = destroy;
 
   return model;
