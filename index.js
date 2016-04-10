@@ -9,15 +9,6 @@ function ReactiveModel(){
   // Values are default values.
   var publicPropertyDefaults = {};
 
-  // Set to true after state has been accessed through the public API.
-  // Public properties may not be added after this has been set to true.
-  // This is tracked to guarantee predictable state accessor behavior.
-  var isFinalized = false;
-
-  // An array of reactive functions that have been set up on this model.
-  // These are tracked only so they can be destroyed in model.destroy().
-  var reactiveFunctions = [];
-
   // The state of the model is represented as an object and stored
   // in this reactive property. Note that only values for public properties
   // whose values differ from their defaults are included in the state object.
@@ -28,6 +19,15 @@ function ReactiveModel(){
   // This is a reactive function set up to listen for changes in all
   // public properties and set the stateProperty value.
   var stateReactiveFunction;
+
+  // Set to true after state has been accessed through the public API.
+  // Public properties may not be added after this has been set to true.
+  // This is tracked to guarantee predictable state accessor behavior.
+  var isFinalized = false;
+
+  // An array of reactive functions that have been set up on this model.
+  // These are tracked only so they can be destroyed in model.destroy().
+  var reactiveFunctions = [];
 
   // The model instance object.
   // This is the value returned from the constructor.
@@ -99,8 +99,8 @@ function ReactiveModel(){
 
     if(isFinalized){
       throw new Error("model.addPublicProperty() is being " +
-        "invoked after model.setState() or model.getState(), but this is not allowed. " +
-        "This is required to guarantee predictable behavior of setState and getState.");
+        "invoked after model.state() has been accessed, but this is not allowed. " +
+        "This is required to guarantee predictable behavior of the state accessor.");
     }
 
     // TODO test this
@@ -113,11 +113,11 @@ function ReactiveModel(){
     //}
 
     // Add a new reactive property to the model.
+    // TODO throw an error if a property with this name is already defined.
     model[propertyName] = ReactiveProperty(defaultValue);
 
     // Store the default value for later reference.
     publicPropertyDefaults[propertyName] = defaultValue;
-    var publicPropertyNames = Object.keys(publicPropertyDefaults);
 
     // Destroy the previous reactive function that was listening for changes
     // in all public properties except the newly added one.
@@ -127,6 +127,7 @@ function ReactiveModel(){
 
     // Set up the new reactive function that will listen for changes
     // in all public properties including the newly added one.
+    var publicPropertyNames = Object.keys(publicPropertyDefaults);
     stateReactiveFunction = ReactiveFunction({
       inputs: publicPropertyNames.map(function (propertyName){
         return model[propertyName];
@@ -151,7 +152,7 @@ function ReactiveModel(){
     return model;
   }
 
-  stateProperty.on(function (state){
+  function setState(state){
 
     // TODO throw an error if some property in state
     // is not in publicProperties
@@ -177,7 +178,7 @@ function ReactiveModel(){
         model[propertyName](newValue);
       }
     });
-  });
+  }
 
   function destroy(){
     
@@ -193,14 +194,19 @@ function ReactiveModel(){
   // This is necessary to enforce the policy that no public properties
   // may be added after the state has been get or set from the public API.
   // This is required to guarantee predictable state accessor behavior.
-  function stateAccessor(){
+  function stateAccessor(newState){
 
     // Mark the model as "finalized" if the state is accessed via the public API.
     // If developers attempt to add public properties after this flag is set,
     // errors will be thrown.
     isFinalized = true;
 
-    // Pass through the invocation to stateProperty.
+    // Invoke the setState logic only when the state is set via the public API.
+    if(arguments.length == 1){
+      setState(newState);
+    }
+
+    // Pass through the getter/setter invocation to stateProperty.
     return stateProperty.apply(model, arguments);
   }
   stateAccessor.on = stateProperty.on;
