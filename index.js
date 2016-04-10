@@ -3,6 +3,13 @@
 var ReactiveFunction = require("reactive-function");
 var ReactiveProperty = require("reactive-property");
 
+// Functional utility for invoking methods on collections.
+function invoke(method){
+  return function(d){
+    return d[method]();
+  };
+}
+
 // Parses the options data structure passed into model(options).
 // Returns an array of reactive function specifications.
 function parseOptions(options){
@@ -14,7 +21,7 @@ function parseOptions(options){
 
     var inputPropertyNames = inputsStr
       .split(",")
-      .map(function (d){ return d.trim(); });
+      .map(invoke("trim"));
 
     var reactiveFunctionSpec = {
       outputPropertyName: outputPropertyName,
@@ -30,10 +37,15 @@ function parseOptions(options){
 // This function is exported as the public API of this module.
 function ReactiveModel(){
 
-  // This object stores the default values for public properties.
+  // This object stores the default values for all public properties.
   // Keys are public property names.
   // Values are default values.
   var publicPropertyDefaults = {};
+
+  // This function returns an array of public property names.
+  var publicPropertyNames = function (){
+    return Object.keys(publicPropertyDefaults);
+  }
 
   // The state of the model is represented as an object and stored
   // in this reactive property. Note that only values for public properties
@@ -58,17 +70,15 @@ function ReactiveModel(){
   // The model instance object.
   // This is the value returned from the constructor.
   var model = function (options){
-
     parseOptions(options).forEach(function (reactiveFunctionSpec){
     
+      // Unpack the parsed reactive function specification.
       var outputPropertyName = reactiveFunctionSpec.outputPropertyName;
       var inputPropertyNames = reactiveFunctionSpec.inputPropertyNames;
       var callback = reactiveFunctionSpec.callback;
 
       // TODO throw an error if a property is not on the model.
-      var inputs = inputPropertyNames.map(function (propertyName){
-        return model[propertyName];
-      });
+      var inputs = inputPropertyNames.map(getProperty);
 
       // Create a new reactive property for the output and assign it to the model.
       // TODO throw an error if the output property is already defined on the model.
@@ -89,6 +99,8 @@ function ReactiveModel(){
             var args = Array.prototype.slice.call(arguments);
 
             // Push the "done" callback onto the args array.
+            // We are actally passing the output reactive property here, invoking it
+            // as the "done" callback will set the value of the output property.
             args.push(output);
 
             // Wrap in setTimeout to guarantee that the output property is set
@@ -111,6 +123,12 @@ function ReactiveModel(){
       }
     });
   };
+
+  // Gets a reactive property from the model by name.
+  // Convenient for functional patterns like `propertyNames.map(getProperty)`
+  function getProperty(propertyName){
+    return model[propertyName];
+  }
 
   // Adds a public property to the model.
   // The property name is required and will be used to reference this property.
@@ -147,19 +165,17 @@ function ReactiveModel(){
 
     // Set up the new reactive function that will listen for changes
     // in all public properties including the newly added one.
-    var publicPropertyNames = Object.keys(publicPropertyDefaults);
+    var inputPropertyNames = publicPropertyNames();
     stateReactiveFunction = ReactiveFunction({
-      inputs: publicPropertyNames.map(function (propertyName){
-        return model[propertyName];
-      }),
+      inputs: inputPropertyNames.map(getProperty),
       output: stateProperty,
       callback: function (){
         var state = {};
-        publicPropertyNames.forEach(function (propertyName){
+        inputPropertyNames.forEach(function (propertyName){
           var value = model[propertyName]();
           var defaultValue = publicPropertyDefaults[propertyName];
 
-          // Omit default values.
+          // Omit default values from the returned state object.
           if(value !== defaultValue){
             state[propertyName] = value;
           }
@@ -172,24 +188,23 @@ function ReactiveModel(){
     return model;
   }
 
-  function setState(state){
+  function setState(newState){
 
     // TODO throw an error if some property in state
     // is not in publicProperties
     //Object.keys(state).forEach(function (property){
-    //  if(!property in publicProperties){
+    //  if(!property in publicPropertyDefaults){
     //    throw new Error("Attempting to set a property that has not" +
-    //      " been added as a public property in model.setState()");
+    //      " been added as a public property in model.state(newState)");
     //  }
     //});
 
-    // Reset state to default values.
-    Object.keys(publicPropertyDefaults).forEach(function (propertyName){
+    publicPropertyNames().forEach(function (propertyName){
       var oldValue = model[propertyName]();
 
       var newValue;
-      if(propertyName in state){
-        newValue = state[propertyName];
+      if(propertyName in newState){
+        newValue = newState[propertyName];
       } else {
         newValue = publicPropertyDefaults[propertyName];
       }
@@ -200,15 +215,14 @@ function ReactiveModel(){
     });
   }
 
+  // Destroys all reactive functions that have been added to the model.
   function destroy(){
     
-    // Destroy all reactive functions that have been added to the model.
-    reactiveFunctions.forEach(function (reactiveFunction){
-      reactiveFunction.destroy();
-    });
+    reactiveFunctions.forEach(invoke("destroy"));
+
+    // TODO destroy all properties on the model, remove their listeners and nodes in the graph.
 
     // TODO test bind case
-    // TODO destroy all properties on the model and remove their listeners.
   }
 
   // This is the public facing wrapper around stateProperty.
