@@ -152,6 +152,7 @@ function ReactiveModel(){
 
     // Add a new reactive property to the model.
     // TODO throw an error if a property with this name is already defined.
+    // TODO throw an error if the property name is "state" or "addPublicProperty".
     model[propertyName] = ReactiveProperty(defaultValue);
 
     // Store the default value for later reference.
@@ -159,6 +160,7 @@ function ReactiveModel(){
 
     // Destroy the previous reactive function that was listening for changes
     // in all public properties except the newly added one.
+    // TODO think about how this might be done only once, at the same time isFinalized is set.
     if(stateReactiveFunction){
       stateReactiveFunction.destroy();
     }
