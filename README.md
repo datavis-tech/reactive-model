@@ -56,8 +56,9 @@ Constructing & Evaluating Data Dependency Graphs
 Serialization & Deserialization
 
  * [model.addPublicProperty(property, defaultValue)](#add-public-property)
- * [model.getState()](#get-state)
- * [model.setState()](#set-state)
+ * [model.state()](#get-state)
+ * [model.state(newState)](#set-state)
+ * [model.state.on(function (newState){})](#on-state)
 
 ### Constructing & Evaluating Data Dependency Graphs
 
@@ -175,19 +176,21 @@ var model = new ReactiveModel()
   .addPublicProperty("y", 6);
 ```
 
-Public properties may not be added after `setState()` or `getState()` have been invoked. This is to guarantee predictable serialization and deserialization behavior.
+Public properties may not be added after the `state` accessor has been accessed. This is to guarantee predictable serialization and deserialization behavior.
 
-<a name="get-state" href="#get-state">#</a> <i>model</i>.<b>getState</b>()
+<a name="get-state" href="#get-state">#</a> <i>model</i>.<b>state</b>()
 
-Returns a serialized form of the model that can later be passed into `setState()`. This is an object that only contains public properties that have values other than their defaults.
+Returns a serialized form of the model that can later be passed as `newState` into `state(newState)`. This is an object that only contains public properties that have values other than their defaults.
 
-<a name="set-state" href="#set-state">#</a> <i>model</i>.<b>setState</b>(<i>state</i>)
+<a name="set-state" href="#set-state">#</a> <i>model</i>.<b>state</b>(<i>newState</i>)
 
-Sets the state of the model from its serialized form. The `state` argument object is expected to contain values for public properties that have values other than their defaults. Public properties not included in `state` will be set to their default values. Properties not previously added as public properties may not be included in the `state` object.
+Sets the state of the model from its serialized form. The `newState` argument object is expected to contain values for public properties that have values other than their defaults. Public properties not included in `newState` will be set to their default values. Properties not previously added as public properties may not be included in the `newState` object.
 
-This function may only be invoked after invoking `model.finalize()`.
+Internally, `state(newState)` sets public properties to the specified values via their reactive-properties, causing the changes to be propagated through all reactive functions that depend on them.
 
-Internally, `setState()` sets public properties to the specified values via their reactive-properties, causing the changes to be propagated through all reactive functions that depend on them.
+<a name="on-state" href="#on-state">#</a> <i>model.state</i>.<b>on</b>(<i>function(newState){ ... }</i>)
+
+This method can be used to listen for changes in state.
 
 ## Glossary
 
@@ -228,7 +231,7 @@ The core ideas of this redesign are:
  * digests are synchronous (avoiding poor performance and inconsistent system state)
  * processing of changes is delayed until the next animation frame, so updates are synchronized with rendering
 
-The state-related functions (addPublicProperty, finalize, getState, and setState) were informed by work on the [Chiasm project](https://github.com/curran/chiasm/). Chiasm manages synchronization of interactive visualizations with a dynamic application state configuration. In order to achieve predictable behavior, Chiasm introduces the notion of "public properties" and the requirement that they have default values. This is essential to achieve the goal of reversability for every action resulting from configuration changes (required to support undo/redo and history navigation, one of the goals of the Chiasm project).
+The state-related functions (addPublicProperty, state) were informed by work on the [Chiasm project](https://github.com/curran/chiasm/). Chiasm manages synchronization of interactive visualizations with a dynamic application state configuration. In order to achieve predictable behavior, Chiasm introduces the notion of "public properties" and the requirement that they have default values. This is essential to achieve the goal of reversability for every action resulting from configuration changes (required to support undo/redo and history navigation, one of the goals of the Chiasm project).
 
 Moving the publicProperty and serialization/deserialization semantics into the model abstraction seemed like a logical move. This will simplify the implementation of an engine like Chiasm, and will provide consistent serialization behavior for any users of reactive-model.
 
