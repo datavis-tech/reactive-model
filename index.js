@@ -3,8 +3,34 @@
 var ReactiveFunction = require("reactive-function");
 var ReactiveProperty = require("reactive-property");
 
+// Parses the options data structure passed into model(options).
+// Returns an array of reactive function specifications.
+function parseOptions(options){
+  return Object.keys(options).map(function (outputPropertyName){
+
+    var arr = options[outputPropertyName];
+    var inputsStr = arr.pop();
+    var callback = arr.pop();
+
+    var inputPropertyNames = inputsStr
+      .split(",")
+      .map(function (d){ return d.trim(); });
+
+    var reactiveFunctionSpec = {
+      outputPropertyName: outputPropertyName,
+      inputPropertyNames: inputPropertyNames,
+      callback: callback
+    };
+
+    return reactiveFunctionSpec;
+  });
+}
+
+// The constructor for reactive models.
+// This function is exported as the public API of this module.
 function ReactiveModel(){
 
+  // This object stores the default values for public properties.
   // Keys are public property names.
   // Values are default values.
   var publicPropertyDefaults = {};
@@ -33,20 +59,14 @@ function ReactiveModel(){
   // This is the value returned from the constructor.
   var model = function (options){
 
-    Object.keys(options).forEach(function (outputPropertyName){
-      var arr = options[outputPropertyName];
-      var inputsStr = arr.pop();
-      var callback = arr.pop();
+    parseOptions(options).forEach(function (reactiveFunctionSpec){
+    
+      var outputPropertyName = reactiveFunctionSpec.outputPropertyName;
+      var inputPropertyNames = reactiveFunctionSpec.inputPropertyNames;
+      var callback = reactiveFunctionSpec.callback;
 
-      // Convert the comma separated list of property names
-      // into an array of reactive properties.
-      var inputs = inputsStr.split(",").map(function (propertyName){
-
-        // Trim leading and trailing white space around property names.
-        propertyName = propertyName.trim();
-
-        // Return the reactive property attached to the model with that name.
-        // TODO throw an error if a property is not on the model.
+      // TODO throw an error if a property is not on the model.
+      var inputs = inputPropertyNames.map(function (propertyName){
         return model[propertyName];
       });
 
@@ -188,6 +208,7 @@ function ReactiveModel(){
     });
 
     // TODO test bind case
+    // TODO destroy all properties on the model and remove their listeners.
   }
 
   // This is the public facing wrapper around stateProperty.
@@ -221,5 +242,3 @@ function ReactiveModel(){
 ReactiveModel.digest = ReactiveFunction.digest;
 
 module.exports = ReactiveModel;
-
-// TODO fix references to setState and getState in comments and documentation.
