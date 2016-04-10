@@ -248,6 +248,9 @@ function ReactiveModel(){
   }
   stateAccessor.on = stateProperty.on;
 
+  // TODO add a test for this.
+  stateAccessor.off = stateProperty.off;
+
   model.addPublicProperty = addPublicProperty;
   model.state = stateAccessor;
   model.destroy = destroy;
