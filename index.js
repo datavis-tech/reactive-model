@@ -5,6 +5,30 @@ var ReactiveProperty = require("reactive-property");
 
 function ReactiveModel(){
 
+  // Keys are public property names.
+  // Values are default values.
+  var publicPropertyDefaults = {};
+
+  // Set to true after model.setState() or model.getState() has been called.
+  // Public properties may not be added after this has been set to true.
+  // This is tracked to guarantee predictable behavior.
+  var isFinalized = false;
+
+  // An array of reactive functions that have been set up on this model.
+  // These are tracked only so they can be destroyed in model.destroy().
+  var reactiveFunctions = [];
+
+  // The state of the model is represented as an object and stored
+  // in this reactive property. Note that only values for public properties
+  // whose values differ from their defaults are included in the state.
+  // The purpose of this is for serialization and deserialization, so 
+  // default values are left out for a concise serialized form.
+  var stateGetterSetter = ReactiveProperty({});
+
+  // This is a reactive function set up to listen for changes in all
+  // public properties and set the stateGetterSetter value.
+  var stateReactiveFunction;
+
   // The model instance object.
   // This is the value returned from the constructor.
   var model = function (options){
@@ -54,8 +78,9 @@ function ReactiveModel(){
             // Wrap in setTimeout to guarantee that the output property is set
             // asynchronously, outside of the current digest.
             setTimeout(function (){
+
               // Invoke the original callback with the args array as arguments.
-              callback.apply(this, args);
+              callback.apply(null, args);
             });
           }
         }));
@@ -68,19 +93,6 @@ function ReactiveModel(){
       }
     });
   };
-
-  // Keys are public property names.
-  // Values are default values.
-  var publicPropertyDefaults = {};
-
-  // Set to true after model.setState() or model.getState() has been called.
-  // Public properties may not be added after this has been set to true.
-  // This is tracked to guarantee predictable behavior.
-  var isFinalized = false;
-
-  // An array of reactive functions that have been set up on this model.
-  // These are tracked only so they can be destroyed in model.destroy().
-  var reactiveFunctions = [];
 
   // Adds a public property to this model.
   // The property name is required and will be used to reference this property.
@@ -105,27 +117,41 @@ function ReactiveModel(){
     model[propertyName] = ReactiveProperty(defaultValue);
     publicPropertyDefaults[propertyName] = defaultValue;
 
+    // Destroy the previous reactive function that was listening for changes
+    // in all public properties except the newly added one.
+    if(stateReactiveFunction){
+      stateReactiveFunction.destroy();
+    }
+
+    // Set up the new reactive function that listens for changes
+    // in all public properties including the newly added one.
+    var publicPropertyNames = Object.keys(publicPropertyDefaults);
+    var publicProperties = publicPropertyNames.map(function (propertyName){
+      return model[propertyName];
+    });
+
+    stateReactiveFunction = ReactiveFunction({
+      inputs: publicProperties,
+      output: stateGetterSetter,
+      callback: function (){
+        var state = {};
+        publicPropertyNames.forEach(function (propertyName){
+          var value = model[propertyName]();
+          var defaultValue = publicPropertyDefaults[propertyName];
+
+          // Omit default values.
+          if(value !== defaultValue){
+            state[propertyName] = value;
+          }
+        });
+        return state;
+      }
+    });
+
     // Support method chaining.
     return model;
   }
 
-  //function getState(){
-  //  isFinalized = true;
-  //  var state = {};
-  //  Object.keys(publicPropertyDefaults).forEach(function (propertyName){
-
-  //    var value = model[propertyName]();
-  //    var defaultValue = publicPropertyDefaults[propertyName];
-
-  //    // TODO throw an error if the property is missing.
-
-  //    // Omit default values.
-  //    if(value !== defaultValue){
-  //      state[propertyName] = value;
-  //    }
-  //  });
-  //  return state;
-  //}
 
   //function setState(state){
   //  isFinalized = true;
@@ -170,6 +196,7 @@ function ReactiveModel(){
   }
 
   model.addPublicProperty = addPublicProperty;
+  model.state = stateGetterSetter;
   //model.getState = getState;
   //model.setState = setState;
   model.destroy = destroy;

@@ -43,27 +43,31 @@ describe("ReactiveModel", function (){
     assert.equal(model.x(), 5);
   });
 
-  //it("Should get state.", function (){
-  //  var model = ReactiveModel()
-  //    .addPublicProperty("x", 5)
-  //    .addPublicProperty("y", 10)
-  //    .x(10)
-  //    .y(20);
+  it("Should get state.", function (){
+    var model = ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 10)
+      .x(10)
+      .y(20);
 
-  //  var state = model.getState();
-  //  assert.equal(Object.keys(state).length, 2);
-  //  assert.equal(state.x, 10);
-  //  assert.equal(state.y, 20);
-  //});
+    ReactiveModel.digest();
 
-  //it("Should get state and omit default values.", function (){
-  //  var model = ReactiveModel()
-  //    .addPublicProperty("x", 5)
-  //    .addPublicProperty("y", 10);
+    var state = model.state();
+    assert.equal(Object.keys(state).length, 2);
+    assert.equal(state.x, 10);
+    assert.equal(state.y, 20);
+  });
 
-  //  var state = model.getState();
-  //  assert.equal(Object.keys(state).length, 0);
-  //});
+  it("Should get state and omit default values.", function (){
+    var model = ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 10);
+
+    ReactiveModel.digest();
+
+    var state = model.state();
+    assert.equal(Object.keys(state).length, 0);
+  });
 
   //it("Should set state.", function (){
 
