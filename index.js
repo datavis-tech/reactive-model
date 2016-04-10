@@ -23,10 +23,10 @@ function ReactiveModel(){
   // whose values differ from their defaults are included in the state.
   // The purpose of this is for serialization and deserialization, so 
   // default values are left out for a concise serialized form.
-  var stateGetterSetter = ReactiveProperty({});
+  var stateProperty = ReactiveProperty({});
 
   // This is a reactive function set up to listen for changes in all
-  // public properties and set the stateGetterSetter value.
+  // public properties and set the stateProperty value.
   var stateReactiveFunction;
 
   // The model instance object.
@@ -132,7 +132,7 @@ function ReactiveModel(){
 
     stateReactiveFunction = ReactiveFunction({
       inputs: publicProperties,
-      output: stateGetterSetter,
+      output: stateProperty,
       callback: function (){
         var state = {};
         publicPropertyNames.forEach(function (propertyName){
@@ -196,7 +196,7 @@ function ReactiveModel(){
   }
 
   model.addPublicProperty = addPublicProperty;
-  model.state = stateGetterSetter;
+  model.state = stateProperty;
   //model.getState = getState;
   //model.setState = setState;
   model.destroy = destroy;

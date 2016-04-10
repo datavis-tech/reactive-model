@@ -69,21 +69,21 @@ describe("ReactiveModel", function (){
     assert.equal(Object.keys(state).length, 0);
   });
 
-  //it("Should set state.", function (){
+  it("Should set state.", function (){
 
-  //  var model = ReactiveModel()
-  //    .addPublicProperty("x", 5)
-  //    .addPublicProperty("y", 10);
+    var model = ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 10);
 
-  //  model.setState({
-  //    x: 20,
-  //    y: 50
-  //  });
+    model.state({
+      x: 20,
+      y: 50
+    });
 
-  //  assert.equal(model.x(), 20);
-  //  assert.equal(model.y(), 50);
+    assert.equal(model.x(), 20);
+    assert.equal(model.y(), 50);
 
-  //});
+  });
 
   //it("Should chain setState.", function (){
   //  var model = ReactiveModel()
