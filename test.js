@@ -126,6 +126,46 @@ describe("ReactiveModel", function (){
     assert.equal(model.y(), 10);
   });
 
+  it("Should listen for changes in state, getting default empty state.", function (done){
+    var model = ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 10);
+
+    model.state.on(function (newState){
+      assert.equal(Object.keys(newState).length, 0);
+      done();
+    });
+  });
+
+  it("Should listen for changes in state, getting state after one change.", function (done){
+    var model = ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 10);
+
+    model.state.on(function (newState){
+      assert.equal(Object.keys(newState).length, 1);
+      assert.equal(newState.x, 15);
+      done();
+    });
+
+    model.x(15);
+  });
+
+  it("Should listen for changes in state, getting state after two changes.", function (done){
+    var model = ReactiveModel()
+      .addPublicProperty("x", 5)
+      .addPublicProperty("y", 10);
+
+    model.state.on(function (newState){
+      assert.equal(Object.keys(newState).length, 2);
+      assert.equal(newState.x, 15);
+      assert.equal(newState.y, 45);
+      done();
+    });
+
+    model.x(15).y(45);
+  });
+
   //it("Should throw an error when attempting to add a public property after getState.", function (){
   //  var model = ReactiveModel();
   //  model.addPublicProperty("x", 5);

@@ -23,7 +23,7 @@ function ReactiveModel(){
   // whose values differ from their defaults are included in the state.
   // The purpose of this is for serialization and deserialization, so 
   // default values are left out for a concise serialized form.
-  var stateProperty = ReactiveProperty({});
+  var stateProperty = ReactiveProperty();
 
   // This is a reactive function set up to listen for changes in all
   // public properties and set the stateProperty value.
