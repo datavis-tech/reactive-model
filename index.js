@@ -192,8 +192,24 @@ function ReactiveModel(){
     // TODO test bind case
   }
 
+  // This is the public facing wrapper around stateProperty.
+  // This is necessary to enforce the policy that no public properties
+  // may be added after the state has been get or set from the public API.
+  // This is required to guarantee predictable state accessor behavior.
+  function stateAccessor(){
+
+    // Mark the model as "finalized" if the state is accessed via the public API.
+    // If developers attempt to add public properties after this flag is set,
+    // errors will be thrown.
+    isFinalized = true;
+
+    // Pass through the invocation to stateProperty.
+    return stateProperty.apply(model, arguments);
+  }
+  stateAccessor.on = stateProperty.on;
+
   model.addPublicProperty = addPublicProperty;
-  model.state = stateProperty;
+  model.state = stateAccessor;
   model.destroy = destroy;
 
   return model;
@@ -202,3 +218,5 @@ function ReactiveModel(){
 ReactiveModel.digest = ReactiveFunction.digest;
 
 module.exports = ReactiveModel;
+
+// TODO fix references to setState and getState in comments and documentation.

@@ -166,19 +166,19 @@ describe("ReactiveModel", function (){
     model.x(15).y(45);
   });
 
-  //it("Should throw an error when attempting to add a public property after getState.", function (){
-  //  var model = ReactiveModel();
-  //  model.addPublicProperty("x", 5);
-  //  model.getState();
-  //  assert.throws(model.addPublicProperty, Error);
-  //});
+  it("Should throw an error when attempting to add a public property after state has been accessed.", function (){
+    var model = ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.state();
+    assert.throws(model.addPublicProperty, Error);
+  });
 
-  //it("Should throw an error when attempting to add a public property after setState.", function (){
-  //  var model = ReactiveModel();
-  //  model.addPublicProperty("x", 5);
-  //  model.setState({ x: 20});
-  //  assert.throws(model.addPublicProperty, Error);
-  //});
+  it("Should throw an error when attempting to add a public property after state has been set.", function (){
+    var model = ReactiveModel();
+    model.addPublicProperty("x", 5);
+    model.state({ x: 20});
+    assert.throws(model.addPublicProperty, Error);
+  });
 
   it("Should react.", function (){
     var model = ReactiveModel()
