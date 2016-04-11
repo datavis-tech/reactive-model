@@ -46,7 +46,46 @@ describe("ReactiveModel", function (){
     });
   });
 
+  describe("Adding properties", function (){
+
+    it("Should add a property and get its value.", function (){
+      var model = ReactiveModel();
+      model.addProperty("x", 5);
+      assert.equal(model.x(), 5);
+    });
+
+    it("Should add a property with no default and set its value.", function (){
+      var model = ReactiveModel();
+      model.addProperty("x");
+      model.x(10);
+      assert.equal(model.x(), 10);
+    });
+
+    it("Should support chaining when setting multiple properties.", function (){
+      var model = ReactiveModel();
+      model.addProperty("x", 5);
+      model.addProperty("y", 6);
+
+      model
+        .x(10)
+        .y(20);
+
+      assert.equal(model.x(), 10);
+      assert.equal(model.y(), 20);
+    });
+
+    it("Should chain addProperty.", function (){
+      var model = ReactiveModel()
+        .addProperty("x", 5)
+      assert.equal(model.x(), 5);
+    });
+  });
+
   describe("Accessing state", function (){
+
+    // TODO add tests that check that properties added with
+    // addProperty are not included in the state.
+    
 
     it("Should get state.", function (){
       var model = ReactiveModel()

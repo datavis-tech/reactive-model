@@ -130,10 +130,20 @@ function ReactiveModel(){
     return model[propertyName];
   }
 
+  // Adds a property to the model that is not public,
+  // meaning that it is not included in the state object.
+  function addProperty(propertyName, defaultValue){
+    model[propertyName] = ReactiveProperty(defaultValue);
+    return model;
+
+    // TODO throw an error if a property with this name is already defined.
+    // TODO throw an error if the property name is "state" or "addPublicProperty".
+  }
+
   // Adds a public property to the model.
   // The property name is required and will be used to reference this property.
   // The default value is required to guarantee predictable behavior of the state accessor.
-  function addPublicProperty(propertyName, defaultValue, metadata){
+  function addPublicProperty(propertyName, defaultValue){
 
     if(isFinalized){
       throw new Error("model.addPublicProperty() is being " +
@@ -150,10 +160,7 @@ function ReactiveModel(){
     //    "use ReactiveModel.NONE as the default value.");
     //}
 
-    // Add a new reactive property to the model.
-    // TODO throw an error if a property with this name is already defined.
-    // TODO throw an error if the property name is "state" or "addPublicProperty".
-    model[propertyName] = ReactiveProperty(defaultValue);
+    addProperty(propertyName, defaultValue);
 
     // Store the default value for later reference.
     publicPropertyDefaults[propertyName] = defaultValue;
@@ -251,6 +258,7 @@ function ReactiveModel(){
   // TODO add a test for this.
   stateAccessor.off = stateProperty.off;
 
+  model.addProperty = addProperty;
   model.addPublicProperty = addPublicProperty;
   model.state = stateAccessor;
   model.destroy = destroy;
