@@ -269,6 +269,20 @@ describe("ReactiveModel", function (){
       assert.equal(model.b(), 6);
     });
 
+    it("Should chain react.", function (){
+      var model = ReactiveModel()
+        .addPublicProperty("a", 5)
+        ({
+          b: [function (a){
+            return a + 1;
+          }, "a"]
+        });
+
+      ReactiveModel.digest();
+
+      assert.equal(model.b(), 6);
+    });
+
     it("Should react and use newly set value.", function (){
       var model = ReactiveModel()
         .addPublicProperty("a", 5);

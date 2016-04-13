@@ -117,6 +117,7 @@ function ReactiveModel(){
         }));
       }
     });
+    return model;
   };
 
   // Gets a reactive property from the model by name.
