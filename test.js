@@ -267,263 +267,230 @@ describe("ReactiveModel", function (){
       assert.equal(model.b(), 6);
     });
 
-    //it("Should chain react.", function (){
-    //  var model = ReactiveModel()
-    //    .addPublicProperty("a", 5)
-    //    ({
-    //      b: [function (a){
-    //        return a + 1;
-    //      }, "a"]
-    //    });
+    it("Should chain react.", function (){
+      var model = ReactiveModel()
+        .addPublicProperty("a", 5)
+        ("b", function (a){
+          return a + 1;
+        }, "a");
 
-    //  ReactiveModel.digest();
+      ReactiveModel.digest();
 
-    //  assert.equal(model.b(), 6);
-    //});
+      assert.equal(model.b(), 6);
+    });
 
-    //it("Should react and use newly set value.", function (){
-    //  var model = ReactiveModel()
-    //    .addPublicProperty("a", 5);
+    it("Should react and use newly set value.", function (){
+      var model = ReactiveModel()
+        .addPublicProperty("a", 5);
 
-    //  model({
-    //    b: [function (a){
-    //      return a + 1;
-    //    }, "a"]
-    //  });
+      model("b", increment, "a");
 
-    //  model.a(10);
+      model.a(10);
 
-    //  ReactiveModel.digest();
+      ReactiveModel.digest();
 
-    //  assert.equal(model.b(), 11);
-    //});
+      assert.equal(model.b(), 11);
+    });
 
-    //it("Should react with two public input properties.", function (){
-    //  var model = ReactiveModel()
-    //    .addPublicProperty("firstName", "Jane")
-    //    .addPublicProperty("lastName", "Smith");
+    it("Should react with two public input properties.", function (){
+      var model = ReactiveModel()
+        .addPublicProperty("firstName", "Jane")
+        .addPublicProperty("lastName", "Smith");
 
-    //  model({
-    //    fullName: [function (firstName, lastName){
-    //      return firstName + " " + lastName;
-    //    }, "firstName, lastName"]
-    //  });
+      model("fullName", function (firstName, lastName){
+        return firstName + " " + lastName;
+      }, "firstName, lastName");
 
-    //  ReactiveModel.digest();
+      ReactiveModel.digest();
 
-    //  assert.equal(model.fullName(), "Jane Smith");
+      assert.equal(model.fullName(), "Jane Smith");
 
-    //});
+    });
 
-    //it("Should propagate two hops in a single digest.", function (){
+    it("Should propagate two hops in a single digest.", function (){
 
-    //  var model = ReactiveModel()
-    //    .addPublicProperty("a", 0);
+      var model = ReactiveModel()
+        .addPublicProperty("a", 0)
+        ("b", increment, "a")
+        ("c", increment, "b");
 
-    //  model({
-    //    b: [increment, "a"],
-    //    c: [increment, "b"]
-    //  });
+      model.a(1);
+      ReactiveModel.digest();
 
-    //  model.a(1);
-    //  ReactiveModel.digest();
+      assert.equal(model.a(), 1);
+      assert.equal(model.b(), 2);
+      assert.equal(model.c(), 3);
+    });
 
-    //  assert.equal(model.a(), 1);
-    //  assert.equal(model.b(), 2);
-    //  assert.equal(model.c(), 3);
-    //});
+    it("Should evaluate tricky case.", function (){
 
-    //it("Should evaluate tricky case.", function (){
+      var model = ReactiveModel()
+        .addPublicProperty("a", 1)
+        .addPublicProperty("c", 2);
 
-    //  var model = ReactiveModel()
-    //    .addPublicProperty("a", 1)
-    //    .addPublicProperty("c", 2);
+      // a - b
+      //       \
+      //        e
+      //       /
+      // c - d
 
-    //  // a - b
-    //  //       \
-    //  //        e
-    //  //       /
-    //  // c - d
+      model
+        ("b", increment, "a")
+        ("d", increment, "c")
+        ("e", add, "b, d");
 
-    //  model({
-    //    b: [increment, "a"],
-    //    d: [increment, "c"],
-    //    e: [add, "b, d"]
-    //  });
+      ReactiveModel.digest();
 
-    //  ReactiveModel.digest();
+      assert.equal(model.e(), (1 + 1) + (2 + 1));
+    });
 
-    //  assert.equal(model.e(), (1 + 1) + (2 + 1));
-    //});
+    it("Should auto-digest.", function (done){
+      var model = ReactiveModel()
+        .addPublicProperty("a", 5)
+        ("b", increment, "a");
 
-    //it("Should auto-digest.", function (done){
-    //  var model = ReactiveModel()
-    //    .addPublicProperty("a", 5);
+      setTimeout(function(){
+        assert.equal(model.b(), 6);
+        model.a(10);
+        assert.equal(model.b(), 6);
+        setTimeout(function(){
+          assert.equal(model.b(), 11);
+          done();
+        });
+      });
+    });
 
-    //  model({
-    //    b: [function (a){
-    //      return a + 1;
-    //    }, "a"]
-    //  });
+    it("Should work with booleans.", function (){
+      var model = ReactiveModel()
+        .addPublicProperty("a", 5);
+      
+      model("b", function (a){
+        return !a;
+      }, "a");
 
-    //  setTimeout(function(){
-    //    assert.equal(model.b(), 6);
-    //    model.a(10);
-    //    assert.equal(model.b(), 6);
-    //    setTimeout(function(){
-    //      assert.equal(model.b(), 11);
-    //      done();
-    //    });
-    //  });
-    //});
+      model.a(false);
+      ReactiveModel.digest();
+      assert.equal(model.b(), true);
 
-    //it("Should work with booleans.", function (){
-    //  var model = ReactiveModel()
-    //    .addPublicProperty("a", 5);
+      model.a(true);
+      ReactiveModel.digest();
+      assert.equal(model.b(), false);
+    });
 
-    //  model({
-    //    b: [function (a){
-    //      return !a;
-    //    }, "a"]
-    //  });
+    it("Should work with null as assigned value.", function (){
+      var model = ReactiveModel()
+        .addPublicProperty("a", 5);
 
-    //  model.a(false);
-    //  ReactiveModel.digest();
-    //  assert.equal(model.b(), true);
+      model("b", function (a){
+        if(a !== 5) return true;
+      }, "a");
 
-    //  model.a(true);
-    //  ReactiveModel.digest();
-    //  assert.equal(model.b(), false);
-    //});
+      model.a(null);
 
-    //it("Should work with null as assigned value.", function (){
-    //  var model = ReactiveModel()
-    //    .addPublicProperty("a", 5);
+      ReactiveModel.digest();
+      assert.equal(model.b(), true);
+    });
 
-    //  model({
-    //    b: [function (a){
-    //      return true;
-    //    }, "a"]
-    //  });
+    it("Should work with null as default value.", function (){
+      var model = ReactiveModel()
+        .addPublicProperty("a", null);
 
-    //  model.a(null);
+      assert.equal(model.a(), null);
 
-    //  ReactiveModel.digest();
-    //  assert.equal(model.b(), true);
-    //});
+      model("b", function (a){
+        return true;
+      }, "a");
 
-    //it("Should work with null as default value.", function (){
-    //  var model = ReactiveModel()
-    //    .addPublicProperty("a", null);
+      ReactiveModel.digest();
+      assert.equal(model.b(), true);
+    });
 
-    //  assert.equal(model.a(), null);
+    it("Should work with asynchronous case.", function (testDone){
+      var model = new ReactiveModel()
+        .addPublicProperty("a", 5);
 
-    //  model({
-    //    b: [function (a){
-    //      return true;
-    //    }, "a"]
-    //  });
+      // Similarly to mocha, if an extra "done" argument is on the function,
+      // it is treated as an asynchronous function. The "done" callback should
+      // be invoked asynchronously with the new value for the output property.
+      model
+        ("b", function (a, done){
+          setTimeout(function (){
+            done(a + 1);
+          }, 20);
+        }, "a")
+        ("c", function (b){
+          assert.equal(b, 2);
+          testDone();
+        }, "b");
 
-    //  ReactiveModel.digest();
-    //  assert.equal(model.b(), true);
-    //});
+      model.a(1);
+    });
 
-    //it("Should work with asynchronous case.", function (testDone){
-    //  var model = new ReactiveModel()
-    //    .addPublicProperty("a", 5);
+    it("Should work with asynchronous case that is not actually asynchronous.", function (testDone){
+      var model = new ReactiveModel()
+        .addPublicProperty("a", 5);
 
-    //  model({
+      model
+        ("b", function (a, done){
 
-    //    // Similarly to mocha, if an extra "done" argument is on the function,
-    //    // it is treated as an asynchronous function. The "done" callback should
-    //    // be invoked asynchronously with the new value for the output property.
-    //    b: [function (a, done){
-    //      setTimeout(function (){
-    //        done(a + 1);
-    //      }, 20);
-    //    }, "a"],
-    //    c: [function (b){
-    //      assert.equal(b, 2);
-    //      testDone();
-    //    }, "b"]
-    //  });
+          // The "done" callback is being invoked synchronously.
+          // This kind of code should not be written, but just in case people do it by accident,
+          // the library is set up to have the expected behavior.
+          done(a + 1);
 
-    //  model.a(1);
-    //});
+        }, "a")
+        ("c", function (b){
+          assert.equal(b, 2);
+          testDone();
+        }, "b");
 
-    //it("Should work with asynchronous case that is not actually asynchronous.", function (testDone){
-    //  var model = new ReactiveModel()
-    //    .addPublicProperty("a", 5);
+      model.a(1);
+    });
+    // TODO should throw an error if done() is called more than once.
 
-    //  model({
-    //    b: [function (a, done){
+    it("Should remove synchronous reactive function on destroy.", function (){
+      var model = ReactiveModel()
+        .addPublicProperty("a", 5)
+        ("b", increment, "a");
 
-    //      // The "done" callback is being invoked synchronously.
-    //      // This kind of code should not be written, but just in case people do it by accident,
-    //      // the library is set up to have the expected behavior.
-    //      done(a + 1);
+      model.a(10);
+      ReactiveModel.digest();
+      assert.equal(model.b(), 11);
 
-    //    }, "a"],
-    //    c: [function (b){
-    //      assert.equal(b, 2);
-    //      testDone();
-    //    }, "b"]
-    //  });
+      model.destroy();
+      model.a(20);
+      ReactiveModel.digest();
+      assert.equal(model.b(), 11);
 
-    //  model.a(1);
-    //});
-    //// TODO should throw an error if done() is called more than once.
+    });
 
-    //it("Should remove synchronous reactive function on destroy.", function (){
-    //  var model = ReactiveModel()
-    //    .addPublicProperty("a", 5);
+    it("Should remove asynchronous reactive function on destroy.", function (done){
+      var model = ReactiveModel()
+        .addPublicProperty("a", 5);
 
-    //  model({
-    //    b: [function (a){
-    //      return a + 1;
-    //    }, "a"]
-    //  });
+      model("b", function (a, done){
+        setTimeout(function(){
+          done(a + 1);
+        }, 5);
+      }, "a");
 
-    //  model.a(10);
-    //  ReactiveModel.digest();
-    //  assert.equal(model.b(), 11);
+      model.a(10);
+      ReactiveModel.digest();
+      setTimeout(function(){
+        assert.equal(model.b(), 11);
+        model.destroy();
+        model.a(20);
 
-    //  model.destroy();
-    //  model.a(20);
-    //  ReactiveModel.digest();
-    //  assert.equal(model.b(), 11);
+        setTimeout(function(){
+          assert.equal(model.b(), 11);
+          done();
+        }, 10);
 
-    //});
-
-    //it("Should remove asynchronous reactive function on destroy.", function (done){
-    //  var model = ReactiveModel()
-    //    .addPublicProperty("a", 5);
-
-    //  model({
-    //    b: [function (a, done){
-    //      setTimeout(function(){
-    //        done(a + 1);
-    //      }, 5);
-    //    }, "a"]
-    //  });
-
-    //  model.a(10);
-    //  ReactiveModel.digest();
-    //  setTimeout(function(){
-    //    assert.equal(model.b(), 11);
-    //    model.destroy();
-    //    model.a(20);
-
-    //    setTimeout(function(){
-    //      assert.equal(model.b(), 11);
-    //      done();
-    //    }, 10);
-
-    //    assert.equal(model.b(), 11);
-    //  }, 10);
+        assert.equal(model.b(), 11);
+      }, 10);
 
 
-    //});
+    });
   });
     // TODO more aggressive destroy - remove properties from graph & remove their listeners
     // TODO dependencies that are not defined as public properties or outputs.
