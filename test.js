@@ -357,6 +357,38 @@ describe("ReactiveModel", function (){
       assert.equal(model.b(), false);
     });
 
+    it("should work with null as assigned value", function (){
+      var model = ReactiveModel()
+        .addPublicProperty("a", 5);
+
+      model({
+        b: [function (a){
+          return true;
+        }, "a"]
+      });
+
+      model.a(null);
+
+      ReactiveModel.digest();
+      assert.equal(model.b(), true);
+    });
+
+    it("should work with null as default value", function (){
+      var model = ReactiveModel()
+        .addPublicProperty("a", null);
+
+      assert.equal(model.a(), null);
+
+      model({
+        b: [function (a){
+          return true;
+        }, "a"]
+      });
+
+      ReactiveModel.digest();
+      assert.equal(model.b(), true);
+    });
+
     it("Should work with asynchronous case.", function (testDone){
       var model = new ReactiveModel()
         .addPublicProperty("a", 5);
