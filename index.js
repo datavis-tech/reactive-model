@@ -42,7 +42,7 @@ function ReactiveModel(){
   // Values are default values.
   var publicPropertyDefaults = {};
 
-  // This function returns an array of public property names.
+  // Returns an array of public property names.
   var publicPropertyNames = function (){
     return Object.keys(publicPropertyDefaults);
   }
@@ -57,11 +57,6 @@ function ReactiveModel(){
   // This is a reactive function set up to listen for changes in all
   // public properties and set the stateProperty value.
   var stateReactiveFunction;
-
-  // Set to true after state has been accessed through the public API.
-  // Public properties may not be added after this has been set to true.
-  // This is tracked to guarantee predictable state accessor behavior.
-  var isFinalized = false;
 
   // An array of reactive functions that have been set up on this model.
   // These are tracked only so they can be destroyed in model.destroy().
@@ -136,8 +131,7 @@ function ReactiveModel(){
     model[propertyName] = ReactiveProperty(defaultValue);
     return model;
 
-    // TODO throw an error if a property with this name is already defined.
-    // TODO throw an error if the property name is "state" or "addPublicProperty".
+    // TODO throw an error if the name is not available (e.g. another property name, "state" or "addPublicProperty").
   }
 
   // Adds a public property to the model.
@@ -145,19 +139,13 @@ function ReactiveModel(){
   // The default value is required to guarantee predictable behavior of the state accessor.
   function addPublicProperty(propertyName, defaultValue){
 
-    if(isFinalized){
-      throw new Error("model.addPublicProperty() is being " +
-        "invoked after model.state() has been accessed, but this is not allowed. " +
-        "This is required to guarantee predictable behavior of the state accessor.");
-    }
-
     // TODO test this
     // if(!isDefined(defaultValue)){
     //  throw new Error("model.addPublicProperty() is being " +
     //    "invoked with an undefined default value. Default values for public properties " +
     //    "must be defined, to guarantee predictable behavior. For public properties that " +
     //    "are optional and should have the semantics of an undefined value, " +
-    //    "use ReactiveModel.NONE as the default value.");
+    //    "use null as the default value.");
     //}
 
     addProperty(propertyName, defaultValue);
@@ -239,11 +227,6 @@ function ReactiveModel(){
   // may be added after the state has been get or set from the public API.
   // This is required to guarantee predictable state accessor behavior.
   function stateAccessor(newState){
-
-    // Mark the model as "finalized" if the state is accessed via the public API.
-    // If developers attempt to add public properties after this flag is set,
-    // errors will be thrown.
-    isFinalized = true;
 
     // Invoke the setState logic only when the state is set via the public API.
     if(arguments.length == 1){

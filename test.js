@@ -85,7 +85,6 @@ describe("ReactiveModel", function (){
 
     // TODO add tests that check that properties added with
     // addProperty are not included in the state.
-    
 
     it("Should get state.", function (){
       var model = ReactiveModel()
@@ -208,20 +207,6 @@ describe("ReactiveModel", function (){
       });
 
       model.x(15).y(45);
-    });
-
-    it("Should throw an error when attempting to add a public property after state has been accessed.", function (){
-      var model = ReactiveModel();
-      model.addPublicProperty("x", 5);
-      model.state();
-      assert.throws(model.addPublicProperty, Error);
-    });
-
-    it("Should throw an error when attempting to add a public property after state has been set.", function (){
-      var model = ReactiveModel();
-      model.addPublicProperty("x", 5);
-      model.state({ x: 20});
-      assert.throws(model.addPublicProperty, Error);
     });
   });
 
