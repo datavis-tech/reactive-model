@@ -29,15 +29,13 @@ This package depends on [reactive-property](https://github.com/curran/reactive-p
 </p>
 
 ```javascript
-var model = ReactiveModel()
+var my = ReactiveModel()
   .addPublicProperty("firstName", "Jane")
   .addPublicProperty("lastName", "Smith");
 
-model({
-  fullName: [function (firstName, lastName){
-    return firstName + " " + lastName;
-  }, "firstName, lastName"]
-});
+my("fullName", function (firstName, lastName){
+  return firstName + " " + lastName;
+}, "firstName, lastName");
 
 ReactiveModel.digest();
 
@@ -72,16 +70,9 @@ Example use:
 var model = ReactiveModel();
 ```
 
-<a name="react" href="#react">#</a> <i>model</i>(<i>options</i>)
+<a name="react" href="#react">#</a> <i>model</i>(<i>outputPropertyName, callback, inputsStr</i>)
 
-Adds the given set of reactive functions to the data dependency graph. In the `options` object:
-
- * keys are output property names
- * values are arrays where
-   * the first element is the reactive function callback,
-   * the second element is a comma delimited string of input property names.
-
-The motivation behind setting it up this way is:
+Adds the given reactive function to the data dependency graph. The motivation behind setting it up this way is:
 
  * The dependencies could be inferred from the argument names of the callback, but this approach would break under minification (since argument names may be changed). Therefore, an explicit representation of the list of property names in string literal form is required.
  * A comma-delimited list was chosen as the representation because one can copy-and-paste the arguments list of the callback directly and simply add quotes around it. From the perspective of developers, this is more convenient than the array-of-strings approach taken by Model.js in representing dependencies.
@@ -90,11 +81,9 @@ The motivation behind setting it up this way is:
 Here is an example invocation that sets the `b` property to be `a + 1` whenever `a` changes:
 
 ```javascript
-model({
-  b: [function (a){
-    return a + 1;
-  }, "a"]
-});
+model("b", function (a){
+  return a + 1;
+}, "a");
 ```
 
 The reactive function callback is invoked with the values of input properties during a [digest](#digest).
@@ -110,10 +99,9 @@ function increment(x){
   return x + 1;
 }
 
-model({
-  b: [increment, "a"],
-  c: [increment, "b"]
-});
+model
+  ("b", increment, "a")
+  ("c", increment, "b");
 ```
 
 In this example, if `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
@@ -121,13 +109,11 @@ In this example, if `a` is assigned to the value 1 and a digest occurs, the valu
 Asynchronous reactive functions are supported using an additional argument, the `done` callback, which should be called asynchronously with the new value for the output property. This is inspired by the [asynchronous tests in Mocha](https://mochajs.org/#asynchronous-code). Here's an asynchronous example:
 
 ```javascript
-model({
-  b: [function (a, done){
-    setTimeout(function (){
-      done(a + 1);
-    }, 500);
-  }, "a"]
-});
+model("b", function (a, done){
+  setTimeout(function (){
+    done(a + 1);
+  }, 500);
+}, "a");
 ```
 
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
