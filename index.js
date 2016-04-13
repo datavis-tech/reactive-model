@@ -43,6 +43,14 @@ function ReactiveModel(){
   // This is the value returned from the constructor.
   var model = function (outputPropertyName, callback, inputsStr){
 
+    // Support optional alternative arguments for no output property.
+    // model(callback, inputsStr)
+    if(arguments.length === 2){
+      inputsStr = arguments[1];
+      callback = arguments[0];
+      outputPropertyName = undefined;
+    }
+
     var inputPropertyNames = inputsStr.split(",").map(invoke("trim"));
 
     // TODO throw an error if a property is not on the model.
@@ -50,8 +58,10 @@ function ReactiveModel(){
 
     // Create a new reactive property for the output and assign it to the model.
     // TODO throw an error if the output property is already defined on the model.
-    var output = ReactiveProperty();
-    model[outputPropertyName] = output;
+    if(outputPropertyName){
+      var output = ReactiveProperty();
+      model[outputPropertyName] = output;
+    }
 
     // If the number of arguments expected by the callback is one greater than the
     // number of inputs, then the last argument is the "done" callback, and this

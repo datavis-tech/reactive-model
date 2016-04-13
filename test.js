@@ -491,6 +491,21 @@ describe("ReactiveModel", function (){
 
 
     });
+
+    it("Should support reactive functions with no return value.", function(){
+      var model = ReactiveModel()
+        .addPublicProperty("a", 5);
+
+      var sideEffect;
+
+      model(function (a){
+        sideEffect = a + 1;
+      }, "a");
+
+      ReactiveModel.digest();
+      assert.equal(sideEffect, 6);
+      
+    });
   });
     // TODO more aggressive destroy - remove properties from graph & remove their listeners
     // TODO dependencies that are not defined as public properties or outputs.
