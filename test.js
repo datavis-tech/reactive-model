@@ -44,6 +44,27 @@ describe("ReactiveModel", function (){
         .addPublicProperty("x", 5)
       assert.equal(model.x(), 5);
     });
+
+    it("Should addPublicProperties with object literal.", function (){
+      var model = ReactiveModel()
+        .addPublicProperties({
+          x: 5,
+          y: 10
+        });
+          
+      assert.equal(model.x(), 5);
+      assert.equal(model.y(), 10);
+
+      model
+        .x(10)
+        .y(20);
+
+      assert.equal(model.x(), 10);
+      assert.equal(model.y(), 20);
+
+      ReactiveModel.digest();
+      assert.equal(Object.keys(model.state()).length, 2);
+    });
   });
 
   describe("Adding properties", function (){
@@ -78,6 +99,27 @@ describe("ReactiveModel", function (){
       var model = ReactiveModel()
         .addProperty("x", 5)
       assert.equal(model.x(), 5);
+    });
+
+    it("Should addProperties with object literal.", function (){
+      var model = ReactiveModel()
+        .addProperties({
+          x: 5,
+          y: 10
+        });
+          
+      assert.equal(model.x(), 5);
+      assert.equal(model.y(), 10);
+
+      model
+        .x(10)
+        .y(20);
+
+      assert.equal(model.x(), 10);
+      assert.equal(model.y(), 20);
+
+      ReactiveModel.digest();
+      assert.equal(model.state(), undefined);
     });
   });
 
