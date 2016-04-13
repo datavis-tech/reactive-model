@@ -10,25 +10,6 @@ function invoke(method){
   };
 }
 
-function parseArguments(args){
-
-  var outputPropertyName = args[0];
-  var callback = args[1];
-  var inputsStr = args[2];
-
-  var inputPropertyNames = inputsStr
-    .split(",")
-    .map(invoke("trim"));
-
-  var reactiveFunctionSpec = {
-    outputPropertyName: outputPropertyName,
-    inputPropertyNames: inputPropertyNames,
-    callback: callback
-  };
-
-  return reactiveFunctionSpec;
-}
-
 // The constructor for reactive models.
 // This function is exported as the public API of this module.
 function ReactiveModel(){
@@ -60,12 +41,9 @@ function ReactiveModel(){
 
   // The model instance object.
   // This is the value returned from the constructor.
-  var model = function (){
+  var model = function (outputPropertyName, callback, inputsStr){
 
-    var reactiveFunctionSpec = parseArguments(arguments);
-    var outputPropertyName = reactiveFunctionSpec.outputPropertyName;
-    var inputPropertyNames = reactiveFunctionSpec.inputPropertyNames;
-    var callback = reactiveFunctionSpec.callback;
+    var inputPropertyNames = inputsStr.split(",").map(invoke("trim"));
 
     // TODO throw an error if a property is not on the model.
     var inputs = inputPropertyNames.map(getProperty);
