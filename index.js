@@ -10,27 +10,23 @@ function invoke(method){
   };
 }
 
-// Parses the options data structure passed into model(options).
-// Returns an array of reactive function specifications.
-function parseOptions(options){
-  return Object.keys(options).map(function (outputPropertyName){
+function parseArguments(args){
 
-    var arr = options[outputPropertyName];
-    var inputsStr = arr.pop();
-    var callback = arr.pop();
+  var outputPropertyName = args[0];
+  var callback = args[1];
+  var inputsStr = args[2];
 
-    var inputPropertyNames = inputsStr
-      .split(",")
-      .map(invoke("trim"));
+  var inputPropertyNames = inputsStr
+    .split(",")
+    .map(invoke("trim"));
 
-    var reactiveFunctionSpec = {
-      outputPropertyName: outputPropertyName,
-      inputPropertyNames: inputPropertyNames,
-      callback: callback
-    };
+  var reactiveFunctionSpec = {
+    outputPropertyName: outputPropertyName,
+    inputPropertyNames: inputPropertyNames,
+    callback: callback
+  };
 
-    return reactiveFunctionSpec;
-  });
+  return reactiveFunctionSpec;
 }
 
 // The constructor for reactive models.
@@ -64,59 +60,57 @@ function ReactiveModel(){
 
   // The model instance object.
   // This is the value returned from the constructor.
-  var model = function (options){
-    parseOptions(options).forEach(function (reactiveFunctionSpec){
-    
-      // Unpack the parsed reactive function specification.
-      var outputPropertyName = reactiveFunctionSpec.outputPropertyName;
-      var inputPropertyNames = reactiveFunctionSpec.inputPropertyNames;
-      var callback = reactiveFunctionSpec.callback;
+  var model = function (){
 
-      // TODO throw an error if a property is not on the model.
-      var inputs = inputPropertyNames.map(getProperty);
+    var reactiveFunctionSpec = parseArguments(arguments);
+    var outputPropertyName = reactiveFunctionSpec.outputPropertyName;
+    var inputPropertyNames = reactiveFunctionSpec.inputPropertyNames;
+    var callback = reactiveFunctionSpec.callback;
 
-      // Create a new reactive property for the output and assign it to the model.
-      // TODO throw an error if the output property is already defined on the model.
-      var output = ReactiveProperty();
-      model[outputPropertyName] = output;
+    // TODO throw an error if a property is not on the model.
+    var inputs = inputPropertyNames.map(getProperty);
 
-      // If the number of arguments expected by the callback is one greater than the
-      // number of inputs, then the last argument is the "done" callback, and this
-      // reactive function will be set up to be asynchronous. The "done" callback should
-      // be called with the new value of the output property asynchronously.
-      var isAsynchronous = (callback.length === inputs.length + 1);
-      if(isAsynchronous){
-        reactiveFunctions.push(ReactiveFunction({
-          inputs: inputs,
-          callback: function (){
+    // Create a new reactive property for the output and assign it to the model.
+    // TODO throw an error if the output property is already defined on the model.
+    var output = ReactiveProperty();
+    model[outputPropertyName] = output;
 
-            // Convert the arguments passed into this function into an array.
-            var args = Array.prototype.slice.call(arguments);
+    // If the number of arguments expected by the callback is one greater than the
+    // number of inputs, then the last argument is the "done" callback, and this
+    // reactive function will be set up to be asynchronous. The "done" callback should
+    // be called with the new value of the output property asynchronously.
+    var isAsynchronous = (callback.length === inputs.length + 1);
+    if(isAsynchronous){
+      reactiveFunctions.push(ReactiveFunction({
+        inputs: inputs,
+        callback: function (){
 
-            // Push the "done" callback onto the args array.
-            // We are actally passing the output reactive property here, invoking it
-            // as the "done" callback will set the value of the output property.
-            args.push(output);
+          // Convert the arguments passed into this function into an array.
+          var args = Array.prototype.slice.call(arguments);
 
-            // Wrap in setTimeout to guarantee that the output property is set
-            // asynchronously, outside of the current digest. This is necessary
-            // to ensure that if developers inadvertently invoke the "done" callback 
-            // synchronously, their code will still have the expected behavior.
-            setTimeout(function (){
+          // Push the "done" callback onto the args array.
+          // We are actally passing the output reactive property here, invoking it
+          // as the "done" callback will set the value of the output property.
+          args.push(output);
 
-              // Invoke the original callback with the args array as arguments.
-              callback.apply(null, args);
-            });
-          }
-        }));
-      } else {
-        reactiveFunctions.push(ReactiveFunction({
-          inputs: inputs,
-          output: output,
-          callback: callback
-        }));
-      }
-    });
+          // Wrap in setTimeout to guarantee that the output property is set
+          // asynchronously, outside of the current digest. This is necessary
+          // to ensure that if developers inadvertently invoke the "done" callback 
+          // synchronously, their code will still have the expected behavior.
+          setTimeout(function (){
+
+            // Invoke the original callback with the args array as arguments.
+            callback.apply(null, args);
+          });
+        }
+      }));
+    } else {
+      reactiveFunctions.push(ReactiveFunction({
+        inputs: inputs,
+        output: output,
+        callback: callback
+      }));
+    }
     return model;
   };
 
