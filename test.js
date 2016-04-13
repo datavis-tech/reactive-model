@@ -303,7 +303,7 @@ describe("ReactiveModel", function (){
 
     });
 
-    it("should propagate two hops in a single digest", function (){
+    it("Should propagate two hops in a single digest.", function (){
 
       var model = ReactiveModel()
         .addPublicProperty("a", 0);
@@ -365,7 +365,7 @@ describe("ReactiveModel", function (){
       });
     });
 
-    it("should work with booleans", function (){
+    it("Should work with booleans.", function (){
       var model = ReactiveModel()
         .addPublicProperty("a", 5);
 
@@ -384,7 +384,7 @@ describe("ReactiveModel", function (){
       assert.equal(model.b(), false);
     });
 
-    it("should work with null as assigned value", function (){
+    it("Should work with null as assigned value.", function (){
       var model = ReactiveModel()
         .addPublicProperty("a", 5);
 
@@ -400,7 +400,7 @@ describe("ReactiveModel", function (){
       assert.equal(model.b(), true);
     });
 
-    it("should work with null as default value", function (){
+    it("Should work with null as default value.", function (){
       var model = ReactiveModel()
         .addPublicProperty("a", null);
 
