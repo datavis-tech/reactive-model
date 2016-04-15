@@ -68,8 +68,8 @@ console.log(my.fullName()); // Prints "John Doe"
 ```
 
 <table>
-  <tr valign="top">
-    <td width="25%">
+  <tr>
+    <td>
       Responding to Resize <br>
       <a href="http://bl.ocks.org/curran/974c9def890f8ac0172611921fb51b8a">
         <img src="http://bl.ocks.org/curran/raw/974c9def890f8ac0172611921fb51b8a/thumbnail.png">
