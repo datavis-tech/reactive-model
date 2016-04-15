@@ -72,7 +72,7 @@ Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5b
 <table>
   <tr>
     <td>
-      Full Name<br>
+      Full Name Greeting<br>
       <a href="http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f">
         <img src="http://bl.ocks.org/curran/raw/b45cf8933cc018cf5bfd4296af97b25f/thumbnail.png">
       </a>
