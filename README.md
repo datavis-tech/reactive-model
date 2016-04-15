@@ -1,8 +1,4 @@
-# reactive-model
-
-[![Build Status](https://travis-ci.org/curran/reactive-model.svg)](https://travis-ci.org/curran/reactive-model)
-
-[![NPM](https://nodei.co/npm/reactive-model.png)](https://npmjs.org/package/reactive-model)
+# ReactiveModel [![NPM](https://nodei.co/npm/reactive-model.png?mini=true)](https://npmjs.org/package/reactive-model) [![Build Status](https://travis-ci.org/curran/reactive-model.svg)](https://travis-ci.org/curran/reactive-model)
 
 A library for authoring data flow components.
 
