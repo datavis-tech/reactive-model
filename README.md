@@ -4,9 +4,12 @@
 
 [![NPM](https://nodei.co/npm/reactive-model.png)](https://npmjs.org/package/reactive-model)
 
-A library for authoring components that propagate changes based on data flow graphs. 
+A library for authoring components that propagate changes based on data flow graphs.
 
-This project is a re-implementation of the ideas in [Model.js](https://github.com/curran/model) that takes a different approach to managing reactive data flows.
+![reactivemodel stack](https://cloud.githubusercontent.com/assets/68416/14555909/f85ed422-0312-11e6-9425-4ca88b81fb04.png)
+
+## Examples
+[![](http://bl.ocks.org/curran/raw/974c9def890f8ac0172611921fb51b8a/thumbnail.png)](http://bl.ocks.org/curran/974c9def890f8ac0172611921fb51b8a)
 
 ## Usage
 
@@ -221,15 +224,7 @@ The state-related functions (addPublicProperty, state) were informed by work on 
 
 Moving the publicProperty and serialization/deserialization semantics into the model abstraction seemed like a logical move. This will simplify the implementation of an engine like Chiasm, and will provide consistent serialization behavior for any users of reactive-model.
 
-### NONE
-
-A special default value `model.NONE` refers to a value that is defined, but represents that the property is optional and has not been speficied (similar conceptually to [Scala's Option Type](http://danielwestheide.com/blog/2012/12/19/the-neophytes-guide-to-scala-part-5-the-option-type.html).
-
 ### Not Yet Implemented
-
-<a name="destroy" href="#destroy">#</a> <i>model</i>.<b>destroy</b>()
-
-Removes all reactive functions added to this model by `model.react()`, and frees all memory allocated internally for this model. This includes removing references to all tracked property values.
 
 <a name="bind" href="#bind">#</a> <i>bind</i>(<i>arr</i>)
 
