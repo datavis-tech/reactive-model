@@ -4,9 +4,9 @@
 
 [![NPM](https://nodei.co/npm/reactive-model.png)](https://npmjs.org/package/reactive-model)
 
-A library for authoring components that propagate changes based on data flow graphs.
+A library for authoring data flow components.
 
-![reactivemodel stack](https://cloud.githubusercontent.com/assets/68416/14555909/f85ed422-0312-11e6-9425-4ca88b81fb04.png)
+![reactivemodel stack](https://cloud.githubusercontent.com/assets/68416/14556258/e8c2ebaa-0314-11e6-813a-f8820675f489.png)
 
 See also [ReactiveProperty](https://github.com/curran/reactive-property), [ReactiveFunction](https://github.com/curran/reactive-function), [GraphDataStructure](https://github.com/curran/graph-data-structure), [D3](d3js.org), [React](https://facebook.github.io/react/).
 
@@ -18,28 +18,41 @@ Require the module in your code: `var ReactiveModel = require("reactive-model");
 
 ## Examples
 
+Below is a code example that demonstrates the basic functionality of this library.
+
 <p align="center">
   <a href="http://bl.ocks.org/curran/5905182da50a4667dc00">
     <img src="http://curran.github.io/images/reactive-model/firstLastFlow.png">
   </a>
   <br>
-  <small>A visual representation of the data dependency graph constructed in this example.</small>
+  <small>A visual representation of the data flow graph constructed in this example.</small>
 </p>
 
 ```javascript
-var my = ReactiveModel()
-  .addProperties({
-    firstName: "Jane",
-    lastName: "Smith"
-  })
-  ("fullName", function (firstName, lastName){
-    return firstName + " " + lastName;
-  }, "firstName, lastName");
 
+// Construct a new ReactiveModel instance.
+var my = ReactiveModel();
+
+// Add two reactive properties to the model.
+my.addProperties({
+  firstName: "Jane",
+  lastName: "Smith"
+});
+
+// Set up a reactive function that computes fullName.
+my("fullName", function (firstName, lastName){
+  return firstName + " " + lastName;
+}, "firstName, lastName");
+
+// Invoke digest() to propagate the changes synchronously.
+// This is automatically invoked on the next animation frame after any changes,
+// but it is invoked here so we can immediately access my.fullName();
 ReactiveModel.digest();
 
+// Access the computed property value.
 console.log(model.fullName()); // Prints "Jane Smith"
 
+// Set new values for firstName and lastName.
 my
   .firstName("John")
   .lastName("Doe");
