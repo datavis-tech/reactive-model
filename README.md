@@ -23,7 +23,7 @@ var ReactiveModel = require("reactive-model");
 
 ## Examples
 
-Below is a code example that demonstrates the basic functionality of this library.
+This example demonstrates computes `fullName` from `firstName` and `lastName`, demonstrating the basic functionality of the library - creating a reactive model, adding properties, adding a reactive function, setting and getting property values, and invoking `digest()`.
 
 <p align="center">
   <a href="http://bl.ocks.org/curran/5905182da50a4667dc00">
@@ -38,7 +38,7 @@ Below is a code example that demonstrates the basic functionality of this librar
 // Construct a new ReactiveModel instance.
 var my = ReactiveModel();
 
-// Add two reactive properties to the model.
+// Add two properties to the model.
 my.addProperties({
   firstName: "Jane",
   lastName: "Smith"
@@ -51,11 +51,11 @@ my("fullName", function (firstName, lastName){
 
 // Invoke digest() to propagate the changes synchronously.
 // This is automatically invoked on the next animation frame after any changes,
-// but it is invoked here so we can immediately access my.fullName();
+// but we invoke it here so we can immediately access my.fullName();
 ReactiveModel.digest();
 
 // Access the computed property value.
-console.log(model.fullName()); // Prints "Jane Smith"
+console.log(my.fullName()); // Prints "Jane Smith"
 
 // Set new values for firstName and lastName.
 my
@@ -64,10 +64,19 @@ my
 
 ReactiveModel.digest();
 
-console.log(model.fullName()); // Prints "John Doe"
+console.log(my.fullName()); // Prints "John Doe"
 ```
 
-[![](http://bl.ocks.org/curran/raw/974c9def890f8ac0172611921fb51b8a/thumbnail.png)](http://bl.ocks.org/curran/974c9def890f8ac0172611921fb51b8a) Responding to Resize
+<table>
+  <tr valign="top">
+    <td width="25%">
+      Responding to Resize <br>
+      <a href="http://bl.ocks.org/curran/974c9def890f8ac0172611921fb51b8a">
+        <img src="http://bl.ocks.org/curran/raw/974c9def890f8ac0172611921fb51b8a/thumbnail.png">
+      </a>
+    </td>
+  </tr>
+</table>
 
 ## API Reference
 
