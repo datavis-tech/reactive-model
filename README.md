@@ -6,11 +6,20 @@ A library for authoring data flow components.
 
 See also [ReactiveProperty](https://github.com/curran/reactive-property), [ReactiveFunction](https://github.com/curran/reactive-function), [GraphDataStructure](https://github.com/curran/graph-data-structure), [D3](d3js.org), [React](https://facebook.github.io/react/).
 
-## Usage
+## Installation
+You can include the library in your HTML like this:
 
-Install via [NPM](https://www.npmjs.com/package/reactive-model): `npm install reactive-model`
+```html
+<script src="//curran.github.io/reactive-model/reactive-model-v0.6.0.min.js"></script>
+```
 
-Require the module in your code: `var ReactiveModel = require("reactive-model");`
+Browser builds (UMD bundles) are published in the [gh-pages branch](https://github.com/curran/reactive-model/tree/gh-pages).
+
+If you are using [NPM](https://www.npmjs.com/package/reactive-model), install with `npm install reactive-model`, then require the module in your code like this:
+
+```javascript
+var ReactiveModel = require("reactive-model");
+```
 
 ## Examples
 
