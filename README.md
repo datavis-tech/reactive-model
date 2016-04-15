@@ -77,8 +77,8 @@ console.log(my.fullName()); // Prints "John Doe"
     </td>
     <td>
       Responding to Resize <br>
-      <a href="http://bl.ocks.org/curran/974c9def890f8ac0172611921fb51b8a">
-        <img src="http://bl.ocks.org/curran/raw/974c9def890f8ac0172611921fb51b8a/thumbnail.png">
+      <a href="http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f">
+        <img src="http://bl.ocks.org/curran/raw/b45cf8933cc018cf5bfd4296af97b25f/thumbnail.png">
       </a>
     </td>
   </tr>
