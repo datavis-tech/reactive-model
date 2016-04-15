@@ -5,7 +5,7 @@
   "main": "reactive-model.js",
   "scripts": {
     "test": "mocha",
-    "build": "VERSION=`node -e 'console.log(require(\"./package.json\").version)'`; browserify index.js -s ReactiveModel | tee reactive-model-v$VERSION.js | uglifyjs -cm > reactive-model-v$VERSION-min.js"
+    "build": "VERSION=`node -e 'console.log(require(\"./package.json\").version)'`; browserify index.js -s ReactiveModel | tee reactive-model-v$VERSION.js | uglifyjs -cm > reactive-model-v$VERSION.min.js"
   },
   "repository": {
     "type": "git",
