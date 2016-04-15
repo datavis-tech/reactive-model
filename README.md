@@ -225,11 +225,11 @@ This method can be used to listen for changes in state.
 ## Glossary
 
  * "reactive model" The result of `new ReactiveModel()`.
- * "reactive function" A callback function and metadata that describes its input and output properties. A representation of set of reactive functions is passed into `model.react`. Any reactive function has:
+ * "reactive function" A callback function and metadata that describes its input and output properties. A specification for a reactive function is passed into `model()`. Any reactive function has:
    * input properties
    * output properties
    * callback(input values) -> output value (the "reactive function callback")
- * "digest" An execution of the algorithm that evaluates the data dependency graph.
+ * "digest" An execution of the algorithm that evaluates the data dependency graph. This includes topological sort.
  * "evaluate" A term to denote complete resolution of the data dependency graph. After the complete data dependency graph has been **evaluated** by a digest, the state of the model is consistent with regard to its reactive functions, and all reactive functions that are transitively dependent on any changed property have been executed in the proper order, with their output values assigned to model properties.
 
 ## Development Flow
