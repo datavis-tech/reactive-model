@@ -1,6 +1,6 @@
-# ReactiveModel [![NPM](https://nodei.co/npm/reactive-model.png?mini=true)](https://npmjs.org/package/reactive-model) [![Build Status](https://travis-ci.org/curran/reactive-model.svg)](https://travis-ci.org/curran/reactive-model)
+# ReactiveModel
 
-A library for authoring data flow components.
+A library for authoring data flow components. [![NPM](https://nodei.co/npm/reactive-model.png?mini=true)](https://npmjs.org/package/reactive-model) [![Build Status](https://travis-ci.org/curran/reactive-model.svg)](https://travis-ci.org/curran/reactive-model)
 
 ![reactivemodel stack](https://cloud.githubusercontent.com/assets/68416/14556258/e8c2ebaa-0314-11e6-813a-f8820675f489.png)
 
@@ -69,6 +69,12 @@ console.log(my.fullName()); // Prints "John Doe"
 
 <table>
   <tr>
+    <td>
+      Full Name<br>
+      <a href="http://bl.ocks.org/curran/974c9def890f8ac0172611921fb51b8a">
+        <img src="http://bl.ocks.org/curran/raw/974c9def890f8ac0172611921fb51b8a/thumbnail.png">
+      </a>
+    </td>
     <td>
       Responding to Resize <br>
       <a href="http://bl.ocks.org/curran/974c9def890f8ac0172611921fb51b8a">
