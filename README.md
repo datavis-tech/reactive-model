@@ -8,20 +8,15 @@ A library for authoring components that propagate changes based on data flow gra
 
 ![reactivemodel stack](https://cloud.githubusercontent.com/assets/68416/14555909/f85ed422-0312-11e6-9425-4ca88b81fb04.png)
 
-## Examples
-[![](http://bl.ocks.org/curran/raw/974c9def890f8ac0172611921fb51b8a/thumbnail.png)](http://bl.ocks.org/curran/974c9def890f8ac0172611921fb51b8a)
+See also [ReactiveProperty](https://github.com/curran/reactive-property), [ReactiveFunction](https://github.com/curran/reactive-function), [GraphDataStructure](https://github.com/curran/graph-data-structure), [D3](d3js.org), [React](https://facebook.github.io/react/).
 
 ## Usage
-
-### NPM
 
 Install via [NPM](https://www.npmjs.com/package/reactive-model): `npm install reactive-model`
 
 Require the module in your code: `var ReactiveModel = require("reactive-model");`
 
-This package depends on [reactive-property](https://github.com/curran/reactive-property) and [reactive-function](https://github.com/curran/reactive-function).
-
-## Example
+## Examples
 
 <p align="center">
   <a href="http://bl.ocks.org/curran/5905182da50a4667dc00">
@@ -33,17 +28,28 @@ This package depends on [reactive-property](https://github.com/curran/reactive-p
 
 ```javascript
 var my = ReactiveModel()
-  .addPublicProperty("firstName", "Jane")
-  .addPublicProperty("lastName", "Smith");
-
-my("fullName", function (firstName, lastName){
-  return firstName + " " + lastName;
-}, "firstName, lastName");
+  .addProperties({
+    firstName: "Jane",
+    lastName: "Smith"
+  })
+  ("fullName", function (firstName, lastName){
+    return firstName + " " + lastName;
+  }, "firstName, lastName");
 
 ReactiveModel.digest();
 
-assert.equal(model.fullName(), "Jane Smith");
+console.log(model.fullName()); // Prints "Jane Smith"
+
+my
+  .firstName("John")
+  .lastName("Doe");
+
+ReactiveModel.digest();
+
+console.log(model.fullName()); // Prints "John Doe"
 ```
+
+[![](http://bl.ocks.org/curran/raw/974c9def890f8ac0172611921fb51b8a/thumbnail.png)](http://bl.ocks.org/curran/974c9def890f8ac0172611921fb51b8a) Responding to Resize
 
 ## API Reference
 
