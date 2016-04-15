@@ -23,7 +23,13 @@ var ReactiveModel = require("reactive-model");
 
 ## Examples
 
-This example demonstrates computes `fullName` from `firstName` and `lastName`, demonstrating the basic functionality of the library - creating a reactive model, adding properties, adding a reactive function, setting and getting property values, and invoking `digest()`.
+This example code computes `fullName` from `firstName` and `lastName`, demonstrating the basic functionality of the library:
+
+ * creating a reactive model,
+ * adding properties,
+ * settin up a reactive function,
+ * setting and getting property values,
+ * and invoking `digest()`.
 
 <p align="center">
   <a href="http://bl.ocks.org/curran/5905182da50a4667dc00">
@@ -66,6 +72,8 @@ ReactiveModel.digest();
 
 console.log(my.fullName()); // Prints "John Doe"
 ```
+
+Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) that extends the above example code to interact with DOM elements.
 
 <table>
   <tr>
