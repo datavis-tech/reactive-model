@@ -10,7 +10,7 @@ See also [ReactiveProperty](https://github.com/curran/reactive-property), [React
 You can include the library in your HTML like this:
 
 ```html
-<script src="//curran.github.io/reactive-model/reactive-model-v0.6.0.min.js"></script>
+<script src="//curran.github.io/reactive-model/reactive-model-v0.7.0.min.js"></script>
 ```
 
 Browser builds (UMD bundles) are published in the [gh-pages branch](https://github.com/curran/reactive-model/tree/gh-pages).
