@@ -253,6 +253,11 @@ function ReactiveModel(){
   model.state = stateAccessor;
   model.destroy = destroy;
 
+  model.call = function(fn){
+    fn(model);
+    return model;
+  };
+
   return model;
 }
 
