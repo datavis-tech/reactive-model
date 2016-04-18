@@ -2,7 +2,7 @@
 
 A library for authoring reactive data flow components. Designed for building data visualizations and user interfaces.
 
-![reactivemodel stack 3](https://cloud.githubusercontent.com/assets/68416/14571296/14b5397e-0366-11e6-9ace-71fddc7e8892.png)
+![reactivemodel stack](https://cloud.githubusercontent.com/assets/68416/14596511/8c68c404-0564-11e6-89a3-03346b5fc6b1.png)
 
 See also [ReactiveProperty](https://github.com/curran/reactive-property), [ReactiveFunction](https://github.com/curran/reactive-function), [GraphDataStructure](https://github.com/curran/graph-data-structure), [D3](d3js.org), [React](https://facebook.github.io/react/).
 
