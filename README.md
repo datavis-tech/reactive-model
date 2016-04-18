@@ -23,7 +23,7 @@ var ReactiveModel = require("reactive-model");
 
 ## Usage
 
-This library provides an abstraction of **reactive data flows**. This means you can define functions in terms of their input and output property names, and the library will take care of executing these functions at the right time based on [topological sort](https://en.wikipedia.org/wiki/Topological_sorting) of the data flow graph.
+This library provides an abstraction for **reactive data flows**. This means you can define functions in terms of their input and output property names, and the library will take care of executing these functions at the right time based on [topological sort](https://en.wikipedia.org/wiki/Topological_sorting) of the data flow graph.
 
 <p align="center">
   <a href="http://bl.ocks.org/curran/5905182da50a4667dc00">
