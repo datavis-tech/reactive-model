@@ -246,17 +246,20 @@ function ReactiveModel(){
   // TODO add a test for this.
   stateAccessor.off = stateProperty.off;
 
+  function call (fn){
+    var args = Array.prototype.slice.call(arguments);
+    args[0] = model;
+    fn.apply(null, args);
+    return model;
+  };
+
   model.addProperty = addProperty;
   model.addProperties = addProperties;
   model.addPublicProperty = addPublicProperty;
   model.addPublicProperties = addPublicProperties;
   model.state = stateAccessor;
   model.destroy = destroy;
-
-  model.call = function(fn){
-    fn(model);
-    return model;
-  };
+  model.call = call;
 
   return model;
 }

@@ -521,6 +521,40 @@ describe("ReactiveModel", function (){
       
       assert.equal(my.b(), 6);
     });
+
+    it("Should support model.call() with 1 argument.", function(){
+
+      function mixin(my, amount){
+        my.addPublicProperty("a", 5)
+          ("b", function (a){
+            return a + amount;
+          }, "a");
+      }
+
+      var my = ReactiveModel()
+        .call(mixin, 2);
+
+      ReactiveModel.digest();
+      
+      assert.equal(my.b(), 7);
+    });
+
+    it("Should support model.call() with 2 arguments.", function(){
+
+      function mixin(my, amount, factor){
+        my.addPublicProperty("a", 5)
+          ("b", function (a){
+            return (a + amount) * factor;
+          }, "a");
+      }
+
+      var my = ReactiveModel()
+        .call(mixin, 2, 3);
+
+      ReactiveModel.digest();
+      
+      assert.equal(my.b(), 21);
+    });
   });
     // TODO more aggressive destroy - remove properties from graph & remove their listeners
     // TODO dependencies that are not defined as public properties or outputs.
