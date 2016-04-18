@@ -4,7 +4,7 @@ A library for authoring reactive data flow components. Designed for building dat
 
 ![reactivemodel stack](https://cloud.githubusercontent.com/assets/68416/14596511/8c68c404-0564-11e6-89a3-03346b5fc6b1.png)
 
-See also [ReactiveProperty](https://github.com/curran/reactive-property), [ReactiveFunction](https://github.com/curran/reactive-function), [GraphDataStructure](https://github.com/curran/graph-data-structure), [D3](d3js.org), [React](https://facebook.github.io/react/).
+See also [ReactiveProperty](https://github.com/curran/reactive-property), [GraphDataStructure](https://github.com/curran/graph-data-structure), [ReactiveFunction](https://github.com/curran/reactive-function), [D3](d3js.org).
 
 ## Installation
 You can include the library in your HTML like this:
@@ -21,7 +21,9 @@ If you are using [NPM](https://www.npmjs.com/package/reactive-model), install wi
 var ReactiveModel = require("reactive-model");
 ```
 
-## Example Code
+## Usage
+
+The thing that this library provides that others don't is the abstraction of **reactive data flows**. This means you can define functions in terms of their input and output property names, and the library will take care of executing these functions at the right time based on [topological sort](https://en.wikipedia.org/wiki/Topological_sorting) of the data flow graph.
 
 <p align="center">
   <a href="http://bl.ocks.org/curran/5905182da50a4667dc00">
@@ -31,41 +33,49 @@ var ReactiveModel = require("reactive-model");
   <small>A visual representation of the data flow graph constructed in this example.</small>
 </p>
 
+As an example, consider the case of a simple Web application where the user can enter his or her first name and last name, and the application will display a greeting using their full name. For this we can construct a `ReactiveModel` instance to manage computation of a `fullName` property based on the `firstName` and `lastName` properties.
+
+To start, we construct a `ReactiveModel` instance and add the `firstName` and `lastName` properties with default values.
+
 ```javascript
+var my = ReactiveModel()
+  .addProperties({
+    firstName: "",
+    lastName: ""
+  });
+```
 
-// Construct a new ReactiveModel instance.
-var my = ReactiveModel();
+The `addProperties` method adds reactive properties and returns the model instance to support method chaining. Property values can be set by invoking the properties as chainable setter functions, like this.
 
-// Add two properties to the model.
-my.addProperties({
-  firstName: "Jane",
-  lastName: "Smith"
-});
+```javascript
+my
+  .firstName("Jane")
+  .lastName("Smith");
+```
 
-// Set up a reactive function that computes fullName.
+Next, we set up a reactive function that computes a new property called `fullName`  based on `firstName` and `lastName`. 
+
+```javascript
 my("fullName", function (firstName, lastName){
   return firstName + " " + lastName;
 }, "firstName, lastName");
-
-// Invoke digest() to propagate the changes synchronously.
-// This is automatically invoked on the next animation frame after any changes,
-// but we invoke it here so we can immediately access my.fullName();
-ReactiveModel.digest();
-
-// Access the computed property value.
-console.log(my.fullName()); // Prints "Jane Smith"
-
-// Set new values for firstName and lastName.
-my
-  .firstName("John")
-  .lastName("Doe");
-
-ReactiveModel.digest();
-
-console.log(my.fullName()); // Prints "John Doe"
 ```
 
-Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) that extends the above example code to interact with DOM elements.
+When invoking the model instance as a function, the first argument is the output property name, the second argument is the reactive function callback, and the third argument is a comma-delimited list of input property names. The comma-delimited format was chosen so developers can easily copy-paste between the callback arguments and the input property names specification. The input property names specification is required because inferring the property names from function arguments breaks under minification.
+
+Once the reactive function and input property values are defined, the changes will automatically propagate on the next animation frame. However, to force synchronous propagation of changes, we can call the following function.
+
+```javascript
+ReactiveModel.digest();
+```
+
+This ensures that the value of `fullName` will be immediately available. We can access it like this.
+
+```javascript
+console.log(my.fullName()); // Prints "Jane Smith"
+```
+
+Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) that extends the above example code to interact with DOM elements and display a greeting.
 
 ## Examples
 
