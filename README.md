@@ -13,8 +13,6 @@ You can include the library in your HTML like this:
 <script src="//curran.github.io/reactive-model/reactive-model-v0.7.0.min.js"></script>
 ```
 
-Browser builds (UMD bundles) are published in the [gh-pages branch](https://github.com/curran/reactive-model/tree/gh-pages).
-
 If you are using [NPM](https://www.npmjs.com/package/reactive-model), install with `npm install reactive-model`, then require the module in your code like this:
 
 ```javascript
