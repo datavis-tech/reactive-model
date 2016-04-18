@@ -23,7 +23,7 @@ var ReactiveModel = require("reactive-model");
 
 ## Usage
 
-The thing that this library provides that others don't is the abstraction of **reactive data flows**. This means you can define functions in terms of their input and output property names, and the library will take care of executing these functions at the right time based on [topological sort](https://en.wikipedia.org/wiki/Topological_sorting) of the data flow graph.
+This library provides an abstraction of **reactive data flows**. This means you can define functions in terms of their input and output property names, and the library will take care of executing these functions at the right time based on [topological sort](https://en.wikipedia.org/wiki/Topological_sorting) of the data flow graph.
 
 <p align="center">
   <a href="http://bl.ocks.org/curran/5905182da50a4667dc00">
@@ -33,7 +33,7 @@ The thing that this library provides that others don't is the abstraction of **r
   <small>A visual representation of the data flow graph constructed in this example.</small>
 </p>
 
-As an example, consider the case of a simple Web application where the user can enter his or her first name and last name, and the application will display a greeting using their full name. For this we can construct a `ReactiveModel` instance to manage computation of a `fullName` property based on the `firstName` and `lastName` properties.
+As an example, consider the case of a [simple Web application](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) where the user can enter his or her first name and last name, and the application will display a greeting using their full name. For this we can construct a `ReactiveModel` instance to manage computation of a `fullName` property based on the `firstName` and `lastName` properties.
 
 To start, we construct a `ReactiveModel` instance and add the `firstName` and `lastName` properties with default values.
 
@@ -63,16 +63,33 @@ my("fullName", function (firstName, lastName){
 
 When invoking the model instance as a function, the first argument is the output property name, the second argument is the reactive function callback, and the third argument is a comma-delimited list of input property names. The comma-delimited format was chosen so developers can easily copy-paste between the callback arguments and the input property names specification. The input property names specification is required because inferring the property names from function arguments breaks under minification.
 
-Once the reactive function and input property values are defined, the changes will automatically propagate on the next animation frame. However, to force synchronous propagation of changes, we can call the following function.
+Once we have `fullName` defined, we can use it as an input to another reactive function that computes the greeting.
+
+```javascript
+my("greeting", function (fullName){
+  return "Hello " + fullName + "!";
+}, "fullName");
+```
+
+Once the reactive functions and input property values are defined, the changes will automatically propagate on the next animation frame. However, to force synchronous propagation of changes, we can call the following function.
 
 ```javascript
 ReactiveModel.digest();
 ```
 
-This ensures that the value of `fullName` will be immediately available. We can access it like this.
+This ensures that the value of computed properties will be immediately available. We can access them like this.
 
 ```javascript
 console.log(my.fullName()); // Prints "Jane Smith"
+console.log(my.greeting()); // Prints "Hello Jane Smith!"
+```
+
+Reactive functions that have side effects but no output value can also be defined (by omitting the output property name argument). This is useful for DOM manipulation, such as passing the greeting text into a DOM element using D3.
+
+```javascript
+my(function (greeting){
+  d3.select("#greeting").text(greeting);
+}, "greeting");
 ```
 
 Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) that extends the above example code to interact with DOM elements and display a greeting.
