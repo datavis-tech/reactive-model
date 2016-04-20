@@ -1,6 +1,6 @@
 {
   "name": "reactive-model",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "A library for data flow components.",
   "main": "reactive-model.js",
   "scripts": {
