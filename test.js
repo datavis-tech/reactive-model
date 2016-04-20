@@ -506,6 +506,9 @@ describe("ReactiveModel", function (){
       assert.equal(sideEffect, 6);
       
     });
+  });
+
+  describe("model.call()", function (){
 
     it("Should support model.call().", function(){
 
@@ -556,6 +559,19 @@ describe("ReactiveModel", function (){
       assert.equal(my.b(), 21);
     });
   });
+  //describe("link()", function (){
+  //  it("should link", function (){
+  //    var a = ReactiveModel().addProperty("x", 5);
+  //    var b = ReactiveModel().addProperty("x", 10);
+
+  //    ReactiveModel.link(a.x, b.x);
+
+  //    ReactiveModel.digest();
+  //    
+  //    assert.equal(b.x(), 5);
+  //  });
+
+  //});
     // TODO more aggressive destroy - remove properties from graph & remove their listeners
     // TODO dependencies that are not defined as public properties or outputs.
     // TODO bind
