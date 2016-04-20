@@ -125,7 +125,7 @@ Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5b
     <td>
       Responsive Axes<br>
       <a href="http://bl.ocks.org/curran/6f97aa94357cae4611c54a80c11f6128">
-        <img  src="http://bl.ocks.org/curran/raw/6f97aa94357cae4611c54a80c11f6128/thumbnail.png">
+        <img src="https://gist.githubusercontent.com/curran/6f97aa94357cae4611c54a80c11f6128/raw/1a7602461b9707a646c15cb3e92f06c0201b3725/thumbnail.png">
       </a>
     </td>
   </tr>
