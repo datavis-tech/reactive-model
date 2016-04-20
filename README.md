@@ -10,7 +10,7 @@ See also [ReactiveProperty](https://github.com/curran/reactive-property), [Graph
 You can include the library in your HTML like this:
 
 ```html
-<script src="//curran.github.io/reactive-model/reactive-model-v0.7.0.min.js"></script>
+<script src="//curran.github.io/reactive-model/reactive-model-v0.8.0.min.js"></script>
 ```
 
 If you are using [NPM](https://www.npmjs.com/package/reactive-model), install with `npm install reactive-model`, then require the module in your code like this:
