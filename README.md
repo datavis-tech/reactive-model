@@ -128,6 +128,12 @@ Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5b
         <img src="https://gist.githubusercontent.com/curran/6f97aa94357cae4611c54a80c11f6128/raw/1a7602461b9707a646c15cb3e92f06c0201b3725/thumbnail.png">
       </a>
     </td>
+    <td>
+      Dynamic Baseball Scatter Plot<br>
+      <a href="http://bl.ocks.org/curran/aff67b589d0f775a6a7b75f94a05fb14">
+        <img src="http://bl.ocks.org/curran/raw/974c9def890f8ac0172611921fb51b8a/thumbnail.png">
+      </a>
+    </td>
   </tr>
 </table>
 
