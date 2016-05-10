@@ -129,9 +129,9 @@ Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5b
       </a>
     </td>
     <td>
-      Dynamic Baseball Scatter Plot<br>
+      Baseball Scatter Plot<br>
       <a href="http://bl.ocks.org/curran/aff67b589d0f775a6a7b75f94a05fb14">
-        <img src="http://bl.ocks.org/curran/raw/974c9def890f8ac0172611921fb51b8a/thumbnail.png">
+        <img src="http://bl.ocks.org/curran/raw/aff67b589d0f775a6a7b75f94a05fb14/thumbnail.png">
       </a>
     </td>
   </tr>
