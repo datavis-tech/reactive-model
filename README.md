@@ -1,6 +1,8 @@
-# ReactiveModel [![NPM](https://nodei.co/npm/reactive-model.png?mini=true)](https://npmjs.org/package/reactive-model) [![Build Status](https://travis-ci.org/curran/reactive-model.svg)](https://travis-ci.org/curran/reactive-model)
+# reactive-model
 
 A library for authoring reactive data flow components. Designed for building data visualizations with [D3](d3js.org).
+
+[![NPM](https://nodei.co/npm/reactive-model.png?mini=true)](https://npmjs.org/package/reactive-model) [![Build Status](https://travis-ci.org/curran/reactive-model.svg)](https://travis-ci.org/curran/reactive-model)
 
 ![reactivemodel stack](https://cloud.githubusercontent.com/assets/68416/14596511/8c68c404-0564-11e6-89a3-03346b5fc6b1.png)
 
