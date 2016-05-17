@@ -15,6 +15,8 @@ You can include the library in your HTML like this:
 <script src="//curran.github.io/reactive-model/reactive-model-v0.8.0.min.js"></script>
 ```
 
+**Warning! Ownership will soon be transferred to [datavis-tech](https://github.com/datavis-tech/), which will cause this github.io link to break.**
+
 If you are using [NPM](https://www.npmjs.com/package/reactive-model), install with `npm install reactive-model`, then require the module in your code like this:
 
 ```javascript
