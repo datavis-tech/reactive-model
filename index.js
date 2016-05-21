@@ -195,28 +195,6 @@ function ReactiveModel(){
     return model;
   }
 
-  // Adds multiple public properties to the model.
-  // Takes an object literal where keys are public property names
-  // and values are their default values.
-  //function addPublicProperties(options){
-  //  Object.keys(options).forEach(function (propertyName){
-  //    var defaultValue = options[propertyName];
-  //    addPublicProperty(propertyName, defaultValue);
-  //  });
-  //  return model;
-  //}
-
-  // Adds multiple properties to the model.
-  // Takes an object literal where keys are public property names
-  // and values are their default values.
-  function addProperties(options){
-    Object.keys(options).forEach(function (propertyName){
-      var defaultValue = options[propertyName];
-      addProperty(propertyName, defaultValue);
-    });
-    return model;
-  }
-
   function setState(newState){
 
     // TODO throw an error if some property in state
@@ -280,7 +258,6 @@ function ReactiveModel(){
     return model;
   };
 
-  model.addProperties = addProperties;
   model.expose = expose;
   model.destroy = destroy;
   model.call = call;

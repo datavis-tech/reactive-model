@@ -98,29 +98,11 @@ describe("ReactiveModel", function (){
     it("Should chain addProperty.", function (){
       var my = ReactiveModel()
         ("x", 5)
+        ("y", 400);
       assert.equal(my.x(), 5);
+      assert.equal(my.y(), 400);
     });
 
-    it("Should addProperties with object literal.", function (){
-      var my = ReactiveModel()
-        .addProperties({
-          x: 5,
-          y: 10
-        });
-          
-      assert.equal(my.x(), 5);
-      assert.equal(my.y(), 10);
-
-      my
-        .x(10)
-        .y(20);
-
-      assert.equal(my.x(), 10);
-      assert.equal(my.y(), 20);
-
-      ReactiveModel.digest();
-      assert.equal(my(), undefined);
-    });
   });
 
   describe("Accessing state", function (){
