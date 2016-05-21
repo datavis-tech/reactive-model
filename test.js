@@ -44,27 +44,6 @@ describe("ReactiveModel", function (){
         ("x", 5)
       assert.equal(my.x(), 5);
     });
-
-    //it("Should addPublicProperties with object literal.", function (){
-    //  var my = ReactiveModel()
-    //    .addPublicProperties({
-    //      x: 5,
-    //      y: 10
-    //    });
-    //      
-    //  assert.equal(my.x(), 5);
-    //  assert.equal(my.y(), 10);
-
-    //  my
-    //    .x(10)
-    //    .y(20);
-
-    //  assert.equal(my.x(), 10);
-    //  assert.equal(my.y(), 20);
-
-    //  ReactiveModel.digest();
-    //  assert.equal(Object.keys(my()).length, 2);
-    //});
   });
 
   describe("Adding properties", function (){
@@ -277,56 +256,49 @@ describe("ReactiveModel", function (){
   describe("Reactive functions", function (){
 
     it("Should react.", function (){
-      var my = ReactiveModel()
-        ("a", 5);
-
-      my("b", function (a){
-        return a + 1;
-      }, "a");
-
+      var my = ReactiveModel()("a", 5);
+      my("b", increment, "a");
       ReactiveModel.digest();
-
       assert.equal(my.b(), 6);
     });
 
     it("Should chain react.", function (){
       var my = ReactiveModel()
         ("a", 5)
-        ("b", function (a){
-          return a + 1;
-        }, "a");
-
+        ("b", increment, "a");
       ReactiveModel.digest();
-
       assert.equal(my.b(), 6);
     });
 
     it("Should react and use newly set value.", function (){
       var my = ReactiveModel()
-        ("a", 5);
-
-      my("b", increment, "a");
-
+        ("a", 5)
+        ("b", increment, "a");
       my.a(10);
-
       ReactiveModel.digest();
-
       assert.equal(my.b(), 11);
     });
 
     it("Should react with two public input properties.", function (){
       var my = ReactiveModel()
         ("firstName", "Jane")
-        ("lastName", "Smith");
-
-      my("fullName", function (firstName, lastName){
-        return firstName + " " + lastName;
-      }, "firstName, lastName");
-
+        ("lastName", "Smith")
+        ("fullName", function (firstName, lastName){
+          return firstName + " " + lastName;
+        }, "firstName, lastName");
       ReactiveModel.digest();
-
       assert.equal(my.fullName(), "Jane Smith");
+    });
 
+    it("Should react with input properties defined in an array.", function (){
+      var my = ReactiveModel()
+        ("firstName", "Jane")
+        ("lastName", "Smith")
+        ("fullName", function (firstName, lastName){
+          return firstName + " " + lastName;
+        }, ["firstName", "lastName"]);
+      ReactiveModel.digest();
+      assert.equal(my.fullName(), "Jane Smith");
     });
 
     it("Should propagate two hops in a single digest.", function (){

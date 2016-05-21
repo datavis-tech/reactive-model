@@ -45,7 +45,7 @@ function ReactiveModel(){
 
   // The model instance object.
   // This is the value returned from the constructor.
-  var model = function (outputPropertyName, callback, inputsStr){
+  var model = function (outputPropertyName, callback, inputPropertyNames){
 
     if(arguments.length === 0){
       return stateAccessor();
@@ -62,8 +62,8 @@ function ReactiveModel(){
     } else if(arguments.length === 2){
       if(typeof arguments[0] === "function"){
 
-        // The invocation is of the form model(callback, inputsStr)
-        inputsStr = arguments[1];
+        // The invocation is of the form model(callback, inputPropertyNames)
+        inputPropertyNames = arguments[1];
         callback = arguments[0];
         outputPropertyName = undefined;
       } else {
@@ -73,7 +73,11 @@ function ReactiveModel(){
       }
     }
 
-    var inputPropertyNames = inputsStr.split(",").map(invoke("trim"));
+    // inputPropertyNames may be a string of comma-separated property names,
+    // or an array of property names.
+    if(typeof inputPropertyNames === "string"){
+      inputPropertyNames = inputPropertyNames.split(",").map(invoke("trim"));
+    }
 
     // TODO throw an error if a property is not on the model.
     var inputs = inputPropertyNames.map(getProperty);
