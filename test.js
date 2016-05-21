@@ -501,36 +501,35 @@ describe("ReactiveModel", function (){
       
     });
 
-    // TODO investigate as possible bug in reactiveFunction
-    //it("Should no return value and multiple inputs.", function(){
-    //  var my = ReactiveModel()
-    //    ("a", 5);
-    //    ("b", 50);
+    it("Should no return value and multiple inputs.", function(){
+      var my = ReactiveModel()
+        ("a", 5)
+        ("b", 50);
 
-    //  var sideEffect;
+      var sideEffect;
 
-    //  my(function (a){
-    //    sideEffect = a + b;
-    //  }, "a, b");
+      my(function (a, b){
+        sideEffect = a + b;
+      }, "a, b");
 
-    //  ReactiveModel.digest();
-    //  assert.equal(sideEffect, 6);
-    //});
+      ReactiveModel.digest();
+      assert.equal(sideEffect, 55);
+    });
 
-    //it("Should no return value and multiple inputs defined as array.", function(){
-    //  var my = ReactiveModel()
-    //    ("a", 5);
-    //    ("b", 50);
+    it("Should no return value and multiple inputs defined as array.", function(){
+      var my = ReactiveModel()
+        ("a", 40)
+        ("b", 60);
 
-    //  var sideEffect;
+      var sideEffect;
 
-    //  my(function (a){
-    //    sideEffect = a + b;
-    //  }, ["a", "b"]);
+      my(function (a, b){
+        sideEffect = a + b;
+      }, ["a", "b"]);
 
-    //  ReactiveModel.digest();
-    //  assert.equal(sideEffect, 6);
-    //});
+      ReactiveModel.digest();
+      assert.equal(sideEffect, 100);
+    });
   });
 
   describe("model.call()", function (){
