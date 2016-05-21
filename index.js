@@ -28,16 +28,16 @@ function ReactiveModel(){
   // This is used in `expose()`;
   var lastPropertyAdded;
 
-  // The state of the model is represented as an object and stored
+  // The configuration of the model is represented as an object and stored
   // in this reactive property. Note that only values for public properties
-  // whose values differ from their defaults are included in the state object.
-  // The purpose of the state accessor API is serialization and deserialization,
+  // whose values differ from their defaults are included in the configuration object.
+  // The purpose of the configuration accessor API is serialization and deserialization,
   // so default values are left out for a concise serialized form.
-  var stateProperty = ReactiveProperty();
+  var configurationProperty = ReactiveProperty();
 
   // This is a reactive function set up to listen for changes in all
-  // public properties and set the stateProperty value.
-  var stateReactiveFunction;
+  // public properties and set the configurationProperty value.
+  var configurationReactiveFunction;
 
   // An array of reactive functions that have been set up on this model.
   // These are tracked only so they can be destroyed in model.destroy().
@@ -49,12 +49,12 @@ function ReactiveModel(){
     var outputPropertyName, callback, inputPropertyNames
 
     if(arguments.length === 0){
-      return stateAccessor();
+      return configurationProperty();
     } else if(arguments.length === 1){
       if(typeof arguments[0] === "object"){
 
-        // The invocation is of the form model(state)
-        return stateAccessor(arguments[0]);
+        // The invocation is of the form model(configuration)
+        return setConfiguration(arguments[0]);
       } else {
 
         // The invocation is of the form model(propertyName)
@@ -140,13 +140,13 @@ function ReactiveModel(){
   }
 
   // Adds a property to the model that is not public,
-  // meaning that it is not included in the state object.
+  // meaning that it is not included in the configuration object.
   function addProperty(propertyName, defaultValue){
     model[propertyName] = ReactiveProperty(defaultValue);
     lastPropertyAdded = propertyName;
     return model;
 
-    // TODO throw an error if the name is not available (e.g. another property name, "state" or "addPublicProperty").
+    // TODO throw an error if the name is not available (e.g. another property name, "configuration" or "addPublicProperty").
   }
 
   // Exposes the last added property to the configuration.
@@ -174,29 +174,29 @@ function ReactiveModel(){
     // Destroy the previous reactive function that was listening for changes
     // in all public properties except the newly added one.
     // TODO think about how this might be done only once, at the same time isFinalized is set.
-    if(stateReactiveFunction){
-      stateReactiveFunction.destroy();
+    if(configurationReactiveFunction){
+      configurationReactiveFunction.destroy();
     }
 
     // Set up the new reactive function that will listen for changes
     // in all public properties including the newly added one.
     var inputPropertyNames = publicPropertyNames();
     //console.log(inputPropertyNames);
-    stateReactiveFunction = ReactiveFunction({
+    configurationReactiveFunction = ReactiveFunction({
       inputs: inputPropertyNames.map(getProperty),
-      output: stateProperty,
+      output: configurationProperty,
       callback: function (){
-        var state = {};
+        var configuration = {};
         inputPropertyNames.forEach(function (propertyName){
           var value = model[propertyName]();
           var defaultValue = publicPropertyDefaults[propertyName];
 
-          // Omit default values from the returned state object.
+          // Omit default values from the returned configuration object.
           if(value !== defaultValue){
-            state[propertyName] = value;
+            configuration[propertyName] = value;
           }
         });
-        return state;
+        return configuration;
       }
     });
 
@@ -204,14 +204,14 @@ function ReactiveModel(){
     return model;
   }
 
-  function setState(newState){
+  function setConfiguration(newConfiguration){
 
-    // TODO throw an error if some property in state
+    // TODO throw an error if some property in configuration
     // is not in publicProperties
-    //Object.keys(state).forEach(function (property){
+    //Object.keys(configuration).forEach(function (property){
     //  if(!property in publicPropertyDefaults){
     //    throw new Error("Attempting to set a property that has not" +
-    //      " been added as a public property in model.state(newState)");
+    //      " been added as a public property in model.configuration(newConfiguration)");
     //  }
     //});
 
@@ -219,8 +219,8 @@ function ReactiveModel(){
       var oldValue = model[propertyName]();
 
       var newValue;
-      if(propertyName in newState){
-        newValue = newState[propertyName];
+      if(propertyName in newConfiguration){
+        newValue = newConfiguration[propertyName];
       } else {
         newValue = publicPropertyDefaults[propertyName];
       }
@@ -229,6 +229,8 @@ function ReactiveModel(){
         model[propertyName](newValue);
       }
     });
+
+    return model;
   }
 
   // Destroys all reactive functions that have been added to the model.
@@ -240,25 +242,6 @@ function ReactiveModel(){
 
     // TODO test bind case
   }
-
-  // This is the public facing wrapper around stateProperty.
-  // This is necessary to enforce the policy that no public properties
-  // may be added after the state has been get or set from the public API.
-  // This is required to guarantee predictable state accessor behavior.
-  function stateAccessor(newState){
-
-    // Invoke the setState logic only when the state is set via the public API.
-    if(arguments.length == 1){
-      setState(newState);
-    }
-
-    // Pass through the getter/setter invocation to stateProperty.
-    return stateProperty.apply(model, arguments);
-  }
-  stateAccessor.on = stateProperty.on;
-
-  // TODO add a test for this.
-  stateAccessor.off = stateProperty.off;
 
   function call (fn){
     var args = Array.prototype.slice.call(arguments);
@@ -274,14 +257,14 @@ function ReactiveModel(){
   
     // Ensure the callback is invoked asynchronously,
     // so that property values can be set inside it.
-    return stateAccessor.on(function (newState){
+    return configurationProperty.on(function (newConfiguration){
       setTimeout(function (){
-        callback(newState);
+        callback(newConfiguration);
       }, 0);
     });
   };
 
-  model.off = stateAccessor.off;
+  model.off = configurationProperty.off;
 
   return model;
 }
