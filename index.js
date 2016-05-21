@@ -19,6 +19,10 @@ function ReactiveModel(){
   // Values are default values.
   var publicPropertyDefaults = {};
 
+  // This is a string, the name of the last property added.
+  // This is used in `expose()`;
+  var lastPropertyAdded;
+
   // Returns an array of public property names.
   var publicPropertyNames = function (){
     return Object.keys(publicPropertyDefaults);
@@ -112,15 +116,14 @@ function ReactiveModel(){
   // meaning that it is not included in the state object.
   function addProperty(propertyName, defaultValue){
     model[propertyName] = ReactiveProperty(defaultValue);
+    lastPropertyAdded = propertyName;
     return model;
 
     // TODO throw an error if the name is not available (e.g. another property name, "state" or "addPublicProperty").
   }
 
-  // Adds a public property to the model.
-  // The property name is required and will be used to reference this property.
-  // The default value is required to guarantee predictable behavior of the state accessor.
-  function addPublicProperty(propertyName, defaultValue){
+  // Exposes the last added property to the configuration.
+  function expose(){
 
     // TODO test this
     // if(!isDefined(defaultValue)){
@@ -131,10 +134,15 @@ function ReactiveModel(){
     //    "use null as the default value.");
     //}
 
-    addProperty(propertyName, defaultValue);
+    // TODO test this
+    if(!lastPropertyAdded){
+      throw Error("Expose() was called without first adding a property.");
+    }
+
+    var propertyName = lastPropertyAdded;
 
     // Store the default value for later reference.
-    publicPropertyDefaults[propertyName] = defaultValue;
+    publicPropertyDefaults[propertyName] = getProperty(propertyName)();
 
     // Destroy the previous reactive function that was listening for changes
     // in all public properties except the newly added one.
@@ -171,13 +179,13 @@ function ReactiveModel(){
   // Adds multiple public properties to the model.
   // Takes an object literal where keys are public property names
   // and values are their default values.
-  function addPublicProperties(options){
-    Object.keys(options).forEach(function (propertyName){
-      var defaultValue = options[propertyName];
-      addPublicProperty(propertyName, defaultValue);
-    });
-    return model;
-  }
+  //function addPublicProperties(options){
+  //  Object.keys(options).forEach(function (propertyName){
+  //    var defaultValue = options[propertyName];
+  //    addPublicProperty(propertyName, defaultValue);
+  //  });
+  //  return model;
+  //}
 
   // Adds multiple properties to the model.
   // Takes an object literal where keys are public property names
@@ -255,8 +263,7 @@ function ReactiveModel(){
 
   model.addProperty = addProperty;
   model.addProperties = addProperties;
-  model.addPublicProperty = addPublicProperty;
-  model.addPublicProperties = addPublicProperties;
+  model.expose = expose;
   model.state = stateAccessor;
   model.destroy = destroy;
   model.call = call;
