@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/curran/reactive-model.git"
+    "url": "https://github.com/datavis-tech/reactive-model.git"
   },
   "author": "Curran Kelleher",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/curran/reactive-model/issues"
+    "url": "https://github.com/datavis-tech/reactive-model/issues"
   },
-  "homepage": "https://github.com/curran/reactive-model",
+  "homepage": "https://github.com/datavis-tech/reactive-model",
   "devDependencies": {
     "mocha": "^2.4.5"
   },
