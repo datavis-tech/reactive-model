@@ -63,7 +63,7 @@ describe("ReactiveModel", function (){
     //  assert.equal(my.y(), 20);
 
     //  ReactiveModel.digest();
-    //  assert.equal(Object.keys(my.state()).length, 2);
+    //  assert.equal(Object.keys(my()).length, 2);
     //});
   });
 
@@ -119,7 +119,7 @@ describe("ReactiveModel", function (){
       assert.equal(my.y(), 20);
 
       ReactiveModel.digest();
-      assert.equal(my.state(), undefined);
+      assert.equal(my(), undefined);
     });
   });
 
@@ -137,7 +137,7 @@ describe("ReactiveModel", function (){
 
       ReactiveModel.digest();
 
-      var state = my.state();
+      var state = my();
       assert.equal(Object.keys(state).length, 2);
       assert.equal(state.x, 10);
       assert.equal(state.y, 20);
@@ -150,7 +150,7 @@ describe("ReactiveModel", function (){
 
       ReactiveModel.digest();
 
-      var state = my.state();
+      var state = my();
       assert.equal(Object.keys(state).length, 0);
     });
 
@@ -160,7 +160,7 @@ describe("ReactiveModel", function (){
         ("x", 5).expose()
         ("y", 10).expose();
 
-      my.state({
+      my({
         x: 20,
         y: 50
       });
@@ -174,7 +174,7 @@ describe("ReactiveModel", function (){
       var my = ReactiveModel()
         ("x", 5).expose()
         ("y", 10).expose()
-        .state({ x: 20, y: 50 });
+        ({ x: 20, y: 50 });
       assert.equal(my.x(), 20);
       assert.equal(my.y(), 50);
     });
@@ -189,7 +189,7 @@ describe("ReactiveModel", function (){
       assert.equal(my.x(), 20);
       assert.equal(my.y(), 50);
 
-      my.state({});
+      my({});
 
       assert.equal(my.x(), 5);
       assert.equal(my.y(), 10);
@@ -205,7 +205,7 @@ describe("ReactiveModel", function (){
       assert.equal(my.x(), 20);
       assert.equal(my.y(), 50);
 
-      my.state({ x: 30 });
+      my({ x: 30 });
 
       assert.equal(my.x(), 30);
       assert.equal(my.y(), 10);
@@ -216,7 +216,7 @@ describe("ReactiveModel", function (){
         ("x", 5).expose()
         ("y", 10).expose();
 
-      my.state.on(function (newState){
+      my.on(function (newState){
         assert.equal(Object.keys(newState).length, 0);
         done();
       });
@@ -227,7 +227,7 @@ describe("ReactiveModel", function (){
         ("x", 5).expose()
         ("y", 10).expose();
 
-      my.state.on(function (newState){
+      my.on(function (newState){
         assert.equal(Object.keys(newState).length, 1);
         assert.equal(newState.x, 15);
         done();
@@ -241,7 +241,7 @@ describe("ReactiveModel", function (){
         ("x", 5).expose()
         ("y", 10).expose();
 
-      my.state.on(function (newState){
+      my.on(function (newState){
         assert.equal(Object.keys(newState).length, 2);
         assert.equal(newState.x, 15);
         assert.equal(newState.y, 45);
@@ -249,6 +249,46 @@ describe("ReactiveModel", function (){
       });
 
       my.x(15).y(45);
+    });
+
+    it("Should listen for changes in state, getting state after two async changes.", function (done){
+      var my = ReactiveModel()
+        ("x", 5).expose()
+        ("z", 10).expose();
+
+      my.on(function (newState){
+        if(my.z() === 10){
+          assert.equal(Object.keys(newState).length, 1);
+          assert.equal(newState.x, 15);
+          my.z(45);
+        } else {
+          assert.equal(Object.keys(newState).length, 2);
+          assert.equal(newState.z, 45);
+          done();
+        }
+      });
+
+      my.x(15);
+    });
+
+    it("Should stop listening for changes in state.", function (done){
+      var my = ReactiveModel()
+        ("x", 5).expose()
+        ("y", 10).expose();
+      var numInvocations = 0;
+
+      var listener = my.on(function (newState){
+        numInvocations++;
+        if(my.x() === 5){
+          my.x(50);
+          my.off(listener);
+
+          setTimeout(function (){
+            assert.equal(numInvocations, 1);
+            done();
+          }, 10);
+        }
+      });
     });
   });
 

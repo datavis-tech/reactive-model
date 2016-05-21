@@ -47,11 +47,18 @@ function ReactiveModel(){
   // This is the value returned from the constructor.
   var model = function (outputPropertyName, callback, inputsStr){
 
-    if(arguments.length === 1){
+    if(arguments.length === 0){
+      return stateAccessor();
+    } else if(arguments.length === 1){
+      if(typeof arguments[0] === "object"){
 
-      // The invocation is of the form model(propertyName)
-      return addProperty(arguments[0]);
+        // The invocation is of the form model(state)
+        return stateAccessor(arguments[0]);
+      } else {
 
+        // The invocation is of the form model(propertyName)
+        return addProperty(arguments[0]);
+      }
     } else if(arguments.length === 2){
       if(typeof arguments[0] === "function"){
 
@@ -165,6 +172,7 @@ function ReactiveModel(){
     // Set up the new reactive function that will listen for changes
     // in all public properties including the newly added one.
     var inputPropertyNames = publicPropertyNames();
+    //console.log(inputPropertyNames);
     stateReactiveFunction = ReactiveFunction({
       inputs: inputPropertyNames.map(getProperty),
       output: stateProperty,
@@ -274,13 +282,25 @@ function ReactiveModel(){
 
   model.addProperties = addProperties;
   model.expose = expose;
-  model.state = stateAccessor;
   model.destroy = destroy;
   model.call = call;
+  model.on = function (callback){
+  
+    // Ensure the callback is invoked asynchronously,
+    // so that property values can be set inside it.
+    return stateAccessor.on(function (newState){
+      setTimeout(function (){
+        callback(newState);
+      }, 0);
+    });
+  };
+
+  model.off = stateAccessor.off;
 
   return model;
 }
 
 ReactiveModel.digest = ReactiveFunction.digest;
+//ReactiveModel.nextFrame = ReactiveFunction.nextFrame;
 
 module.exports = ReactiveModel;
