@@ -47,12 +47,23 @@ function ReactiveModel(){
   // This is the value returned from the constructor.
   var model = function (outputPropertyName, callback, inputsStr){
 
-    // Support optional alternative arguments for no output property.
-    // model(callback, inputsStr)
-    if(arguments.length === 2){
-      inputsStr = arguments[1];
-      callback = arguments[0];
-      outputPropertyName = undefined;
+    if(arguments.length === 1){
+
+      // The invocation is of the form model(propertyName)
+      return addProperty(arguments[0]);
+
+    } else if(arguments.length === 2){
+      if(typeof arguments[0] === "function"){
+
+        // The invocation is of the form model(callback, inputsStr)
+        inputsStr = arguments[1];
+        callback = arguments[0];
+        outputPropertyName = undefined;
+      } else {
+
+        // The invocation is of the form model(propertyName, defaultValue)
+        return addProperty(arguments[0], arguments[1]);
+      }
     }
 
     var inputPropertyNames = inputsStr.split(",").map(invoke("trim"));
@@ -261,7 +272,6 @@ function ReactiveModel(){
     return model;
   };
 
-  model.addProperty = addProperty;
   model.addProperties = addProperties;
   model.expose = expose;
   model.state = stateAccessor;

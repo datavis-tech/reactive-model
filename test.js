@@ -15,21 +15,21 @@ describe("ReactiveModel", function (){
 
     it("Should add a public property and get its value.", function (){
       var my = ReactiveModel();
-      my.addProperty("x", 5);
+      my("x", 5);
       assert.equal(my.x(), 5);
     });
 
     it("Should add a public property and set its value.", function (){
       var my = ReactiveModel();
-      my.addProperty("x", 5);
+      my("x", 5);
       my.x(10);
       assert.equal(my.x(), 10);
     });
 
     it("Should support chaining when setting multiple properties.", function (){
       var my = ReactiveModel();
-      my.addProperty("x", 5);
-      my.addProperty("y", 6);
+      my("x", 5);
+      my("y", 6);
 
       my
         .x(10)
@@ -41,7 +41,7 @@ describe("ReactiveModel", function (){
 
     it("Should chain addProperty.", function (){
       var my = ReactiveModel()
-        .addProperty("x", 5)
+        ("x", 5)
       assert.equal(my.x(), 5);
     });
 
@@ -71,21 +71,21 @@ describe("ReactiveModel", function (){
 
     it("Should add a property and get its value.", function (){
       var my = ReactiveModel();
-      my.addProperty("x", 5);
+      my("x", 5);
       assert.equal(my.x(), 5);
     });
 
     it("Should add a property with no default and set its value.", function (){
       var my = ReactiveModel();
-      my.addProperty("x");
+      my("x");
       my.x(10);
       assert.equal(my.x(), 10);
     });
 
     it("Should support chaining when setting multiple properties.", function (){
       var my = ReactiveModel();
-      my.addProperty("x", 5);
-      my.addProperty("y", 6);
+      my("x", 5);
+      my("y", 6);
 
       my
         .x(10)
@@ -97,7 +97,7 @@ describe("ReactiveModel", function (){
 
     it("Should chain addProperty.", function (){
       var my = ReactiveModel()
-        .addProperty("x", 5)
+        ("x", 5)
       assert.equal(my.x(), 5);
     });
 
@@ -130,8 +130,8 @@ describe("ReactiveModel", function (){
 
     it("Should get state.", function (){
       var my = ReactiveModel()
-        .addProperty("x", 5).expose()
-        .addProperty("y", 10).expose()
+        ("x", 5).expose()
+        ("y", 10).expose()
         .x(10)
         .y(20);
 
@@ -145,8 +145,8 @@ describe("ReactiveModel", function (){
 
     it("Should get state and omit default values.", function (){
       var my = ReactiveModel()
-        .addProperty("x", 5).expose()
-        .addProperty("y", 10).expose();
+        ("x", 5).expose()
+        ("y", 10).expose();
 
       ReactiveModel.digest();
 
@@ -157,8 +157,8 @@ describe("ReactiveModel", function (){
     it("Should set state.", function (){
 
       var my = ReactiveModel()
-        .addProperty("x", 5).expose()
-        .addProperty("y", 10).expose();
+        ("x", 5).expose()
+        ("y", 10).expose();
 
       my.state({
         x: 20,
@@ -172,8 +172,8 @@ describe("ReactiveModel", function (){
 
     it("Should chain setState.", function (){
       var my = ReactiveModel()
-        .addProperty("x", 5).expose()
-        .addProperty("y", 10).expose()
+        ("x", 5).expose()
+        ("y", 10).expose()
         .state({ x: 20, y: 50 });
       assert.equal(my.x(), 20);
       assert.equal(my.y(), 50);
@@ -181,8 +181,8 @@ describe("ReactiveModel", function (){
 
     it("Should set state with default values for omitted properties.", function (){
       var my = ReactiveModel()
-        .addProperty("x", 5).expose()
-        .addProperty("y", 10).expose()
+        ("x", 5).expose()
+        ("y", 10).expose()
         .x(20)
         .y(50);
 
@@ -197,8 +197,8 @@ describe("ReactiveModel", function (){
 
     it("Should set state with default values and new values.", function (){
       var my = ReactiveModel()
-        .addProperty("x", 5).expose()
-        .addProperty("y", 10).expose()
+        ("x", 5).expose()
+        ("y", 10).expose()
         .x(20)
         .y(50);
 
@@ -213,8 +213,8 @@ describe("ReactiveModel", function (){
 
     it("Should listen for changes in state, getting default empty state.", function (done){
       var my = ReactiveModel()
-        .addProperty("x", 5).expose()
-        .addProperty("y", 10).expose();
+        ("x", 5).expose()
+        ("y", 10).expose();
 
       my.state.on(function (newState){
         assert.equal(Object.keys(newState).length, 0);
@@ -224,8 +224,8 @@ describe("ReactiveModel", function (){
 
     it("Should listen for changes in state, getting state after one change.", function (done){
       var my = ReactiveModel()
-        .addProperty("x", 5).expose()
-        .addProperty("y", 10).expose();
+        ("x", 5).expose()
+        ("y", 10).expose();
 
       my.state.on(function (newState){
         assert.equal(Object.keys(newState).length, 1);
@@ -238,8 +238,8 @@ describe("ReactiveModel", function (){
 
     it("Should listen for changes in state, getting state after two changes.", function (done){
       var my = ReactiveModel()
-        .addProperty("x", 5).expose()
-        .addProperty("y", 10).expose();
+        ("x", 5).expose()
+        ("y", 10).expose();
 
       my.state.on(function (newState){
         assert.equal(Object.keys(newState).length, 2);
@@ -256,7 +256,7 @@ describe("ReactiveModel", function (){
 
     it("Should react.", function (){
       var my = ReactiveModel()
-        .addProperty("a", 5);
+        ("a", 5);
 
       my("b", function (a){
         return a + 1;
@@ -269,7 +269,7 @@ describe("ReactiveModel", function (){
 
     it("Should chain react.", function (){
       var my = ReactiveModel()
-        .addProperty("a", 5)
+        ("a", 5)
         ("b", function (a){
           return a + 1;
         }, "a");
@@ -281,7 +281,7 @@ describe("ReactiveModel", function (){
 
     it("Should react and use newly set value.", function (){
       var my = ReactiveModel()
-        .addProperty("a", 5);
+        ("a", 5);
 
       my("b", increment, "a");
 
@@ -294,8 +294,8 @@ describe("ReactiveModel", function (){
 
     it("Should react with two public input properties.", function (){
       var my = ReactiveModel()
-        .addProperty("firstName", "Jane")
-        .addProperty("lastName", "Smith");
+        ("firstName", "Jane")
+        ("lastName", "Smith");
 
       my("fullName", function (firstName, lastName){
         return firstName + " " + lastName;
@@ -310,7 +310,7 @@ describe("ReactiveModel", function (){
     it("Should propagate two hops in a single digest.", function (){
 
       var my = ReactiveModel()
-        .addProperty("a", 0)
+        ("a", 0)
         ("b", increment, "a")
         ("c", increment, "b");
 
@@ -325,8 +325,8 @@ describe("ReactiveModel", function (){
     it("Should evaluate tricky case.", function (){
 
       var my = ReactiveModel()
-        .addProperty("a", 1)
-        .addProperty("c", 2);
+        ("a", 1)
+        ("c", 2);
 
       // a - b
       //       \
@@ -346,7 +346,7 @@ describe("ReactiveModel", function (){
 
     it("Should auto-digest.", function (done){
       var my = ReactiveModel()
-        .addProperty("a", 5)
+        ("a", 5)
         ("b", increment, "a");
 
       setTimeout(function(){
@@ -362,7 +362,7 @@ describe("ReactiveModel", function (){
 
     it("Should work with booleans.", function (){
       var my = ReactiveModel()
-        .addProperty("a", 5);
+        ("a", 5);
       
       my("b", function (a){
         return !a;
@@ -379,7 +379,7 @@ describe("ReactiveModel", function (){
 
     it("Should work with null as assigned value.", function (){
       var my = ReactiveModel()
-        .addProperty("a", 5);
+        ("a", 5);
 
       my("b", function (a){
         if(a !== 5) return true;
@@ -393,7 +393,7 @@ describe("ReactiveModel", function (){
 
     it("Should work with null as default value.", function (){
       var my = ReactiveModel()
-        .addProperty("a", null);
+        ("a", null);
 
       assert.equal(my.a(), null);
 
@@ -407,7 +407,7 @@ describe("ReactiveModel", function (){
 
     it("Should work with asynchronous case.", function (testDone){
       var my = new ReactiveModel()
-        .addProperty("a", 5);
+        ("a", 5);
 
       // Similarly to mocha, if an extra "done" argument is on the function,
       // it is treated as an asynchronous function. The "done" callback should
@@ -428,7 +428,7 @@ describe("ReactiveModel", function (){
 
     it("Should work with asynchronous case that is not actually asynchronous.", function (testDone){
       var my = new ReactiveModel()
-        .addProperty("a", 5);
+        ("a", 5);
 
       my
         ("b", function (a, done){
@@ -450,7 +450,7 @@ describe("ReactiveModel", function (){
 
     it("Should remove synchronous reactive function on destroy.", function (){
       var my = ReactiveModel()
-        .addProperty("a", 5)
+        ("a", 5)
         ("b", increment, "a");
 
       my.a(10);
@@ -466,7 +466,7 @@ describe("ReactiveModel", function (){
 
     it("Should remove asynchronous reactive function on destroy.", function (done){
       var my = ReactiveModel()
-        .addProperty("a", 5);
+        ("a", 5);
 
       my("b", function (a, done){
         setTimeout(function(){
@@ -494,7 +494,7 @@ describe("ReactiveModel", function (){
 
     it("Should support reactive functions with no return value.", function(){
       var my = ReactiveModel()
-        .addProperty("a", 5);
+        ("a", 5);
 
       var sideEffect;
 
@@ -513,7 +513,7 @@ describe("ReactiveModel", function (){
     it("Should support model.call().", function(){
 
       function mixin(my){
-        my.addProperty("a", 5)
+        my("a", 5)
           ("b", increment, "a");
       }
 
@@ -528,7 +528,7 @@ describe("ReactiveModel", function (){
     it("Should support model.call() with 1 argument.", function(){
 
       function mixin(my, amount){
-        my.addProperty("a", 5)
+        my("a", 5)
           ("b", function (a){
             return a + amount;
           }, "a");
@@ -545,7 +545,7 @@ describe("ReactiveModel", function (){
     it("Should support model.call() with 2 arguments.", function(){
 
       function mixin(my, amount, factor){
-        my.addProperty("a", 5)
+        my("a", 5)
           ("b", function (a){
             return (a + amount) * factor;
           }, "a");
@@ -561,8 +561,8 @@ describe("ReactiveModel", function (){
   });
   //describe("link()", function (){
   //  it("should link", function (){
-  //    var a = ReactiveModel().addProperty("x", 5);
-  //    var b = ReactiveModel().addProperty("x", 10);
+  //    var a = ReactiveModel()("x", 5);
+  //    var b = ReactiveModel()("x", 10);
 
   //    ReactiveModel.link(a.x, b.x);
 
