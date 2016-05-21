@@ -500,6 +500,37 @@ describe("ReactiveModel", function (){
       assert.equal(sideEffect, 6);
       
     });
+
+    // TODO investigate as possible bug in reactiveFunction
+    //it("Should no return value and multiple inputs.", function(){
+    //  var my = ReactiveModel()
+    //    ("a", 5);
+    //    ("b", 50);
+
+    //  var sideEffect;
+
+    //  my(function (a){
+    //    sideEffect = a + b;
+    //  }, "a, b");
+
+    //  ReactiveModel.digest();
+    //  assert.equal(sideEffect, 6);
+    //});
+
+    //it("Should no return value and multiple inputs defined as array.", function(){
+    //  var my = ReactiveModel()
+    //    ("a", 5);
+    //    ("b", 50);
+
+    //  var sideEffect;
+
+    //  my(function (a){
+    //    sideEffect = a + b;
+    //  }, ["a", "b"]);
+
+    //  ReactiveModel.digest();
+    //  assert.equal(sideEffect, 6);
+    //});
   });
 
   describe("model.call()", function (){

@@ -19,14 +19,14 @@ function ReactiveModel(){
   // Values are default values.
   var publicPropertyDefaults = {};
 
-  // This is a string, the name of the last property added.
-  // This is used in `expose()`;
-  var lastPropertyAdded;
-
   // Returns an array of public property names.
   var publicPropertyNames = function (){
     return Object.keys(publicPropertyDefaults);
-  }
+  };
+
+  // This is a string, the name of the last property added.
+  // This is used in `expose()`;
+  var lastPropertyAdded;
 
   // The state of the model is represented as an object and stored
   // in this reactive property. Note that only values for public properties
@@ -45,7 +45,8 @@ function ReactiveModel(){
 
   // The model instance object.
   // This is the value returned from the constructor.
-  var model = function (outputPropertyName, callback, inputPropertyNames){
+  var model = function (){
+    var outputPropertyName, callback, inputPropertyNames
 
     if(arguments.length === 0){
       return stateAccessor();
@@ -71,6 +72,10 @@ function ReactiveModel(){
         // The invocation is of the form model(propertyName, defaultValue)
         return addProperty(arguments[0], arguments[1]);
       }
+    } else if(arguments.length === 3){
+      outputPropertyName = arguments[0];
+      callback = arguments[1];
+      inputPropertyNames = arguments[2];
     }
 
     // inputPropertyNames may be a string of comma-separated property names,
@@ -121,7 +126,7 @@ function ReactiveModel(){
     } else {
       reactiveFunctions.push(ReactiveFunction({
         inputs: inputs,
-        output: output,
+        output: output, // This may be undefined.
         callback: callback
       }));
     }
