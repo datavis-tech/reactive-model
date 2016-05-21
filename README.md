@@ -2,17 +2,17 @@
 
 A library for authoring reactive data flow components. Designed for building data visualizations with [D3](d3js.org).
 
-[![NPM](https://nodei.co/npm/reactive-model.png?mini=true)](https://npmjs.org/package/reactive-model) [![Build Status](https://travis-ci.org/curran/reactive-model.svg)](https://travis-ci.org/curran/reactive-model)
+[![NPM](https://nodei.co/npm/reactive-model.png?mini=true)](https://npmjs.org/package/reactive-model) [![Build Status](https://travis-ci.org/datavis-tech/reactive-model.svg)](https://travis-ci.org/datavis-tech/reactive-model)
 
 ![reactivemodel stack](https://cloud.githubusercontent.com/assets/68416/14596511/8c68c404-0564-11e6-89a3-03346b5fc6b1.png)
 
-See also [ReactiveProperty](https://github.com/curran/reactive-property), [GraphDataStructure](https://github.com/curran/graph-data-structure), [ReactiveFunction](https://github.com/curran/reactive-function), [D3](d3js.org).
+See also [ReactiveProperty](https://github.com/datavis-tech/reactive-property), [GraphDataStructure](https://github.com/datavis-tech/graph-data-structure), [ReactiveFunction](https://github.com/datavis-tech/reactive-function), [D3](d3js.org).
 
 ## Installation
 You can include the library in your HTML like this:
 
 ```html
-<script src="//curran.github.io/reactive-model/reactive-model-v0.8.0.min.js"></script>
+<script src="//datavis-tech.github.io/reactive-model/reactive-model-v0.8.0.min.js"></script>
 ```
 
 **Warning! Ownership will soon be transferred to [datavis-tech](https://github.com/datavis-tech/), which will cause this github.io link to break.**
@@ -225,7 +225,7 @@ The term "digest" was chosen because it is already in common use within the Angu
 
 <a name="reactive-properties" href="#reactive-properties">#</a> reactive-properties
 
-Every property is made available on the model object as a [chainable getter-setter function](http://bost.ocks.org/mike/chart/#reconfiguration). These properties are instances of another module, [reactive-property](https://github.com/curran/reactive-property).
+Every property is made available on the model object as a [chainable getter-setter function](http://bost.ocks.org/mike/chart/#reconfiguration). These properties are instances of another module, [reactive-property](https://github.com/datavis-tech/reactive-property).
 
 For example, assuming there is a [public property](#add-public-property) `a`, we can set its value like this:
 
@@ -293,7 +293,7 @@ Run `npm test` to run the unit tests.
 
 ## How it Works
 
-This library maintains an instance of [graph-data-structure](https://github.com/curran/graph-data-structure) internally, called the "data dependency graph", in which
+This library maintains an instance of [graph-data-structure](https://github.com/datavis-tech/graph-data-structure) internally, called the "data dependency graph", in which
 
  * vertices represent reactive properties, and
  * edges represent dependencies.
@@ -316,7 +316,7 @@ The core ideas of this redesign are:
  * digests are synchronous (avoiding poor performance and inconsistent system state)
  * processing of changes is delayed until the next animation frame, so updates are synchronized with rendering
 
-The state-related functions (addPublicProperty, state) were informed by work on the [Chiasm project](https://github.com/curran/chiasm/). Chiasm manages synchronization of interactive visualizations with a dynamic application state configuration. In order to achieve predictable behavior, Chiasm introduces the notion of "public properties" and the requirement that they have default values. This is essential to achieve the goal of reversability for every action resulting from configuration changes (required to support undo/redo and history navigation, one of the goals of the Chiasm project).
+The state-related functions (addPublicProperty, state) were informed by work on the [Chiasm project](https://github.com/chiasm-propect/chiasm/). Chiasm manages synchronization of interactive visualizations with a dynamic application state configuration. In order to achieve predictable behavior, Chiasm introduces the notion of "public properties" and the requirement that they have default values. This is essential to achieve the goal of reversability for every action resulting from configuration changes (required to support undo/redo and history navigation, one of the goals of the Chiasm project).
 
 Moving the publicProperty and serialization/deserialization semantics into the model abstraction seemed like a logical move. This will simplify the implementation of an engine like Chiasm, and will provide consistent serialization behavior for any users of reactive-model.
 
