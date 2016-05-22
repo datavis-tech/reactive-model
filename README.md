@@ -22,11 +22,9 @@ This library provides an abstraction for **reactive data flows**. This means you
 **Table of Contents**
 
  * [Examples](#examples)
-   * [AB](#ab)
-   * [ABC](#abc)
-   * [CDE](#cde)
+   * [ABCs](#abcs)
    * [Full Name](#full-name)
-   * [Tricky Case](#tricky-case)
+   * [Tricky Cases](#tricky-cases)
  * [Installing](#installing)
  * [API Reference](#api-reference)
    * [Creating Reactive Models](#creating-reactive-models)
@@ -79,8 +77,9 @@ This library provides an abstraction for **reactive data flows**. This means you
   </tr>
 </table>
 
+### ABCs
 
-### AB
+#### AB
 
 Here is an example where `b` gets set to `a + 1` whenever `a` changes:
 
@@ -100,7 +99,7 @@ var my = ReactiveModel()
 
 The naming convention of `my` pays homage to [Towards Reusable Charts](https://bost.ocks.org/mike/chart/#reconfiguration).
 
-### ABC
+#### ABC
 
 Here's an example that assign `b = a + 1` and `c = b + 1`.
 
@@ -121,7 +120,7 @@ var my = ReactiveModel()
 
 See also [ABC in reactive-function](https://github.com/datavis-tech/reactive-function#abc).
 
-### CDE
+#### CDE
 
 Here's an example that shows a reactive function with two inputs, where `e = c + d`.
 
@@ -215,7 +214,7 @@ my(function (greeting){
 
 Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) that extends the above example code to interact with DOM elements and display a greeting.
 
-### Tricky Case
+### Tricky Cases
 
 Reactive functions can be combined to create arbitrarily complex data flow graphs. Here's an example that demonstrates why [topological sorting](https://en.wikipedia.org/wiki/Topological_sorting) is the best algorithm for computing the order in which to execute data flow graphs. In this graph, propagation using breadth-first search (which is what [Model.js](https://github.com/curran/model) uses) would cause `e` to be set twice, and the first time it would be set with an *inconsistent state*. Using topological sorting for change propagation guarantees that `e` will only be set once, and there will never be inconsistent states.
 
@@ -226,6 +225,7 @@ Reactive functions can be combined to create arbitrarily complex data flow graph
 </p>
 
 ```javascript
+function increment(x){ return x + 1; }
 function add(x, y){ return x + y; }
 
 var my = ReactiveModel()
@@ -237,6 +237,29 @@ var my = ReactiveModel()
 ```
 
 See also [Tricky Case in reactive-function](https://github.com/datavis-tech/reactive-function/blob/master/README.md#tricky-case).
+
+Here's a similar case that reactive-model handles correctly. If breadth-first search were used in this case, then `h` would get set 3 times, the first two times with an inconsistent state.
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15454976/472cf534-2064-11e6-9a19-865d6d6a1643.png">
+  <br>
+  Another tricky case where breadth-first propagation fails.
+</p>
+
+```javascript
+function increment(x){ return x + 1; }
+function add3(x, y, z){ return x + y + z; }
+
+var my = ReactiveModel()
+  ("a", 5)
+  ("b", increment, "a")
+  ("c", increment, "b")
+  ("d", increment, "c")
+  ("e", increment, "a")
+  ("f", increment, "e")
+  ("g", increment, "a")
+  ("h", add3, "d, f, g");
+```
 
 For more detailed example code, have a look at the [tests](https://github.com/datavis-tech/reactive-model/blob/master/test.js).
 
