@@ -158,21 +158,19 @@ The return value from the callback is assigned to the output property during a d
 
 Here's an example that assign `b = a + 1` and `c = b + 1`.
 
-<p align="center">
-  <img src="https://cloud.githubusercontent.com/assets/68416/15385597/44a10522-1dc0-11e6-9054-2150f851db46.png">
-  <br>
-  Here, b is both an output and an input.
-</p>
-
 ```javascript
-function increment(x){
-  return x + 1;
-}
+function increment(x){ return x + 1; }
 
 reactiveModel
   ("b", increment, "a")
   ("c", increment, "b");
 ```
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15385597/44a10522-1dc0-11e6-9054-2150f851db46.png">
+  <br>
+  Here, b is both an output and an input.
+</p>
 
 In this example, if `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
 
@@ -194,6 +192,17 @@ reactiveModel("b", function (a, done){
   The tricky case, where breadth-first propagation fails.
 </p>
 
+```javascript
+function add(x, y){ return x + y; }
+
+var my = ReactiveModel()
+  ("a", 5)
+  ("b", increment, "a")
+  ("c", increment, "b")
+  ("d", increment, "a")
+  ("e", add, "b, d");
+```
+
 ## Installing
 You can include the library in your HTML like this:
 
@@ -213,6 +222,17 @@ var ReactiveModel = require("reactive-model");
  * [Properties](#properties)
  * [Data Flow](#data-flow)
  * [Configuration](#configuration)
+
+var my = ReactiveModel();
+
+my("x");
+my("x", 5);
+
+my.x();
+my.x(5);
+my
+  .x(10)
+  .y(20);
 
 ### Creating Reactive Models
 
