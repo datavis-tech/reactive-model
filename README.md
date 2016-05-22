@@ -1,14 +1,16 @@
 # reactive-model
 
-A library for authoring reactive data flow components. Designed for building data visualizations with [D3](d3js.org).
+A JavaScript library for data flow programming.
 
-[![NPM](https://nodei.co/npm/reactive-model.png?mini=true)](https://npmjs.org/package/reactive-model) [![Build Status](https://travis-ci.org/datavis-tech/reactive-model.svg)](https://travis-ci.org/datavis-tech/reactive-model)
+[![NPM](https://nodei.co/npm/reactive-model.png)](https://npmjs.org/package/reactive-model)
+[![NPM](https://nodei.co/npm-dl/reactive-model.png?months=3)](https://npmjs.org/package/reactive-model)
+[![Build Status](https://travis-ci.org/datavis-tech/reactive-model.svg?branch=master)](https://travis-ci.org/datavis-tech/reactive-model)
 
 ![reactivemodel stack](https://cloud.githubusercontent.com/assets/68416/14596511/8c68c404-0564-11e6-89a3-03346b5fc6b1.png)
 
 See also [ReactiveProperty](https://github.com/datavis-tech/reactive-property), [GraphDataStructure](https://github.com/datavis-tech/graph-data-structure), [ReactiveFunction](https://github.com/datavis-tech/reactive-function), [D3](d3js.org).
 
-## Installation
+## Installing
 You can include the library in your HTML like this:
 
 ```html
