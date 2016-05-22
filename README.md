@@ -265,7 +265,8 @@ ReactiveModel.digest();
 }, "a")
 
  my.destroy();
- 
+ .call(mixin);
+  .call(mixin, 2);
 ```
 
 ### Creating Reactive Models
@@ -280,29 +281,26 @@ var reactiveModel = ReactiveModel();
 
 ### Properties
 
-<a name="reactive-properties" href="#reactive-properties">#</a> reactive-properties
+<a name="add-property" href="#add-property">#</a> <i>reactiveModel</i>(<i>propertyName</i>[, <i>defaultValue</i>])
 
-Every property is made available on the model object as a [chainable getter-setter function](http://bost.ocks.org/mike/chart/#reconfiguration). These properties are instances of another module, [reactive-property](https://github.com/datavis-tech/reactive-property).
-
-For example, assuming there is a [public property](#add-public-property) `a`, we can set its value like this:
+Adds a [property](https://github.com/datavis-tech/reactive-property) to the model. Returns the model to support chaining.
 
 ```javascript
-reactiveModel.a(5);
+var reactiveModel = ReactiveModel()
+  ("a", 5);
 ```
 
-The value can then be retreived by invoking the function with no arguments:
+Get its value.
 
 ```javascript
 reactiveModel.a(); // returns 5
 ```
 
-When the setter form is used, the `model` object is returned. This enables method chaining. For example, assuming there are tracked properties `a`, `b`, and `c`, their values can be set like this:
+Set its value.
 
 ```javascript
-reactiveModel.a(3).b(4).c(5);
+reactiveModel.a(10);
 ```
-
-Whenever any public property used as an input to a reactive function is set, the [`digest()`](#digest) function is automatically scheduled to be invoked on the next tick.
 
 ### Data Flow
 
@@ -317,6 +315,8 @@ Arguments:
    * an array of property name strings.
 
 Adds the given reactive function to the data dependency graph.
+
+Whenever any public property used as an input to a reactive function is set, the [`digest()`](#digest) function is automatically scheduled to be invoked on the next animation frame.
 
 
 The motivation behind setting it up this way is:
