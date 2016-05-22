@@ -337,3 +337,9 @@ Invoking `bind()` adds a cycle of pass-through reactive functions to the data de
  * [d3-scale](https://github.com/d3/d3-scale) Inspired documentation style.
  * [mobx](https://github.com/mobxjs/mobx) Very similar effort.
  * [RxJS](https://github.com/Reactive-Extensions/RxJS) and [Bacon](https://baconjs.github.io/) Full blown FRP packages.
+
+<p align="center">
+  <a href="https://datavis.tech/">
+    <img src="https://cloud.githubusercontent.com/assets/68416/15298394/a7a0a66a-1bbc-11e6-9636-367bed9165fc.png">
+  </a>
+</p>
