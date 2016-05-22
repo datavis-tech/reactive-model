@@ -6,15 +6,20 @@ A JavaScript library for [dataflow programming](https://en.wikipedia.org/wiki/Da
 [![NPM](https://nodei.co/npm-dl/reactive-model.png?months=3)](https://npmjs.org/package/reactive-model)
 [![Build Status](https://travis-ci.org/datavis-tech/reactive-model.svg?branch=master)](https://travis-ci.org/datavis-tech/reactive-model)
 
-![reactivemodel stack](https://cloud.githubusercontent.com/assets/68416/14596511/8c68c404-0564-11e6-89a3-03346b5fc6b1.png)
+This library provides an abstraction for **reactive data flows**. This means you can define so-called "reactive functions" in terms of their inputs and output, and the library will take care of executing these functions in the correct order. When input properties change, those changes are propagated through the data flow graph based on [topological sorting](https://en.wikipedia.org/wiki/Topological_sorting).
 
-See also [ReactiveProperty](https://github.com/datavis-tech/reactive-property), [GraphDataStructure](https://github.com/datavis-tech/graph-data-structure), [ReactiveFunction](https://github.com/datavis-tech/reactive-function), [D3](d3js.org).
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15452883/b7100114-201b-11e6-8582-028465ed91cd.png">
+  <br>
+  The reactive-model stack for interactive data visualizations.
+  <br>
+  <a href="https://github.com/datavis-tech/reactive-property">reactive-property</a>,
+  <a href="https://github.com/datavis-tech/graph-data-structure">graph-data-structure</a>,
+  <a href="https://github.com/datavis-tech/reactive-function">reactive-function</a>,
+  <a href="d3js.org">D3</a>
+</p>
 
-This library provides an abstraction for **reactive data flows**. This means you can define functions in terms of their input and output property names, and the library will take care of executing these functions at the right time based on [topological sort](https://en.wikipedia.org/wiki/Topological_sorting) of the data flow graph.
-
-As an example, consider the case of a [simple Web application](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) where the user can enter his or her first name and last name, and the application will display a greeting using their full name. For this we can construct a `ReactiveModel` instance to manage computation of a `fullName` property based on the `firstName` and `lastName` properties.
-
-To start, we construct a `ReactiveModel` instance and add `firstName` and `lastName` properties.
+As an example, consider the case of a [simple Web application](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) where the user can enter his or her first name and last name, and the application will display a greeting using their full name. To start with, we can construct a `ReactiveModel` instance and add `firstName` and `lastName` properties. The naming convention of `my` pays homage to [Towards Reusable Charts](https://bost.ocks.org/mike/chart/)
 
 ```javascript
 var my = ReactiveModel()
@@ -22,7 +27,7 @@ var my = ReactiveModel()
   ("lastName");
 ```
 
-Invoking the reactive property instance as a function adds reactive properties and returns the model instance to support chaining. Property values can then be set by invoking the properties as chainable setter functions, like this.
+Invoking `my` with a string adds a property with the given name and returns `my` to support chaining. After properties are added, they are exposed as chainable getter-setters on `my`. Here's how you can set their values.
 
 ```javascript
 my
@@ -30,7 +35,7 @@ my
   .lastName("Smith");
 ```
 
-Next, we set up a reactive function that computes a new property called `fullName`  based on `firstName` and `lastName`. 
+Next, we set up a reactive function that computes `fullName`.
 
 ```javascript
 my("fullName", function (firstName, lastName){
@@ -38,11 +43,11 @@ my("fullName", function (firstName, lastName){
 }, "firstName, lastName");
 ```
 
-When invoking the model instance as a function with three arguments,
+Reactive functions are created by invoking `my` with three arguments,
 
- * the first argument is the output property name,
- * the second argument is the reactive function callback,
- * the third argument is a comma-delimited list of input property names. Could also be an array of strings
+ 1 the output property name,
+ 2 the reactive function callback,
+ 3 a comma-delimited list of input property names (could also be an array of strings).
 
 The comma-delimited format was chosen so developers can easily copy-paste between the callback arguments and the input property names specification. The input property names specification is required because inferring the property names from function arguments breaks under minification.
 
