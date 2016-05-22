@@ -16,14 +16,16 @@ This library provides an abstraction for **reactive data flows**. This means you
   <a href="https://github.com/datavis-tech/reactive-property">reactive-property</a> |
   <a href="https://github.com/datavis-tech/graph-data-structure">graph-data-structure</a> |
   <a href="https://github.com/datavis-tech/reactive-function">reactive-function</a> |
-  <a href="d3js.org">D3</a>
+  <a href="https://d3js.org/">D3</a>
 </p>
 
 **Table of Contents**
 
  * [Examples](#examples)
-   * [Full Name](#full-name)
+   * [AB](#ab)
    * [ABC](#abc)
+   * [CDE](#cde)
+   * [Full Name](#full-name)
    * [Tricky Case](#tricky-case)
  * [Installing](#installing)
  * [API Reference](#api-reference)
@@ -76,6 +78,58 @@ This library provides an abstraction for **reactive data flows**. This means you
     </td>
   </tr>
 </table>
+
+
+### AB
+
+Here is an example where `b` gets set to `a + 1` whenever `a` changes:
+
+```javascript
+var my = ReactiveModel
+  ("a")
+  ("b", function (a){
+    return a + 1;
+  }, "a");
+```
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15453189/89c06740-2029-11e6-940b-58207a1492ca.png">
+  <br>
+  When a changes, b gets updated.
+</p>
+
+### ABC
+
+Here's an example that assign `b = a + 1` and `c = b + 1`.
+
+```javascript
+function increment(x){ return x + 1; }
+
+reactiveModel
+  ("b", increment, "a")
+  ("c", increment, "b");
+```
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15385597/44a10522-1dc0-11e6-9054-2150f851db46.png">
+  <br>
+  Here, b is both an output and an input.
+</p>
+
+In this example, if `a` is assigned to the value 1 and a [digest](#digest) occurs, the value of `c` will be 3.
+
+### CDE
+
+Here's an example that shows a reactive function with multiple inputs.
+
+```javascript
+function add(x, y){ return x + y; }
+
+var model = ReactiveModel()
+  ("a", 5)
+  ("b", 10)
+  ("c", add, "a, b");
+```
 
 ### Full Name
 
@@ -140,58 +194,6 @@ my(function (greeting){
 
 Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) that extends the above example code to interact with DOM elements and display a greeting.
 
-### ABC
-
-Here is an example invocation that sets the `b` property to be `a + 1` whenever `a` changes:
-
-```javascript
-var my = ReactiveModel
-  ("a")
-  ("b", function (a){
-    return a + 1;
-  }, "a");
-```
-
-<p align="center">
-  <img src="https://cloud.githubusercontent.com/assets/68416/15453189/89c06740-2029-11e6-940b-58207a1492ca.png">
-  <br>
-  When a changes, b gets updated.
-</p>
-
-The reactive function callback is invoked with the values of input properties during a [digest](#digest).
-
-After setting up the reactive function like this, the callback is invoked in the next digest if all of its input properties are defined. If not all of its input properties are defined, then it will not be invoked in the next digest. When any input properties change, the reactive function callback will be invoked in the next digest after the change (only if all inputs are defined).
-
-The return value from the callback is assigned to the output property during a digest. The output of one reactive function may be used as an input to other reactive functions. This is how you can construct complex data flow graphs. Note that during each digest, changes are propagated through the dependency graph synchronously, within a single tick of the event loop.
-
-Here's an example that assign `b = a + 1` and `c = b + 1`.
-
-```javascript
-function increment(x){ return x + 1; }
-
-reactiveModel
-  ("b", increment, "a")
-  ("c", increment, "b");
-```
-
-<p align="center">
-  <img src="https://cloud.githubusercontent.com/assets/68416/15385597/44a10522-1dc0-11e6-9054-2150f851db46.png">
-  <br>
-  Here, b is both an output and an input.
-</p>
-
-In this example, if `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
-
-Asynchronous reactive functions are supported using an additional argument, the `done` callback, which should be called asynchronously with the new value for the output property. This is inspired by the [asynchronous tests in Mocha](https://mochajs.org/#asynchronous-code). Here's an asynchronous example:
-
-```javascript
-reactiveModel("b", function (a, done){
-  setTimeout(function (){
-    done(a + 1);
-  }, 500);
-}, "a");
-```
-
 ### Tricky Case
 
 <p align="center">
@@ -234,11 +236,6 @@ var ReactiveModel = require("reactive-model");
 var my = ReactiveModel();
 
 ```javascript
-my("x");
-my("x", 5);
-
-my.x();
-my.x(5);
 my
   .x(10)
   .y(20);
@@ -268,6 +265,10 @@ ReactiveModel.digest();
  .call(mixin);
   .call(mixin, 2);
 ```
+
+
+
+
 
 ### Creating Reactive Models
 
@@ -326,6 +327,16 @@ Arguments:
 Adds the given reactive function to the data dependency graph.
 
 Whenever any public property used as an input to a reactive function is set, the [`digest()`](#digest) function is automatically scheduled to be invoked on the next animation frame.
+
+Asynchronous reactive functions are supported using an additional argument, the `done` callback, which should be called asynchronously with the new value for the output property. This is inspired by the [asynchronous tests in Mocha](https://mochajs.org/#asynchronous-code). Here's an asynchronous example:
+
+```javascript
+reactiveModel("b", function (a, done){
+  setTimeout(function (){
+    done(a + 1);
+  }, 500);
+}, "a");
+```
 
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
