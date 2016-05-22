@@ -27,21 +27,18 @@ describe("ReactiveModel", function (){
     });
 
     it("Should support chaining when setting multiple properties.", function (){
-      var my = ReactiveModel();
-      my("x", 5);
-      my("y", 6);
+      var my = ReactiveModel()
+        ("x", 5)
+        ("y", 6);
 
-      my
-        .x(10)
-        .y(20);
+      my.x(10).y(20);
 
       assert.equal(my.x(), 10);
       assert.equal(my.y(), 20);
     });
 
     it("Should chain addProperty.", function (){
-      var my = ReactiveModel()
-        ("x", 5)
+      var my = ReactiveModel()("x", 5);
       assert.equal(my.x(), 5);
     });
   });
@@ -84,12 +81,12 @@ describe("ReactiveModel", function (){
 
   });
 
-  describe("Accessing state", function (){
+  describe("Accessing configuration", function (){
 
     // TODO add tests that check that properties added with
-    // addProperty are not included in the state.
+    // addProperty are not included in the configuration.
 
-    it("Should get state.", function (){
+    it("Should get configuration.", function (){
       var my = ReactiveModel()
         ("x", 5).expose()
         ("y", 10).expose()
@@ -98,24 +95,24 @@ describe("ReactiveModel", function (){
 
       ReactiveModel.digest();
 
-      var state = my();
-      assert.equal(Object.keys(state).length, 2);
-      assert.equal(state.x, 10);
-      assert.equal(state.y, 20);
+      var configuration = my();
+      assert.equal(Object.keys(configuration).length, 2);
+      assert.equal(configuration.x, 10);
+      assert.equal(configuration.y, 20);
     });
 
-    it("Should get state and omit default values.", function (){
+    it("Should get configuration and omit default values.", function (){
       var my = ReactiveModel()
         ("x", 5).expose()
         ("y", 10).expose();
 
       ReactiveModel.digest();
 
-      var state = my();
-      assert.equal(Object.keys(state).length, 0);
+      var configuration = my();
+      assert.equal(Object.keys(configuration).length, 0);
     });
 
-    it("Should set state.", function (){
+    it("Should set configuration.", function (){
 
       var my = ReactiveModel()
         ("x", 5).expose()
@@ -140,7 +137,7 @@ describe("ReactiveModel", function (){
       assert.equal(my.y(), 50);
     });
 
-    it("Should set state with default values for omitted properties.", function (){
+    it("Should set configuration with default values for omitted properties.", function (){
       var my = ReactiveModel()
         ("x", 5).expose()
         ("y", 10).expose()
@@ -156,7 +153,7 @@ describe("ReactiveModel", function (){
       assert.equal(my.y(), 10);
     });
 
-    it("Should set state with default values and new values.", function (){
+    it("Should set configuration with default values and new values.", function (){
       var my = ReactiveModel()
         ("x", 5).expose()
         ("y", 10).expose()
@@ -172,7 +169,7 @@ describe("ReactiveModel", function (){
       assert.equal(my.y(), 10);
     });
 
-    it("Should listen for changes in state, getting default empty state.", function (done){
+    it("Should listen for changes in configuration, getting default empty configuration.", function (done){
       var my = ReactiveModel()
         ("x", 5).expose()
         ("y", 10).expose();
@@ -183,7 +180,7 @@ describe("ReactiveModel", function (){
       });
     });
 
-    it("Should listen for changes in state, getting state after one change.", function (done){
+    it("Should listen for changes in configuration, getting configuration after one change.", function (done){
       var my = ReactiveModel()
         ("x", 5).expose()
         ("y", 10).expose();
@@ -197,7 +194,7 @@ describe("ReactiveModel", function (){
       my.x(15);
     });
 
-    it("Should listen for changes in state, getting state after two changes.", function (done){
+    it("Should listen for changes in configuration, getting configuration after two changes.", function (done){
       var my = ReactiveModel()
         ("x", 5).expose()
         ("y", 10).expose();
@@ -212,7 +209,7 @@ describe("ReactiveModel", function (){
       my.x(15).y(45);
     });
 
-    it("Should listen for changes in state, getting state after two async changes.", function (done){
+    it("Should listen for changes in configuration, getting configuration after two async changes.", function (done){
       var my = ReactiveModel()
         ("x", 5).expose()
         ("z", 10).expose();
@@ -232,7 +229,7 @@ describe("ReactiveModel", function (){
       my.x(15);
     });
 
-    it("Should stop listening for changes in state.", function (done){
+    it("Should stop listening for changes in configuration.", function (done){
       var my = ReactiveModel()
         ("x", 5).expose()
         ("y", 10).expose();
@@ -316,7 +313,7 @@ describe("ReactiveModel", function (){
       assert.equal(my.c(), 3);
     });
 
-    it("Should evaluate tricky case.", function (){
+    it("Should evaluate not-too-tricky case.", function (){
 
       var my = ReactiveModel()
         ("a", 1)
@@ -336,6 +333,34 @@ describe("ReactiveModel", function (){
       ReactiveModel.digest();
 
       assert.equal(my.e(), (1 + 1) + (2 + 1));
+    });
+
+    it("Should evaluate tricky case.", function (){
+
+      //      a
+      //     / \
+      //    b   |
+      //    |   d
+      //    c   |
+      //     \ /
+      //      e   
+
+      var my = ReactiveModel()
+        ("a", 5)
+        ("b", increment, "a")
+        ("c", increment, "b")
+        ("d", increment, "a")
+        ("e", add, "b, d");
+
+      ReactiveModel.digest();
+
+      var a = my.a(),
+          b = a + 1,
+          c = b + 1,
+          d = a + 1,
+          e = b + d;
+
+      assert.equal(my.e(), e);
     });
 
     it("Should auto-digest.", function (done){
