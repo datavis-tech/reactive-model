@@ -19,68 +19,19 @@ This library provides an abstraction for **reactive data flows**. This means you
   <a href="d3js.org">D3</a>
 </p>
 
-As an example, consider the case of a [simple Web application](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) where the user can enter his or her first name and last name, and the application will display a greeting using their full name. To start with, we can construct a `ReactiveModel` instance and add `firstName` and `lastName` properties. The naming convention of `my` pays homage to [Towards Reusable Charts](https://bost.ocks.org/mike/chart/)
+**Table of Contents**
 
-```javascript
-var my = ReactiveModel()
-  ("firstName")
-  ("lastName");
-```
+ * [Examples](#examples)
+   * [Full Name](#full-name)
+   * [ABC](#abc)
+   * [Tricky Case](#tricky-case)
+ * [Installing](#installing)
+ * [API Reference](#api-reference)
+   * [Creating Reactive Models](#creating-reactive-models)
+   * [Properties](#properties)
+   * [Data Flow](#data-flow)
+   * [Configuration](#configuration)
 
-Invoking `my` with a string adds a property with the given name and returns `my` to support chaining. After properties are added, they are exposed as chainable getter-setters on `my`. Here's how you can set their values.
-
-```javascript
-my
-  .firstName("Jane")
-  .lastName("Smith");
-```
-
-Next, we set up a reactive function that computes `fullName`.
-
-```javascript
-my("fullName", function (firstName, lastName){
-  return firstName + " " + lastName;
-}, "firstName, lastName");
-```
-
-Reactive functions are created by invoking `my` with three arguments,
-
- 1. the output property name,
- 2. the reactive function callback,
- 3. a comma-delimited list of input property names (could also be an array of strings).
-
-The comma-delimited format was chosen so developers can easily copy-paste between the callback arguments and the input property names specification. The input property names specification is required because inferring the property names from function arguments breaks under minification.
-
-Once we have `fullName` defined, we can use it as an input to another reactive function that computes the greeting.
-
-```javascript
-my("greeting", function (fullName){
-  return "Hello " + fullName + "!";
-}, "fullName");
-```
-
-When input properties are defined, the changes will automatically propagate through the data flow graph of reactive functions on the next animation frame. However, to force synchronous propagation of changes, we can call the following function.
-
-```javascript
-ReactiveModel.digest();
-```
-
-This ensures that the value of computed properties will be immediately available. We can access them like this.
-
-```javascript
-console.log(my.fullName()); // Prints "Jane Smith"
-console.log(my.greeting()); // Prints "Hello Jane Smith!"
-```
-
-Reactive functions that have side effects but no output value can be defined by omitting the output property name argument. This is useful for DOM manipulation, such as passing the greeting text into a DOM element using D3.
-
-```javascript
-my(function (greeting){
-  d3.select("#greeting").text(greeting);
-}, "greeting");
-```
-
-Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) that extends the above example code to interact with DOM elements and display a greeting.
 
 ## Examples
 
@@ -126,6 +77,131 @@ Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5b
     </td>
   </tr>
 </table>
+
+### Full Name
+
+Consider a [Web application that greets a user](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f). The user can enter his or her first name and last name, and the application will display a greeting using their full name. To start with, we can construct a `ReactiveModel` instance and add `firstName` and `lastName` properties. The naming convention of `my` pays homage to [Towards Reusable Charts](https://bost.ocks.org/mike/chart/)
+
+```javascript
+var my = ReactiveModel()
+  ("firstName")
+  ("lastName");
+```
+
+Invoking `my` with a string adds a property with the given name and returns `my` to support chaining. After properties are added, they are exposed as chainable getter-setters on `my`. Here's how you can set their values.
+
+```javascript
+my
+  .firstName("Jane")
+  .lastName("Smith");
+```
+
+Next, we set up a reactive function that computes `fullName`.
+
+```javascript
+my("fullName", function (firstName, lastName){
+  return firstName + " " + lastName;
+}, "firstName, lastName");
+```
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15389922/cf3f24dc-1dd6-11e6-92d6-058051b752ea.png">
+  <br>
+  The data flow graph for the example code above.
+</p>
+
+Reactive functions are created by invoking `my` with three arguments,
+
+ 1. the output property name,
+ 2. the reactive function callback,
+ 3. a comma-delimited list of input property names (could also be an array of strings).
+
+The comma-delimited format was chosen so developers can easily copy-paste between the callback arguments and the input property names specification. The input property names specification is required because inferring the property names from function arguments breaks under minification.
+
+Once we have `fullName` defined, we can use it as an input to another reactive function that computes the greeting.
+
+```javascript
+my("greeting", function (fullName){
+  return "Hello " + fullName + "!";
+}, "fullName");
+```
+
+When input properties are defined, the changes will automatically propagate through the data flow graph of reactive functions on the next animation frame. However, to force synchronous propagation of changes, we can call the following function.
+
+```javascript
+ReactiveModel.digest();
+```
+
+This ensures that the value of computed properties will be immediately available. We can access them like this.
+
+```javascript
+console.log(my.fullName()); // Prints "Jane Smith"
+console.log(my.greeting()); // Prints "Hello Jane Smith!"
+```
+
+Reactive functions that have side effects but no output value can be defined by omitting the output property name argument. This is useful for DOM manipulation, such as passing the greeting text into a DOM element using D3.
+
+```javascript
+my(function (greeting){
+  d3.select("#greeting").text(greeting);
+}, "greeting");
+```
+
+Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) that extends the above example code to interact with DOM elements and display a greeting.
+
+### ABC
+
+Here is an example invocation that sets the `b` property to be `a + 1` whenever `a` changes:
+
+```javascript
+reactiveModel("b", function (a){
+  return a + 1;
+}, "a");
+```
+
+The reactive function callback is invoked with the values of input properties during a [digest](#digest).
+
+After setting up the reactive function like this, the callback is invoked in the next digest if all of its input properties are defined. If not all of its input properties are defined, then it will not be invoked in the next digest. When any input properties change, the reactive function callback will be invoked in the next digest after the change (only if all inputs are defined).
+
+The return value from the callback is assigned to the output property during a digest. The output of one reactive function may be used as an input to other reactive functions. This is how you can construct complex data flow graphs. Note that during each digest, changes are propagated through the dependency graph synchronously, within a single tick of the event loop.
+
+Here's an example that assign `b = a + 1` and `c = b + 1`.
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15385597/44a10522-1dc0-11e6-9054-2150f851db46.png">
+  <br>
+  Here, b is both an output and an input.
+</p>
+
+```javascript
+function increment(x){
+  return x + 1;
+}
+
+reactiveModel
+  ("b", increment, "a")
+  ("c", increment, "b");
+```
+
+In this example, if `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
+
+Asynchronous reactive functions are supported using an additional argument, the `done` callback, which should be called asynchronously with the new value for the output property. This is inspired by the [asynchronous tests in Mocha](https://mochajs.org/#asynchronous-code). Here's an asynchronous example:
+
+```javascript
+reactiveModel("b", function (a, done){
+  setTimeout(function (){
+    done(a + 1);
+  }, 500);
+}, "a");
+```
+
+### Tricky Case
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15400254/7f779c9a-1e08-11e6-8992-9d2362bfba63.png">
+  <br>
+  The tricky case, where breadth-first propagation fails.
+</p>
 
 ## Installing
 You can include the library in your HTML like this:
@@ -193,43 +269,7 @@ Adds the given reactive function to the data dependency graph. The motivation be
  * A comma-delimited list was chosen as the representation because one can copy-and-paste the arguments list of the callback directly and simply add quotes around it. From the perspective of developers, this is more convenient than the array-of-strings approach taken by Model.js in representing dependencies.
  * The dependencies list is the second argument so it does not make the first line of the expression very long. With Model.js, the dependencies list comes first, followed by the callback, so the repetition of dependencies falls on the same line. With the dependencies list as the second argument, it fits nicely onto its own line after the definition of the callback function.
 
-Here is an example invocation that sets the `b` property to be `a + 1` whenever `a` changes:
 
-```javascript
-reactiveModel("b", function (a){
-  return a + 1;
-}, "a");
-```
-
-The reactive function callback is invoked with the values of input properties during a [digest](#digest).
-
-After setting up the reactive function like this, the callback is invoked in the next digest if all of its input properties are defined. If not all of its input properties are defined, then it will not be invoked in the next digest. When any input properties change, the reactive function callback will be invoked in the next digest after the change (only if all inputs are defined).
-
-The return value from the callback is assigned to the output property during a digest. The output of one reactive function may be used as an input to other reactive functions. This is how you can construct complex data flow graphs. Note that during each digest, changes are propagated through the dependency graph synchronously, within a single tick of the event loop.
-
-Here's an example that assign `b = a + 1` and `c = b + 1`:
-
-```javascript
-function increment(x){
-  return x + 1;
-}
-
-reactiveModel
-  ("b", increment, "a")
-  ("c", increment, "b");
-```
-
-In this example, if `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
-
-Asynchronous reactive functions are supported using an additional argument, the `done` callback, which should be called asynchronously with the new value for the output property. This is inspired by the [asynchronous tests in Mocha](https://mochajs.org/#asynchronous-code). Here's an asynchronous example:
-
-```javascript
-reactiveModel("b", function (a, done){
-  setTimeout(function (){
-    done(a + 1);
-  }, 500);
-}, "a");
-```
 
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
