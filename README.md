@@ -13,9 +13,9 @@ This library provides an abstraction for **reactive data flows**. This means you
   <br>
   The reactive-model stack for interactive data visualizations.
   <br>
-  <a href="https://github.com/datavis-tech/reactive-property">reactive-property</a>|
-  <a href="https://github.com/datavis-tech/graph-data-structure">graph-data-structure</a>|
-  <a href="https://github.com/datavis-tech/reactive-function">reactive-function</a>|
+  <a href="https://github.com/datavis-tech/reactive-property">reactive-property</a> |
+  <a href="https://github.com/datavis-tech/graph-data-structure">graph-data-structure</a> |
+  <a href="https://github.com/datavis-tech/reactive-function">reactive-function</a> |
   <a href="d3js.org">D3</a>
 </p>
 
@@ -31,7 +31,6 @@ This library provides an abstraction for **reactive data flows**. This means you
    * [Properties](#properties)
    * [Data Flow](#data-flow)
    * [Configuration](#configuration)
-
 
 ## Examples
 
@@ -80,7 +79,7 @@ This library provides an abstraction for **reactive data flows**. This means you
 
 ### Full Name
 
-Consider a [Web application that greets a user](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f). The user can enter his or her first name and last name, and the application will display a greeting using their full name. To start with, we can construct a `ReactiveModel` instance and add `firstName` and `lastName` properties. The naming convention of `my` pays homage to [Towards Reusable Charts](https://bost.ocks.org/mike/chart/)
+Consider a [Web application that greets a user](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f). The user can enter his or her first name and last name, and the application will display a greeting using their full name. To start with, we can construct a `ReactiveModel` instance and add `firstName` and `lastName` properties. The naming convention of `my` pays homage to [Towards Reusable Charts](https://bost.ocks.org/mike/chart/).
 
 ```javascript
 var my = ReactiveModel()
@@ -109,14 +108,6 @@ my("fullName", function (firstName, lastName){
   <br>
   The data flow graph for the example code above.
 </p>
-
-Reactive functions are created by invoking `my` with three arguments,
-
- 1. the output property name,
- 2. the reactive function callback,
- 3. a comma-delimited list of input property names (could also be an array of strings).
-
-The comma-delimited format was chosen so developers can easily copy-paste between the callback arguments and the input property names specification. The input property names specification is required because inferring the property names from function arguments breaks under minification.
 
 Once we have `fullName` defined, we can use it as an input to another reactive function that computes the greeting.
 
@@ -261,14 +252,24 @@ Whenever any public property used as an input to a reactive function is set, the
 
 ### Data Flow
 
-<a name="react" href="#react">#</a> <i>reactiveModel</i>(<i>outputPropertyName, callback, inputsStr</i>)
+<a name="react" href="#react">#</a> <i>reactiveModel</i>(<i>output</i>, <i>callback</i>, <i>inputs</i>)
 
-Adds the given reactive function to the data dependency graph. The motivation behind setting it up this way is:
+Arguments:
+
+ * *output* - The output property name (a string).
+ * *callback* - The reactive function callback (a function).
+ * *inputs* - The list of input property names. May be either
+   * a comma-delimited list of input property names (a string), or
+   * an array of property name strings.
+
+Adds the given reactive function to the data dependency graph.
+
+
+The motivation behind setting it up this way is:
 
  * The dependencies could be inferred from the argument names of the callback, but this approach would break under minification (since argument names may be changed). Therefore, an explicit representation of the list of property names in string literal form is required.
- * A comma-delimited list was chosen as the representation because one can copy-and-paste the arguments list of the callback directly and simply add quotes around it. From the perspective of developers, this is more convenient than the array-of-strings approach taken by Model.js in representing dependencies.
+ * The comma-delimited format was chosen so developers can easily copy-paste between the callback arguments and the input property names specification. The input property names specification is required because inferring the property names from function arguments breaks under minification. The option to specify an array of strings was added to support the case of programmatically generating the property names.
  * The dependencies list is the second argument so it does not make the first line of the expression very long. With Model.js, the dependencies list comes first, followed by the callback, so the repetition of dependencies falls on the same line. With the dependencies list as the second argument, it fits nicely onto its own line after the definition of the callback function.
-
 
 
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
