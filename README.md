@@ -21,18 +21,9 @@ This library provides an abstraction for **reactive data flows**. This means you
 
 **Table of Contents**
 
- * [Examples](#examples)
-   * [AB](#ab)
-   * [ABC](#abc)
-   * [CDE](#cde)
-   * [Full Name](#full-name)
-   * [Tricky Case](#tricky-case)
+ * [Examples](#examples) - [AB](#ab) | [ABC](#abc) | [CDE](#cde) | [Full Name](#full-name) | [Tricky Case](#tricky-case)
  * [Installing](#installing)
- * [API Reference](#api-reference)
-   * [Creating Reactive Models](#creating-reactive-models)
-   * [Properties](#properties)
-   * [Data Flow](#data-flow)
-   * [Configuration](#configuration)
+ * [API Reference](#api-reference) - [Creating Reactive Models](#creating-reactive-models) | [Properties](#properties) | [Data Flow](#data-flow) | [Configuration](#configuration)
 
 ## Examples
 
@@ -85,7 +76,7 @@ This library provides an abstraction for **reactive data flows**. This means you
 Here is an example where `b` gets set to `a + 1` whenever `a` changes:
 
 ```javascript
-var my = ReactiveModel
+var my = ReactiveModel()
   ("a") // Create the property "a" with no default value.
   ("b", function (a){
     return a + 1;
@@ -97,6 +88,8 @@ var my = ReactiveModel
   <br>
   When a changes, b gets updated.
 </p>
+
+The naming convention of `my` pays homage to [Towards Reusable Charts](https://bost.ocks.org/mike/chart/).
 
 ### ABC
 
@@ -121,7 +114,7 @@ In this example, if `a` is assigned to the value 1 and a [digest](#digest) occur
 
 ### CDE
 
-Here's an example that shows a reactive function with multiple inputs, where `e` gets set to `c + d`.
+Here's an example that shows a reactive function with two inputs, where `e` gets set to `c + d`.
 
 ```javascript
 function add(x, y){ return x + y; }
@@ -129,7 +122,7 @@ function add(x, y){ return x + y; }
 var my = ReactiveModel()
   ("c", 5)
   ("d", 10)
-  ("e", add, "c, d");
+  ("e", add, ["c", "d"]);
 ```
 
 <p align="center">
@@ -140,7 +133,7 @@ var my = ReactiveModel()
 
 ### Full Name
 
-Consider a [Web application that greets a user](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f). The user can enter his or her first name and last name, and the application will display a greeting using their full name. To start with, we can construct a `ReactiveModel` instance and add `firstName` and `lastName` properties. The naming convention of `my` pays homage to [Towards Reusable Charts](https://bost.ocks.org/mike/chart/).
+Consider a [Web application that greets a user](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f). The user can enter his or her first name and last name, and the application will display a greeting using their full name. To start with, we can construct a **[ReactiveModel](#constructor)** instance and [add properties](#add-property) `firstName` and `lastName` (with no default values).
 
 ```javascript
 var my = ReactiveModel()
@@ -148,7 +141,7 @@ var my = ReactiveModel()
   ("lastName");
 ```
 
-Invoking `my` with a string adds a property with the given name and returns `my` to support chaining. After properties are added, they are exposed as chainable getter-setters on `my`. Here's how you can set their values.
+After properties are added, they are exposed as [chainable getter-setters](https://github.com/datavis-tech/reactive-property#accessing-properties) on `my`. Here's how you can set their values.
 
 ```javascript
 my
@@ -178,7 +171,7 @@ my("greeting", function (fullName){
 }, "fullName");
 ```
 
-When input properties are defined, the changes will automatically propagate through the data flow graph of reactive functions on the next animation frame. However, to force synchronous propagation of changes, we can call the following function.
+When input properties are defined, the changes will automatically propagate on the next animation frame. However, to force synchronous propagation of changes, we can call [digest](#digest).
 
 ```javascript
 ReactiveModel.digest();
@@ -219,6 +212,8 @@ var my = ReactiveModel()
   ("d", increment, "a")
   ("e", add, "b, d");
 ```
+
+See also [Tricky Case in reactive-function](https://github.com/datavis-tech/reactive-function/blob/master/README.md#tricky-case).
 
 ## Installing
 You can include the library in your HTML like this:
@@ -289,11 +284,16 @@ var model = ReactiveModel();
 
 <a name="destroy" href="#destroy">#</a> <i>model</i>.<b>destroy</b>()
 
-Cleans up resources allocated to this model and removes listeners from all properties.
+Cleans up resources allocated to this model. Invokes 
+
+ * [reactiveFunction.destroy()](https://github.com/datavis-tech/reactive-function/blob/master/README.md#destroy) on all reactive functions created on this model, and 
+ * [reactiveProperty.destroy()](https://github.com/datavis-tech/reactive-property#destroy) on all properties created on this model.
+
+You should invoke this function when finished using model instances in order to avoid memory leaks.
 
 ### Properties
 
-<a name="add-property" href="#add-property">#</a> <i>model</i>(<i>propertyName</i>[, <i>defaultValue</i>])
+<a name="add-property" href="#add-property">#</a> <b><i>model</i></b>(<i>propertyName</i>[, <i>defaultValue</i>])
 
 Adds a property to the model. Returns the model to support chaining.
 
@@ -302,7 +302,7 @@ Arguments:
  * *propertyName* - The name of the property (a string).
  * *defaultValue* (optional) - The default value for this property.
 
-The property is exposed as an instance of [reactive-property](https://github.com/datavis-tech/reactive-property) on the model object at `model[propertyName]`.
+After a property is added, it is exposed as an instance of [reactive-property](https://github.com/datavis-tech/reactive-property) on the model object at `model[propertyName]`.
 
 Here's example code that shows how to add a property `a` and access it.
 
@@ -321,7 +321,9 @@ model.a(10);
 
 ### Data Flow
 
-<a name="react" href="#react">#</a> <i>reactiveModel</i>([<i>output</i>, ]<i>callback</i>, <i>inputs</i>)
+<a name="reactive-function" href="#reactive-function">#</a> <b><i>model</i></b>([<i>output</i>, ]<i>callback</i>, <i>inputs</i>)
+
+Adds the given reactive function to this model and the singleton data flow graph.
 
 Arguments:
 
@@ -330,8 +332,6 @@ Arguments:
  * *inputs* - The list of input property names. May be either
    * a comma-delimited list of input property names (a string), or
    * an array of property name strings.
-
-Adds the given reactive function to the data dependency graph.
 
 Whenever any public property used as an input to a reactive function is set, the [`digest()`](#digest) function is automatically scheduled to be invoked on the next animation frame.
 
@@ -347,24 +347,23 @@ reactiveModel("b", function (a, done){
 
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
-Synchronously evaluates the data dependency graph.
-
+Synchronously evaluates the data flow graph. This is the same function as [ReactiveFunction.digest()](https://github.com/datavis-tech/reactive-function#digest).
 
 ### Configuration
 
-<a name="add-public-property" href="#add-public-property">#</a> <i>model</i>.<b>addPublicProperty</b>(<i>property</i>, <i>defaultValue</i>)
+<a name="add-public-property" href="#add-public-property">#</a> <i>property</i>.<b>expose</b>()
 
-Adds a public property with the given default value.
+Exposes the previously added property to the configuration. Returns the model to support chaining.
 
-Returns the `model` object, so is chainable, like this:
+The previously added property *must* have a default value defined.
+
+Here's an example where two properties `x` and `y` are defined with default values and exposed to the configuration.
 
 ```javascript
 var model = new ReactiveModel()
   ("x", 5).expose()
   ("y", 6).expose();
 ```
-
-Public properties may not be added after the `state` accessor has been accessed. This is to guarantee predictable serialization and deserialization behavior.
 
 <a name="get-state" href="#get-state">#</a> <i>model</i>.<b>state</b>()
 
