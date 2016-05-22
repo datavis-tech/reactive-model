@@ -39,8 +39,8 @@ To start, we construct a `ReactiveModel` instance and add `firstName` and `lastN
 
 ```javascript
 var my = ReactiveModel()
-  .addProperty("firstName")
-  .addProperty("lastName");
+  ("firstName")
+  ("lastName");
 ```
 
 Invoking the reactive property instance as a function adds reactive properties and returns the model instance to support chaining. Property values can then be set by invoking the properties as chainable setter functions, like this.
@@ -182,7 +182,7 @@ Adds the given reactive function to the data dependency graph. The motivation be
 Here is an example invocation that sets the `b` property to be `a + 1` whenever `a` changes:
 
 ```javascript
-model("b", function (a){
+reactiveModel("b", function (a){
   return a + 1;
 }, "a");
 ```
@@ -200,7 +200,7 @@ function increment(x){
   return x + 1;
 }
 
-model
+reactiveModel
   ("b", increment, "a")
   ("c", increment, "b");
 ```
@@ -210,7 +210,7 @@ In this example, if `a` is assigned to the value 1 and a digest occurs, the valu
 Asynchronous reactive functions are supported using an additional argument, the `done` callback, which should be called asynchronously with the new value for the output property. This is inspired by the [asynchronous tests in Mocha](https://mochajs.org/#asynchronous-code). Here's an asynchronous example:
 
 ```javascript
-model("b", function (a, done){
+reactiveModel("b", function (a, done){
   setTimeout(function (){
     done(a + 1);
   }, 500);
@@ -232,19 +232,19 @@ Every property is made available on the model object as a [chainable getter-sett
 For example, assuming there is a [public property](#add-public-property) `a`, we can set its value like this:
 
 ```javascript
-model.a(5);
+reactiveModel.a(5);
 ```
 
 The value can then be retreived by invoking the function with no arguments:
 
 ```javascript
-model.a(); // returns 5
+reactiveModel.a(); // returns 5
 ```
 
 When the setter form is used, the `model` object is returned. This enables method chaining. For example, assuming there are tracked properties `a`, `b`, and `c`, their values can be set like this:
 
 ```javascript
-model.a(3).b(4).c(5);
+reactiveModel.a(3).b(4).c(5);
 ```
 
 Whenever any public property used as an input to a reactive function is set, the [`digest()`](#digest) function is automatically scheduled to be invoked on the next tick.
@@ -259,8 +259,8 @@ Returns the `model` object, so is chainable, like this:
 
 ```javascript
 var model = new ReactiveModel()
-  .addPublicProperty("x", 5)
-  .addPublicProperty("y", 6);
+  ("x", 5).expose()
+  ("y", 6).expose();
 ```
 
 Public properties may not be added after the `state` accessor has been accessed. This is to guarantee predictable serialization and deserialization behavior.
