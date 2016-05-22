@@ -145,10 +145,18 @@ Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5b
 Here is an example invocation that sets the `b` property to be `a + 1` whenever `a` changes:
 
 ```javascript
-reactiveModel("b", function (a){
-  return a + 1;
-}, "a");
+var my = ReactiveModel
+  ("a")
+  ("b", function (a){
+    return a + 1;
+  }, "a");
 ```
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15453189/89c06740-2029-11e6-940b-58207a1492ca.png">
+  <br>
+  When a changes, b gets updated.
+</p>
 
 The reactive function callback is invoked with the values of input properties during a [digest](#digest).
 
@@ -225,6 +233,7 @@ var ReactiveModel = require("reactive-model");
 
 var my = ReactiveModel();
 
+```javascript
 my("x");
 my("x", 5);
 
@@ -233,6 +242,31 @@ my.x(5);
 my
   .x(10)
   .y(20);
+
+("x", 5).expose()
+
+var state = my();
+my({
+  x: 20,
+  y: 50
+});
+my.on(function (newState){
+my.off
+("fullName", function (firstName, lastName){
+  return firstName + " " + lastName;
+}, ["firstName", "lastName"]);
+ReactiveModel.digest();
+  my.a(null);
+  
+("b", function (a, done){
+  setTimeout(function (){
+    done(a + 1);
+  }, 20);
+}, "a")
+
+ my.destroy();
+ 
+```
 
 ### Creating Reactive Models
 
