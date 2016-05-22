@@ -39,8 +39,8 @@ To start, we construct a `ReactiveModel` instance and add `firstName` and `lastN
 
 ```javascript
 var my = ReactiveModel()
-  ("firstName")
-  ("lastName");
+  .addProperty("firstName")
+  .addProperty("lastName");
 ```
 
 Invoking the reactive property instance as a function adds reactive properties and returns the model instance to support chaining. Property values can then be set by invoking the properties as chainable setter functions, like this.
