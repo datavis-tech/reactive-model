@@ -21,9 +21,18 @@ This library provides an abstraction for **reactive data flows**. This means you
 
 **Table of Contents**
 
- * [Examples](#examples) - [AB](#ab) | [ABC](#abc) | [CDE](#cde) | [Full Name](#full-name) | [Tricky Case](#tricky-case)
+ * [Examples](#examples)
+   * [AB](#ab)
+   * [ABC](#abc)
+   * [CDE](#cde)
+   * [Full Name](#full-name)
+   * [Tricky Case](#tricky-case)
  * [Installing](#installing)
- * [API Reference](#api-reference) - [Creating Reactive Models](#creating-reactive-models) | [Properties](#properties) | [Data Flow](#data-flow) | [Configuration](#configuration)
+ * [API Reference](#api-reference)
+   * [Creating Reactive Models](#creating-reactive-models)
+   * [Properties](#properties)
+   * [Data Flow](#data-flow)
+   * [Configuration](#configuration)
 
 ## Examples
 
@@ -208,6 +217,8 @@ Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5b
 
 ### Tricky Case
 
+Reactive functions can be combined to create arbitrarily complex data flow graphs. Here's an example that demonstrates why [topological sorting](https://en.wikipedia.org/wiki/Topological_sorting) is the best algorithm for computing the order in which to execute data flow graphs. In this graph, propagation using breadth-first search (which is what [Model.js](https://github.com/curran/model) uses) would cause `e` to be set twice, and the first time it would be set with an *inconsistent state*. Using topological sorting for change propagation guarantees that `e` will only be set once, and there will never be inconsistent states.
+
 <p align="center">
   <img src="https://cloud.githubusercontent.com/assets/68416/15400254/7f779c9a-1e08-11e6-8992-9d2362bfba63.png">
   <br>
@@ -226,6 +237,8 @@ var my = ReactiveModel()
 ```
 
 See also [Tricky Case in reactive-function](https://github.com/datavis-tech/reactive-function/blob/master/README.md#tricky-case).
+
+For more detailed example code, have a look at the [tests](https://github.com/datavis-tech/reactive-model/blob/master/test.js).
 
 ## Installing
 You can include the library in your HTML like this:
