@@ -16,21 +16,14 @@ This library provides an abstraction for **reactive data flows**. This means you
   <a href="https://github.com/datavis-tech/reactive-property">reactive-property</a> |
   <a href="https://github.com/datavis-tech/graph-data-structure">graph-data-structure</a> |
   <a href="https://github.com/datavis-tech/reactive-function">reactive-function</a> |
-  <a href="d3js.org">D3</a>
+  <a href="https://d3js.org/">D3</a>
 </p>
 
 **Table of Contents**
 
- * [Examples](#examples)
-   * [Full Name](#full-name)
-   * [ABC](#abc)
-   * [Tricky Case](#tricky-case)
+ * [Examples](#examples) - [AB](#ab) | [ABC](#abc) | [CDE](#cde) | [Full Name](#full-name) | [Tricky Case](#tricky-case)
  * [Installing](#installing)
- * [API Reference](#api-reference)
-   * [Creating Reactive Models](#creating-reactive-models)
-   * [Properties](#properties)
-   * [Data Flow](#data-flow)
-   * [Configuration](#configuration)
+ * [API Reference](#api-reference) - [Creating Reactive Models](#creating-reactive-models) | [Properties](#properties) | [Data Flow](#data-flow) | [Configuration](#configuration)
 
 ## Examples
 
@@ -77,9 +70,70 @@ This library provides an abstraction for **reactive data flows**. This means you
   </tr>
 </table>
 
+
+### AB
+
+Here is an example where `b` gets set to `a + 1` whenever `a` changes:
+
+```javascript
+var my = ReactiveModel()
+  ("a") // Create the property "a" with no default value.
+  ("b", function (a){
+    return a + 1;
+  }, "a");
+```
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15453189/89c06740-2029-11e6-940b-58207a1492ca.png">
+  <br>
+  When a changes, b gets updated.
+</p>
+
+The naming convention of `my` pays homage to [Towards Reusable Charts](https://bost.ocks.org/mike/chart/).
+
+### ABC
+
+Here's an example that assign `b = a + 1` and `c = b + 1`.
+
+```javascript
+function increment(x){ return x + 1; }
+
+var my = ReactiveModel()
+  ("a", 5) // Create the property "a" with a default value of 5.
+  ("b", increment, "a")
+  ("c", increment, "b");
+```
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15385597/44a10522-1dc0-11e6-9054-2150f851db46.png">
+  <br>
+  Here, b is both an output and an input.
+</p>
+
+In this example, if `a` is assigned to the value 1 and a [digest](#digest) occurs, the value of `c` will be 3.
+
+### CDE
+
+Here's an example that shows a reactive function with two inputs, where `e` gets set to `c + d`.
+
+```javascript
+function add(x, y){ return x + y; }
+
+var my = ReactiveModel()
+  ("c", 5)
+  ("d", 10)
+  ("e", add, ["c", "d"]);
+```
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15453417/d2179a14-2032-11e6-9cfb-024c416c699e.png">
+  <br>
+  A reactive function with two inputs.
+</p>
+
 ### Full Name
 
-Consider a [Web application that greets a user](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f). The user can enter his or her first name and last name, and the application will display a greeting using their full name. To start with, we can construct a `ReactiveModel` instance and add `firstName` and `lastName` properties. The naming convention of `my` pays homage to [Towards Reusable Charts](https://bost.ocks.org/mike/chart/).
+Consider a [Web application that greets a user](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f). The user can enter his or her first name and last name, and the application will display a greeting using their full name. To start with, we can construct a **[ReactiveModel](#constructor)** instance and [add properties](#add-property) `firstName` and `lastName` (with no default values).
 
 ```javascript
 var my = ReactiveModel()
@@ -87,7 +141,7 @@ var my = ReactiveModel()
   ("lastName");
 ```
 
-Invoking `my` with a string adds a property with the given name and returns `my` to support chaining. After properties are added, they are exposed as chainable getter-setters on `my`. Here's how you can set their values.
+After properties are added, they are exposed as [chainable getter-setters](https://github.com/datavis-tech/reactive-property#accessing-properties) on `my`. Here's how you can set their values.
 
 ```javascript
 my
@@ -117,7 +171,7 @@ my("greeting", function (fullName){
 }, "fullName");
 ```
 
-When input properties are defined, the changes will automatically propagate through the data flow graph of reactive functions on the next animation frame. However, to force synchronous propagation of changes, we can call the following function.
+When input properties are defined, the changes will automatically propagate on the next animation frame. However, to force synchronous propagation of changes, we can call [digest](#digest).
 
 ```javascript
 ReactiveModel.digest();
@@ -140,52 +194,6 @@ my(function (greeting){
 
 Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) that extends the above example code to interact with DOM elements and display a greeting.
 
-### ABC
-
-Here is an example invocation that sets the `b` property to be `a + 1` whenever `a` changes:
-
-```javascript
-reactiveModel("b", function (a){
-  return a + 1;
-}, "a");
-```
-
-The reactive function callback is invoked with the values of input properties during a [digest](#digest).
-
-After setting up the reactive function like this, the callback is invoked in the next digest if all of its input properties are defined. If not all of its input properties are defined, then it will not be invoked in the next digest. When any input properties change, the reactive function callback will be invoked in the next digest after the change (only if all inputs are defined).
-
-The return value from the callback is assigned to the output property during a digest. The output of one reactive function may be used as an input to other reactive functions. This is how you can construct complex data flow graphs. Note that during each digest, changes are propagated through the dependency graph synchronously, within a single tick of the event loop.
-
-Here's an example that assign `b = a + 1` and `c = b + 1`.
-
-<p align="center">
-  <img src="https://cloud.githubusercontent.com/assets/68416/15385597/44a10522-1dc0-11e6-9054-2150f851db46.png">
-  <br>
-  Here, b is both an output and an input.
-</p>
-
-```javascript
-function increment(x){
-  return x + 1;
-}
-
-reactiveModel
-  ("b", increment, "a")
-  ("c", increment, "b");
-```
-
-In this example, if `a` is assigned to the value 1 and a digest occurs, the value of `c` after the digest will be 3.
-
-Asynchronous reactive functions are supported using an additional argument, the `done` callback, which should be called asynchronously with the new value for the output property. This is inspired by the [asynchronous tests in Mocha](https://mochajs.org/#asynchronous-code). Here's an asynchronous example:
-
-```javascript
-reactiveModel("b", function (a, done){
-  setTimeout(function (){
-    done(a + 1);
-  }, 500);
-}, "a");
-```
-
 ### Tricky Case
 
 <p align="center">
@@ -193,6 +201,19 @@ reactiveModel("b", function (a, done){
   <br>
   The tricky case, where breadth-first propagation fails.
 </p>
+
+```javascript
+function add(x, y){ return x + y; }
+
+var my = ReactiveModel()
+  ("a", 5)
+  ("b", increment, "a")
+  ("c", increment, "b")
+  ("d", increment, "a")
+  ("e", add, "b, d");
+```
+
+See also [Tricky Case in reactive-function](https://github.com/datavis-tech/reactive-function/blob/master/README.md#tricky-case).
 
 ## Installing
 You can include the library in your HTML like this:
@@ -214,6 +235,43 @@ var ReactiveModel = require("reactive-model");
  * [Data Flow](#data-flow)
  * [Configuration](#configuration)
 
+var my = ReactiveModel();
+
+```javascript
+my
+  .x(10)
+  .y(20);
+
+("x", 5).expose()
+
+var state = my();
+my({
+  x: 20,
+  y: 50
+});
+my.on(function (newState){
+my.off
+("fullName", function (firstName, lastName){
+  return firstName + " " + lastName;
+}, ["firstName", "lastName"]);
+ReactiveModel.digest();
+  my.a(null);
+  
+("b", function (a, done){
+  setTimeout(function (){
+    done(a + 1);
+  }, 20);
+}, "a")
+
+ my.destroy();
+ .call(mixin);
+  .call(mixin, 2);
+```
+
+
+
+
+
 ### Creating Reactive Models
 
 <a name="constructor" href="#constructor">#</a> <b>ReactiveModel</b>()
@@ -221,81 +279,91 @@ var ReactiveModel = require("reactive-model");
 Constructs a new reactive model instance.
 
 ```javascript
-var reactiveModel = ReactiveModel();
+var model = ReactiveModel();
 ```
+
+<a name="destroy" href="#destroy">#</a> <i>model</i>.<b>destroy</b>()
+
+Cleans up resources allocated to this model. Invokes 
+
+ * [reactiveFunction.destroy()](https://github.com/datavis-tech/reactive-function/blob/master/README.md#destroy) on all reactive functions created on this model, and 
+ * [reactiveProperty.destroy()](https://github.com/datavis-tech/reactive-property#destroy) on all properties created on this model.
+
+You should invoke this function when finished using model instances in order to avoid memory leaks.
 
 ### Properties
 
-<a name="reactive-properties" href="#reactive-properties">#</a> reactive-properties
+<a name="add-property" href="#add-property">#</a> <b><i>model</i></b>(<i>propertyName</i>[, <i>defaultValue</i>])
 
-Every property is made available on the model object as a [chainable getter-setter function](http://bost.ocks.org/mike/chart/#reconfiguration). These properties are instances of another module, [reactive-property](https://github.com/datavis-tech/reactive-property).
-
-For example, assuming there is a [public property](#add-public-property) `a`, we can set its value like this:
-
-```javascript
-reactiveModel.a(5);
-```
-
-The value can then be retreived by invoking the function with no arguments:
-
-```javascript
-reactiveModel.a(); // returns 5
-```
-
-When the setter form is used, the `model` object is returned. This enables method chaining. For example, assuming there are tracked properties `a`, `b`, and `c`, their values can be set like this:
-
-```javascript
-reactiveModel.a(3).b(4).c(5);
-```
-
-Whenever any public property used as an input to a reactive function is set, the [`digest()`](#digest) function is automatically scheduled to be invoked on the next tick.
-
-### Data Flow
-
-<a name="react" href="#react">#</a> <i>reactiveModel</i>(<i>output</i>, <i>callback</i>, <i>inputs</i>)
+Adds a property to the model. Returns the model to support chaining.
 
 Arguments:
 
- * *output* - The output property name (a string).
+ * *propertyName* - The name of the property (a string).
+ * *defaultValue* (optional) - The default value for this property.
+
+After a property is added, it is exposed as an instance of [reactive-property](https://github.com/datavis-tech/reactive-property) on the model object at `model[propertyName]`.
+
+Here's example code that shows how to add a property `a` and access it.
+
+```javascript
+var model = ReactiveModel();
+
+// Add property "a" with a default value of 5.
+model("a", 5);
+
+// Acces the value of "a".
+model.a(); // returns 5
+
+// Set the value of "a".
+model.a(10);
+```
+
+### Data Flow
+
+<a name="reactive-function" href="#reactive-function">#</a> <b><i>model</i></b>([<i>output</i>, ]<i>callback</i>, <i>inputs</i>)
+
+Adds the given reactive function to this model and the singleton data flow graph.
+
+Arguments:
+
+ * *output* (optional) - The output property name (a string).
  * *callback* - The reactive function callback (a function).
  * *inputs* - The list of input property names. May be either
    * a comma-delimited list of input property names (a string), or
    * an array of property name strings.
 
-Adds the given reactive function to the data dependency graph.
+Whenever any public property used as an input to a reactive function is set, the [`digest()`](#digest) function is automatically scheduled to be invoked on the next animation frame.
 
+Asynchronous reactive functions are supported using an additional argument, the `done` callback, which should be called asynchronously with the new value for the output property. This is inspired by the [asynchronous tests in Mocha](https://mochajs.org/#asynchronous-code). Here's an asynchronous example:
 
-The motivation behind setting it up this way is:
-
- * The dependencies could be inferred from the argument names of the callback, but this approach would break under minification (since argument names may be changed). Therefore, an explicit representation of the list of property names in string literal form is required.
- * The comma-delimited format was chosen so developers can easily copy-paste between the callback arguments and the input property names specification. The input property names specification is required because inferring the property names from function arguments breaks under minification. The option to specify an array of strings was added to support the case of programmatically generating the property names.
- * The dependencies list is the second argument so it does not make the first line of the expression very long. With Model.js, the dependencies list comes first, followed by the callback, so the repetition of dependencies falls on the same line. With the dependencies list as the second argument, it fits nicely onto its own line after the definition of the callback function.
-
+```javascript
+reactiveModel("b", function (a, done){
+  setTimeout(function (){
+    done(a + 1);
+  }, 500);
+}, "a");
+```
 
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
-Synchronously evaluates the data dependency graph.
-
-This function is exposed on the `ReactiveModel` constructor function rather than the `ReactiveModel` instance because there is a singleton data dependency graph shared by all reactive model instances. This approach was taken to enable reactive functions that take input from one model and yield output on another (via [bind](#bind)).
-
-The term "digest" was chosen because it is already in common use within the AngularJS community and refers to almost exactly the same operation - see [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest).
-
+Synchronously evaluates the data flow graph. This is the same function as [ReactiveFunction.digest()](https://github.com/datavis-tech/reactive-function#digest).
 
 ### Configuration
 
-<a name="add-public-property" href="#add-public-property">#</a> <i>model</i>.<b>addPublicProperty</b>(<i>property</i>, <i>defaultValue</i>)
+<a name="add-public-property" href="#add-public-property">#</a> <i>property</i>.<b>expose</b>()
 
-Adds a public property with the given default value.
+Exposes the previously added property to the configuration. Returns the model to support chaining.
 
-Returns the `model` object, so is chainable, like this:
+The previously added property *must* have a default value defined.
+
+Here's an example where two properties `x` and `y` are defined with default values and exposed to the configuration.
 
 ```javascript
 var model = new ReactiveModel()
   ("x", 5).expose()
   ("y", 6).expose();
 ```
-
-Public properties may not be added after the `state` accessor has been accessed. This is to guarantee predictable serialization and deserialization behavior.
 
 <a name="get-state" href="#get-state">#</a> <i>model</i>.<b>state</b>()
 
@@ -323,7 +391,7 @@ This method can be used to listen for changes in state.
 
 ## How it Works
 
-This library maintains an instance of [graph-data-structure](https://github.com/datavis-tech/graph-data-structure) internally, called the "data dependency graph", in which
+This library maintains an singleton instance of [graph-data-structure](https://github.com/datavis-tech/graph-data-structure) internally, called the "data dependency graph", in which
 
  * vertices represent reactive properties, and
  * edges represent dependencies.
@@ -349,6 +417,16 @@ The core ideas of this redesign are:
 The state-related functions (addPublicProperty, state) were informed by work on the [Chiasm project](https://github.com/chiasm-propect/chiasm/). Chiasm manages synchronization of interactive visualizations with a dynamic application state configuration. In order to achieve predictable behavior, Chiasm introduces the notion of "public properties" and the requirement that they have default values. This is essential to achieve the goal of reversability for every action resulting from configuration changes (required to support undo/redo and history navigation, one of the goals of the Chiasm project).
 
 Moving the publicProperty and serialization/deserialization semantics into the model abstraction seemed like a logical move. This will simplify the implementation of an engine like Chiasm, and will provide consistent serialization behavior for any users of reactive-model.
+
+The `digest` function is exposed on the `ReactiveModel` constructor function rather than the `ReactiveModel` instance because there is a singleton data dependency graph shared by all reactive model instances. This approach was taken to enable reactive functions that take input from one model and yield output on another (via [bind](#bind)).
+
+The term "digest" was chosen because it is already in common use within the AngularJS community and refers to almost exactly the same operation - see [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest).
+
+The motivation behind the organization of reactive function setup arguments is:
+
+ * The dependencies could be inferred from the argument names of the callback, but this approach would break under minification (since argument names may be changed). Therefore, an explicit representation of the list of property names in string literal form is required.
+ * The comma-delimited format was chosen so developers can easily copy-paste between the callback arguments and the input property names specification. The input property names specification is required because inferring the property names from function arguments breaks under minification. The option to specify an array of strings was added to support the case of programmatically generating the property names.
+ * The dependencies list is the second argument so it does not make the first line of the expression very long. With Model.js, the dependencies list comes first, followed by the callback, so the repetition of dependencies falls on the same line. With the dependencies list as the second argument, it fits nicely onto its own line after the definition of the callback function.
 
 ### Not Yet Implemented
 
