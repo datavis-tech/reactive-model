@@ -13,9 +13,9 @@ This library provides an abstraction for **reactive data flows**. This means you
   <br>
   The reactive-model stack for interactive data visualizations.
   <br>
-  <a href="https://github.com/datavis-tech/reactive-property">reactive-property</a>,
-  <a href="https://github.com/datavis-tech/graph-data-structure">graph-data-structure</a>,
-  <a href="https://github.com/datavis-tech/reactive-function">reactive-function</a>,
+  <a href="https://github.com/datavis-tech/reactive-property">reactive-property</a>|
+  <a href="https://github.com/datavis-tech/graph-data-structure">graph-data-structure</a>|
+  <a href="https://github.com/datavis-tech/reactive-function">reactive-function</a>|
   <a href="d3js.org">D3</a>
 </p>
 
@@ -45,9 +45,9 @@ my("fullName", function (firstName, lastName){
 
 Reactive functions are created by invoking `my` with three arguments,
 
- 1 the output property name,
- 2 the reactive function callback,
- 3 a comma-delimited list of input property names (could also be an array of strings).
+ 1. the output property name,
+ 2. the reactive function callback,
+ 3. a comma-delimited list of input property names (could also be an array of strings).
 
 The comma-delimited format was chosen so developers can easily copy-paste between the callback arguments and the input property names specification. The input property names specification is required because inferring the property names from function arguments breaks under minification.
 
@@ -142,31 +142,48 @@ var ReactiveModel = require("reactive-model");
 
 ## API Reference
 
-Constructing & Evaluating Data Dependency Graphs
+ * [Creating Reactive Models](#creating-reactive-models)
+ * [Properties](#properties)
+ * [Data Flow](#data-flow)
+ * [Configuration](#configuration)
 
- * [ReactiveModel()](#reactive-model-constructor)
- * [model(options)](#react)
- * [ReactiveModel.digest()](#digest)
- * [reactive-properties](#reactive-properties)
-
-Serialization & Deserialization
-
- * [model.addPublicProperty(property, defaultValue)](#add-public-property)
- * [model.state()](#get-state)
- * [model.state(newState)](#set-state)
- * [model.state.on(function (newState){})](#on-state)
-
-### Constructing & Evaluating Data Dependency Graphs
+### Creating Reactive Models
 
 <a name="constructor" href="#constructor">#</a> <b>ReactiveModel</b>()
 
 Constructs a new reactive model instance.
 
-Example use:
-
 ```javascript
 var reactiveModel = ReactiveModel();
 ```
+
+### Properties
+
+<a name="reactive-properties" href="#reactive-properties">#</a> reactive-properties
+
+Every property is made available on the model object as a [chainable getter-setter function](http://bost.ocks.org/mike/chart/#reconfiguration). These properties are instances of another module, [reactive-property](https://github.com/datavis-tech/reactive-property).
+
+For example, assuming there is a [public property](#add-public-property) `a`, we can set its value like this:
+
+```javascript
+reactiveModel.a(5);
+```
+
+The value can then be retreived by invoking the function with no arguments:
+
+```javascript
+reactiveModel.a(); // returns 5
+```
+
+When the setter form is used, the `model` object is returned. This enables method chaining. For example, assuming there are tracked properties `a`, `b`, and `c`, their values can be set like this:
+
+```javascript
+reactiveModel.a(3).b(4).c(5);
+```
+
+Whenever any public property used as an input to a reactive function is set, the [`digest()`](#digest) function is automatically scheduled to be invoked on the next tick.
+
+### Data Flow
 
 <a name="react" href="#react">#</a> <i>reactiveModel</i>(<i>outputPropertyName, callback, inputsStr</i>)
 
@@ -222,31 +239,8 @@ This function is exposed on the `ReactiveModel` constructor function rather than
 
 The term "digest" was chosen because it is already in common use within the AngularJS community and refers to almost exactly the same operation - see [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest).
 
-<a name="reactive-properties" href="#reactive-properties">#</a> reactive-properties
 
-Every property is made available on the model object as a [chainable getter-setter function](http://bost.ocks.org/mike/chart/#reconfiguration). These properties are instances of another module, [reactive-property](https://github.com/datavis-tech/reactive-property).
-
-For example, assuming there is a [public property](#add-public-property) `a`, we can set its value like this:
-
-```javascript
-reactiveModel.a(5);
-```
-
-The value can then be retreived by invoking the function with no arguments:
-
-```javascript
-reactiveModel.a(); // returns 5
-```
-
-When the setter form is used, the `model` object is returned. This enables method chaining. For example, assuming there are tracked properties `a`, `b`, and `c`, their values can be set like this:
-
-```javascript
-reactiveModel.a(3).b(4).c(5);
-```
-
-Whenever any public property used as an input to a reactive function is set, the [`digest()`](#digest) function is automatically scheduled to be invoked on the next tick.
-
-### Serialization & Deserialization
+### Configuration
 
 <a name="add-public-property" href="#add-public-property">#</a> <i>model</i>.<b>addPublicProperty</b>(<i>property</i>, <i>defaultValue</i>)
 
@@ -285,10 +279,6 @@ This method can be used to listen for changes in state.
    * callback(input values) -> output value (the "reactive function callback")
  * "digest" An execution of the algorithm that evaluates the data dependency graph. This includes topological sort.
  * "evaluate" A term to denote complete resolution of the data dependency graph. After the complete data dependency graph has been **evaluated** by a digest, the state of the model is consistent with regard to its reactive functions, and all reactive functions that are transitively dependent on any changed property have been executed in the proper order, with their output values assigned to model properties.
-
-## Development Flow
-
-Run `npm test` to run the unit tests.
 
 ## How it Works
 
