@@ -86,7 +86,7 @@ Here is an example where `b` gets set to `a + 1` whenever `a` changes:
 
 ```javascript
 var my = ReactiveModel
-  ("a")
+  ("a") // Create the property "a" with no default value.
   ("b", function (a){
     return a + 1;
   }, "a");
@@ -105,7 +105,8 @@ Here's an example that assign `b = a + 1` and `c = b + 1`.
 ```javascript
 function increment(x){ return x + 1; }
 
-reactiveModel
+var my = ReactiveModel()
+  ("a", 5) // Create the property "a" with a default value of 5.
   ("b", increment, "a")
   ("c", increment, "b");
 ```
@@ -120,16 +121,22 @@ In this example, if `a` is assigned to the value 1 and a [digest](#digest) occur
 
 ### CDE
 
-Here's an example that shows a reactive function with multiple inputs.
+Here's an example that shows a reactive function with multiple inputs, where `e` gets set to `c + d`.
 
 ```javascript
 function add(x, y){ return x + y; }
 
-var model = ReactiveModel()
-  ("a", 5)
-  ("b", 10)
-  ("c", add, "a, b");
+var my = ReactiveModel()
+  ("c", 5)
+  ("d", 10)
+  ("e", add, "c, d");
 ```
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15453417/d2179a14-2032-11e6-9cfb-024c416c699e.png">
+  <br>
+  A reactive function with two inputs.
+</p>
 
 ### Full Name
 
