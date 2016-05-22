@@ -27,21 +27,18 @@ describe("ReactiveModel", function (){
     });
 
     it("Should support chaining when setting multiple properties.", function (){
-      var my = ReactiveModel();
-      my("x", 5);
-      my("y", 6);
+      var my = ReactiveModel()
+        ("x", 5)
+        ("y", 6);
 
-      my
-        .x(10)
-        .y(20);
+      my.x(10).y(20);
 
       assert.equal(my.x(), 10);
       assert.equal(my.y(), 20);
     });
 
     it("Should chain addProperty.", function (){
-      var my = ReactiveModel()
-        ("x", 5)
+      var my = ReactiveModel()("x", 5);
       assert.equal(my.x(), 5);
     });
   });
@@ -316,7 +313,7 @@ describe("ReactiveModel", function (){
       assert.equal(my.c(), 3);
     });
 
-    it("Should evaluate tricky case.", function (){
+    it("Should evaluate not-too-tricky case.", function (){
 
       var my = ReactiveModel()
         ("a", 1)
@@ -336,6 +333,34 @@ describe("ReactiveModel", function (){
       ReactiveModel.digest();
 
       assert.equal(my.e(), (1 + 1) + (2 + 1));
+    });
+
+    it("Should evaluate tricky case.", function (){
+
+      //      a
+      //     / \
+      //    b   |
+      //    |   d
+      //    c   |
+      //     \ /
+      //      e   
+
+      var my = ReactiveModel()
+        ("a", 5)
+        ("b", increment, "a")
+        ("c", increment, "b")
+        ("d", increment, "a")
+        ("e", add, "b, d");
+
+      ReactiveModel.digest();
+
+      var a = my.a(),
+          b = a + 1,
+          c = b + 1,
+          d = a + 1,
+          e = b + d;
+
+      assert.equal(my.e(), e);
     });
 
     it("Should auto-digest.", function (done){
