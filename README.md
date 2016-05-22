@@ -276,39 +276,48 @@ ReactiveModel.digest();
 Constructs a new reactive model instance.
 
 ```javascript
-var reactiveModel = ReactiveModel();
+var model = ReactiveModel();
 ```
+
+<a name="destroy" href="#destroy">#</a> <i>model</i>.<b>destroy</b>()
+
+Cleans up resources allocated to this model and removes listeners from all properties.
 
 ### Properties
 
-<a name="add-property" href="#add-property">#</a> <i>reactiveModel</i>(<i>propertyName</i>[, <i>defaultValue</i>])
+<a name="add-property" href="#add-property">#</a> <i>model</i>(<i>propertyName</i>[, <i>defaultValue</i>])
 
-Adds a [property](https://github.com/datavis-tech/reactive-property) to the model. Returns the model to support chaining.
+Adds a property to the model. Returns the model to support chaining.
 
-```javascript
-var reactiveModel = ReactiveModel()
-  ("a", 5);
-```
+Arguments:
 
-Get its value.
+ * *propertyName* - The name of the property (a string).
+ * *defaultValue* (optional) - The default value for this property.
 
-```javascript
-reactiveModel.a(); // returns 5
-```
+The property is exposed as an instance of [reactive-property](https://github.com/datavis-tech/reactive-property) on the model object at `model[propertyName]`.
 
-Set its value.
+Here's example code that shows how to add a property `a` and access it.
 
 ```javascript
-reactiveModel.a(10);
+var model = ReactiveModel();
+
+// Add property "a" with a default value of 5.
+model("a", 5);
+
+// Acces the value of "a".
+model.a(); // returns 5
+
+// Set the value of "a".
+model.a(10);
 ```
 
 ### Data Flow
 
-<a name="react" href="#react">#</a> <i>reactiveModel</i>(<i>output</i>, <i>callback</i>, <i>inputs</i>)
+<a name="react" href="#react">#</a> <i>reactiveModel</i>([<i>output</i>, ]<i>callback</i>, <i>inputs</i>)
 
 Arguments:
 
- * *output* - The output property name (a string).
+ * *output* (optional) - The output property name (a string).
  * *callback* - The reactive function callback (a function).
  * *inputs* - The list of input property names. May be either
    * a comma-delimited list of input property names (a string), or
@@ -318,21 +327,9 @@ Adds the given reactive function to the data dependency graph.
 
 Whenever any public property used as an input to a reactive function is set, the [`digest()`](#digest) function is automatically scheduled to be invoked on the next animation frame.
 
-
-The motivation behind setting it up this way is:
-
- * The dependencies could be inferred from the argument names of the callback, but this approach would break under minification (since argument names may be changed). Therefore, an explicit representation of the list of property names in string literal form is required.
- * The comma-delimited format was chosen so developers can easily copy-paste between the callback arguments and the input property names specification. The input property names specification is required because inferring the property names from function arguments breaks under minification. The option to specify an array of strings was added to support the case of programmatically generating the property names.
- * The dependencies list is the second argument so it does not make the first line of the expression very long. With Model.js, the dependencies list comes first, followed by the callback, so the repetition of dependencies falls on the same line. With the dependencies list as the second argument, it fits nicely onto its own line after the definition of the callback function.
-
-
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
 Synchronously evaluates the data dependency graph.
-
-This function is exposed on the `ReactiveModel` constructor function rather than the `ReactiveModel` instance because there is a singleton data dependency graph shared by all reactive model instances. This approach was taken to enable reactive functions that take input from one model and yield output on another (via [bind](#bind)).
-
-The term "digest" was chosen because it is already in common use within the AngularJS community and refers to almost exactly the same operation - see [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest).
 
 
 ### Configuration
@@ -377,7 +374,7 @@ This method can be used to listen for changes in state.
 
 ## How it Works
 
-This library maintains an instance of [graph-data-structure](https://github.com/datavis-tech/graph-data-structure) internally, called the "data dependency graph", in which
+This library maintains an singleton instance of [graph-data-structure](https://github.com/datavis-tech/graph-data-structure) internally, called the "data dependency graph", in which
 
  * vertices represent reactive properties, and
  * edges represent dependencies.
@@ -403,6 +400,16 @@ The core ideas of this redesign are:
 The state-related functions (addPublicProperty, state) were informed by work on the [Chiasm project](https://github.com/chiasm-propect/chiasm/). Chiasm manages synchronization of interactive visualizations with a dynamic application state configuration. In order to achieve predictable behavior, Chiasm introduces the notion of "public properties" and the requirement that they have default values. This is essential to achieve the goal of reversability for every action resulting from configuration changes (required to support undo/redo and history navigation, one of the goals of the Chiasm project).
 
 Moving the publicProperty and serialization/deserialization semantics into the model abstraction seemed like a logical move. This will simplify the implementation of an engine like Chiasm, and will provide consistent serialization behavior for any users of reactive-model.
+
+The `digest` function is exposed on the `ReactiveModel` constructor function rather than the `ReactiveModel` instance because there is a singleton data dependency graph shared by all reactive model instances. This approach was taken to enable reactive functions that take input from one model and yield output on another (via [bind](#bind)).
+
+The term "digest" was chosen because it is already in common use within the AngularJS community and refers to almost exactly the same operation - see [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest).
+
+The motivation behind the organization of reactive function setup arguments is:
+
+ * The dependencies could be inferred from the argument names of the callback, but this approach would break under minification (since argument names may be changed). Therefore, an explicit representation of the list of property names in string literal form is required.
+ * The comma-delimited format was chosen so developers can easily copy-paste between the callback arguments and the input property names specification. The input property names specification is required because inferring the property names from function arguments breaks under minification. The option to specify an array of strings was added to support the case of programmatically generating the property names.
+ * The dependencies list is the second argument so it does not make the first line of the expression very long. With Model.js, the dependencies list comes first, followed by the callback, so the repetition of dependencies falls on the same line. With the dependencies list as the second argument, it fits nicely onto its own line after the definition of the callback function.
 
 ### Not Yet Implemented
 
