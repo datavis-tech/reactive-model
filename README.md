@@ -351,11 +351,11 @@ Synchronously evaluates the data flow graph. This is the same function as [React
 
 ### Configuration
 
-<a name="add-public-property" href="#add-public-property">#</a> <i>property</i>.<b>expose</b>()
+<a name="expose" href="#expose">#</a> <i>property</i>.<b>expose</b>()
 
 Exposes the previously added property to the configuration. Returns the model to support chaining.
 
-The previously added property *must* have a default value defined.
+The property to expose *must* have a default value defined.
 
 Here's an example where two properties `x` and `y` are defined with default values and exposed to the configuration.
 
@@ -365,19 +365,53 @@ var model = new ReactiveModel()
   ("y", 6).expose();
 ```
 
-<a name="get-configuration" href="#get-configuration">#</a> <i>model</i>.<b>configuration</b>()
+<a name="get-configuration" href="#get-configuration">#</a> <b><i>model</i></b>()
 
-Returns a serialized form of the model that can later be passed as `newState` into `configuration(newState)`. This is an object that only contains public properties that have values other than their defaults.
+Returns the model configuration. Only contains [exposed](#expose) properties that have values other than their defaults.
 
-<a name="set-configuration" href="#set-configuration">#</a> <i>model</i>.<b>configuration</b>(<i>newState</i>)
+```javascript
+var model = new ReactiveModel()
+  ("x", 5).expose()
+  ("y", 6).expose();
+  
+model.x(50);
 
-Sets the configuration of the model from its serialized form. The `newState` argument object is expected to contain values for public properties that have values other than their defaults. Public properties not included in `newState` will be set to their default values. Properties not previously added as public properties may not be included in the `newState` object.
+var configuration = model();
+```
+The value of `configuration` here will be
 
-Internally, `configuration(newState)` sets public properties to the specified values via their reactive-properties, causing the changes to be propagated through all reactive functions that depend on them.
+```json
+{ "x": 50 }
+```
 
-<a name="on-configuration" href="#on-configuration">#</a> <i>model.configuration</i>.<b>on</b>(<i>function(newState){ ... }</i>)
+Note that `y` is omitted, because it has its default value.
 
-This method can be used to listen for changes in configuration.
+<a name="set-configuration" href="#set-configuration">#</a> <b><i>model</i></b>(<i>configuration</i>)
+
+Sets the model configuration. [Exposed](#expose) properties whose values are not included in *configuration* will be set to their default values.
+
+```javascript
+var model = new ReactiveModel()
+  ("x", 5).expose()
+  ("y", 6).expose();
+  
+model.x(50);
+
+// Set the configuration.
+model({ y: 60 });
+
+console.log(model.x()); // Prints 5 (x was set back to its default value).
+console.log(model.y()); // Prints 60.
+
+```
+
+<a name="on" href="#on">#</a> <i>model</i>.<b>on</b>(<i>listener</i>)
+
+This method can be used to listen for changes in configuration. Returns the listener function that can be used to stop listening for changes.
+
+<a name="off" href="#on">#</a> <i>model</i>.<b>off</b>(<i>listener</i>)
+
+Stop listening for changes in configuration.
 
 ## Glossary
 
