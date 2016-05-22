@@ -15,8 +15,6 @@ You can include the library in your HTML like this:
 <script src="//datavis-tech.github.io/reactive-model/reactive-model-v0.8.0.min.js"></script>
 ```
 
-**Warning! Ownership will soon be transferred to [datavis-tech](https://github.com/datavis-tech/), which will cause this github.io link to break.**
-
 If you are using [NPM](https://www.npmjs.com/package/reactive-model), install with `npm install reactive-model`, then require the module in your code like this:
 
 ```javascript
@@ -37,17 +35,15 @@ This library provides an abstraction for **reactive data flows**. This means you
 
 As an example, consider the case of a [simple Web application](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) where the user can enter his or her first name and last name, and the application will display a greeting using their full name. For this we can construct a `ReactiveModel` instance to manage computation of a `fullName` property based on the `firstName` and `lastName` properties.
 
-To start, we construct a `ReactiveModel` instance and add the `firstName` and `lastName` properties with default values.
+To start, we construct a `ReactiveModel` instance and add `firstName` and `lastName` properties.
 
 ```javascript
 var my = ReactiveModel()
-  .addProperties({
-    firstName: "",
-    lastName: ""
-  });
+  ("firstName")
+  ("lastName");
 ```
 
-The `addProperties` method adds reactive properties and returns the model instance to support method chaining. Property values can be set by invoking the properties as chainable setter functions, like this.
+Invoking the reactive property instance as a function adds reactive properties and returns the model instance to support chaining. Property values can then be set by invoking the properties as chainable setter functions, like this.
 
 ```javascript
 my
@@ -63,7 +59,13 @@ my("fullName", function (firstName, lastName){
 }, "firstName, lastName");
 ```
 
-When invoking the model instance as a function, the first argument is the output property name, the second argument is the reactive function callback, and the third argument is a comma-delimited list of input property names. The comma-delimited format was chosen so developers can easily copy-paste between the callback arguments and the input property names specification. The input property names specification is required because inferring the property names from function arguments breaks under minification.
+When invoking the model instance as a function with three arguments,
+
+ * the first argument is the output property name,
+ * the second argument is the reactive function callback,
+ * the third argument is a comma-delimited list of input property names. Could also be an array of strings
+
+The comma-delimited format was chosen so developers can easily copy-paste between the callback arguments and the input property names specification. The input property names specification is required because inferring the property names from function arguments breaks under minification.
 
 Once we have `fullName` defined, we can use it as an input to another reactive function that computes the greeting.
 
@@ -73,7 +75,7 @@ my("greeting", function (fullName){
 }, "fullName");
 ```
 
-Once the reactive functions and input property values are defined, the changes will automatically propagate on the next animation frame. However, to force synchronous propagation of changes, we can call the following function.
+When input properties are defined, the changes will automatically propagate through the data flow graph of reactive functions on the next animation frame. However, to force synchronous propagation of changes, we can call the following function.
 
 ```javascript
 ReactiveModel.digest();
@@ -86,7 +88,7 @@ console.log(my.fullName()); // Prints "Jane Smith"
 console.log(my.greeting()); // Prints "Hello Jane Smith!"
 ```
 
-Reactive functions that have side effects but no output value can also be defined (by omitting the output property name argument). This is useful for DOM manipulation, such as passing the greeting text into a DOM element using D3.
+Reactive functions that have side effects but no output value can be defined by omitting the output property name argument. This is useful for DOM manipulation, such as passing the greeting text into a DOM element using D3.
 
 ```javascript
 my(function (greeting){
@@ -159,17 +161,17 @@ Serialization & Deserialization
 
 ### Constructing & Evaluating Data Dependency Graphs
 
-<a name="reactive-model-constructor" href="#reactive-model-constructor">#</a> <b>ReactiveModel</b>()
+<a name="constructor" href="#constructor">#</a> <b>ReactiveModel</b>()
 
-Constructs a new reactive model.
+Constructs a new reactive model instance.
 
 Example use:
 
 ```javascript
-var model = ReactiveModel();
+var reactiveModel = ReactiveModel();
 ```
 
-<a name="react" href="#react">#</a> <i>model</i>(<i>outputPropertyName, callback, inputsStr</i>)
+<a name="react" href="#react">#</a> <i>reactiveModel</i>(<i>outputPropertyName, callback, inputsStr</i>)
 
 Adds the given reactive function to the data dependency graph. The motivation behind setting it up this way is:
 
