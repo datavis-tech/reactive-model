@@ -1,6 +1,6 @@
 # reactive-model
 
-A JavaScript library for data flow programming.
+A JavaScript library for [dataflow programming](https://en.wikipedia.org/wiki/Dataflow_programming).
 
 [![NPM](https://nodei.co/npm/reactive-model.png)](https://npmjs.org/package/reactive-model)
 [![NPM](https://nodei.co/npm-dl/reactive-model.png?months=3)](https://npmjs.org/package/reactive-model)
@@ -10,30 +10,7 @@ A JavaScript library for data flow programming.
 
 See also [ReactiveProperty](https://github.com/datavis-tech/reactive-property), [GraphDataStructure](https://github.com/datavis-tech/graph-data-structure), [ReactiveFunction](https://github.com/datavis-tech/reactive-function), [D3](d3js.org).
 
-## Installing
-You can include the library in your HTML like this:
-
-```html
-<script src="//datavis-tech.github.io/reactive-model/reactive-model-v0.8.0.min.js"></script>
-```
-
-If you are using [NPM](https://www.npmjs.com/package/reactive-model), install with `npm install reactive-model`, then require the module in your code like this:
-
-```javascript
-var ReactiveModel = require("reactive-model");
-```
-
-## Usage
-
 This library provides an abstraction for **reactive data flows**. This means you can define functions in terms of their input and output property names, and the library will take care of executing these functions at the right time based on [topological sort](https://en.wikipedia.org/wiki/Topological_sorting) of the data flow graph.
-
-<p align="center">
-  <a href="http://bl.ocks.org/curran/5905182da50a4667dc00">
-    <img src="http://curran.github.io/images/reactive-model/firstLastFlow.png">
-  </a>
-  <br>
-  <small>A visual representation of the data flow graph constructed in this example.</small>
-</p>
 
 As an example, consider the case of a [simple Web application](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) where the user can enter his or her first name and last name, and the application will display a greeting using their full name. For this we can construct a `ReactiveModel` instance to manage computation of a `fullName` property based on the `firstName` and `lastName` properties.
 
@@ -144,6 +121,19 @@ Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5b
     </td>
   </tr>
 </table>
+
+## Installing
+You can include the library in your HTML like this:
+
+```html
+<script src="//datavis-tech.github.io/reactive-model/reactive-model-v0.8.0.min.js"></script>
+```
+
+If you are using [NPM](https://www.npmjs.com/package/reactive-model), install with `npm install reactive-model`, then require the module in your code like this:
+
+```javascript
+var ReactiveModel = require("reactive-model");
+```
 
 ## API Reference
 
