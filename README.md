@@ -393,7 +393,7 @@ fullName(model, "Jane", "Smith");
 
 ### Configuration
 
-<a name="expose" href="#expose">#</a> <i>property</i>.<b>expose</b>()
+<a name="expose" href="#expose">#</a> <b><i>model</i></b>.<b>expose</b>()
 
 Exposes the previously added property to the configuration. Returns the model to support chaining.
 
@@ -410,6 +410,8 @@ var model = new ReactiveModel()
 <a name="get-configuration" href="#get-configuration">#</a> <b><i>model</i></b>()
 
 Returns the model configuration. Only contains [exposed](#expose) properties that have values other than their defaults.
+
+Example:
 
 ```javascript
 var model = new ReactiveModel()
@@ -444,7 +446,6 @@ model({ y: 60 });
 
 console.log(model.x()); // Prints 5 (x was set back to its default value).
 console.log(model.y()); // Prints 60.
-
 ```
 
 <a name="on" href="#on">#</a> <i>model</i>.<b>on</b>(<i>listener</i>)
@@ -455,7 +456,7 @@ This method can be used to listen for changes in configuration. Returns the list
 
 Stop listening for changes in configuration.
 
-## Glossary
+## Fluff
 
  * "reactive model" The result of `new ReactiveModel()`.
  * "reactive function" A callback function and metadata that describes its input and output properties. A specification for a reactive function is passed into `model()`. Any reactive function has:
@@ -464,8 +465,6 @@ Stop listening for changes in configuration.
    * callback(input values) -> output value (the "reactive function callback")
  * "digest" An execution of the algorithm that evaluates the data dependency graph. This includes topological sort.
  * "evaluate" A term to denote complete resolution of the data dependency graph. After the complete data dependency graph has been **evaluated** by a digest, the state of the model is consistent with regard to its reactive functions, and all reactive functions that are transitively dependent on any changed property have been executed in the proper order, with their output values assigned to model properties.
-
-## Fluff
 
 This library maintains an singleton instance of [graph-data-structure](https://github.com/datavis-tech/graph-data-structure) internally, called the "data dependency graph", in which
 
