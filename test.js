@@ -363,6 +363,47 @@ describe("ReactiveModel", function (){
       assert.equal(my.e(), e);
     });
 
+    it("Should evaluate trickier case.", function (){
+
+      //       a
+      //     / \ \
+      //    b   | \
+      //    |   e  \
+      //    c   |  g
+      //    |   f  /
+      //    d   | /
+      //     \ / /
+      //       h   
+
+      function add3(x, y, z){ return x + y + z; }
+
+      var my = ReactiveModel()
+        ("a", 5)
+        ("b", increment, "a")
+        ("c", increment, "b")
+        ("d", increment, "c")
+        ("e", increment, "a")
+        ("f", increment, "e")
+        ("g", increment, "a")
+        ("h", add3, "d, f, g");
+
+      ReactiveModel.digest();
+
+      // TODO add capability to serialize graph
+      //console.log(ReactiveModel.graph.serialize());
+
+      var a = my.a(),
+          b = a + 1,
+          c = b + 1,
+          d = c + 1,
+          e = a + 1,
+          f = e + 1,
+          g = a + 1,
+          h = d + f + g;
+
+      assert.equal(my.h(), h);
+    });
+
     it("Should auto-digest.", function (done){
       var my = ReactiveModel()
         ("a", 5)
