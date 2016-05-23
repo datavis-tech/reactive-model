@@ -496,66 +496,6 @@ The argument *listener* is a function of the form <b>listener</b>(<i>configurati
 
 Stop listening for changes in configuration. The argument *listener* must be the value returned from **[on](#on)** (not the function passed into **[on](#on)**).
 
-## Fluff
-
- * "reactive model" The result of `new ReactiveModel()`.
- * "reactive function" A callback function and metadata that describes its input and output properties. A specification for a reactive function is passed into `model()`. Any reactive function has:
-   * input properties
-   * output properties
-   * callback(input values) -> output value (the "reactive function callback")
- * "digest" An execution of the algorithm that evaluates the data dependency graph. This includes topological sort.
- * "evaluate" A term to denote complete resolution of the data dependency graph. After the complete data dependency graph has been **evaluated** by a digest, the state of the model is consistent with regard to its reactive functions, and all reactive functions that are transitively dependent on any changed property have been executed in the proper order, with their output values assigned to model properties.
-
-This library maintains an singleton instance of [graph-data-structure](https://github.com/datavis-tech/graph-data-structure) internally, called the "data dependency graph", in which
-
- * vertices represent reactive properties, and
- * edges represent dependencies.
-
-Whenever reactive functions are added to the model, nodes and edges are added to this data structure. Whenever a property is changed, that property is marked as changed.
-
-The digest algorithm performs a topological sort using the changed property nodes as sources. The resulting list of nodes is in the sorted order in which the reactive functions must be executed. After computing this ordering, each reactive function is executed, and its output value is assigned to its output property. Before executing each reactive function, a check is performed that ensures all of its input properties are defined.
-
-The `done` callback for asynchronous reactive functions is inspired by the [asynchronous tests in Mocha](https://mochajs.org/#asynchronous-code).
-
-This is a re-design of [model.js](https://github.com/curran/model) that addresses the following issues:
-
- * The model.js syntax does not encode the data dependency graph explicitly, it is expressed implicitly by setting model property values within reactive functions (`model.when` callbacks).
- * The execution model of model.js uses `setTimeout` to queue evaluation of every single edge in the data dependency graph. This can have a performance impact, and can lead to inconsistent system state while the dependency graph is being evaluated. Let's say `setTimeout` takes about 4 ms to resolve. This means it would take 4 * d ms to evaluate any full data dependency graph, where d is the number of hops required through the data dependency graph.
-
-The core ideas of this redesign are:
-
- * data dependency graphs are specified explicitly (a lot like [Make](http://en.wikipedia.org/wiki/Make_%28software%29))
- * changes are digested using an explicit topological sort algorithm on the data dependency graph
- * digests are synchronous (avoiding poor performance and inconsistent system state)
- * processing of changes is delayed until the next animation frame, so updates are synchronized with rendering
-
-The configuration-related functions (addPublicProperty, configuration) were informed by work on the [Chiasm project](https://github.com/chiasm-propect/chiasm/). Chiasm manages synchronization of interactive visualizations with a dynamic application state configuration. In order to achieve predictable behavior, Chiasm introduces the notion of "public properties" and the requirement that they have default values. This is essential to achieve the goal of reversability for every action resulting from configuration changes (required to support undo/redo and history navigation, one of the goals of the Chiasm project).
-
-Moving the publicProperty and serialization/deserialization semantics into the model abstraction seemed like a logical move. This will simplify the implementation of an engine like Chiasm, and will provide consistent serialization behavior for any users of reactive-model.
-
-The `digest` function is exposed on the `ReactiveModel` constructor function rather than the `ReactiveModel` instance because there is a singleton data dependency graph shared by all reactive model instances. This approach was taken to enable reactive functions that take input from one model and yield output on another (via [bind](#bind)).
-
-The term "digest" was chosen because it is already in common use within the AngularJS community and refers to almost exactly the same operation - see [AngularJS $digest()](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest).
-
-The motivation behind the organization of reactive function setup arguments is:
-
- * The dependencies could be inferred from the argument names of the callback, but this approach would break under minification (since argument names may be changed). Therefore, an explicit representation of the list of property names in string literal form is required.
- * The comma-delimited format was chosen so developers can easily copy-paste between the callback arguments and the input property names specification. The input property names specification is required because inferring the property names from function arguments breaks under minification. The option to specify an array of strings was added to support the case of programmatically generating the property names.
- * The dependencies list is the second argument so it does not make the first line of the expression very long. With Model.js, the dependencies list comes first, followed by the callback, so the repetition of dependencies falls on the same line. With the dependencies list as the second argument, it fits nicely onto its own line after the definition of the callback function.
-
-### Not Yet Implemented
-
-<a name="bind" href="#bind">#</a> <i>bind</i>(<i>arr</i>)
-
-Establish bidirectional data binding between properties from different models.
-
-The `arr` argument is expected to be an array of objects with the following properties:
-
- * `model` A reference to an instance of `ReactiveModel`.
- * `property` A property name on that model.
-
-Invoking `bind()` adds a cycle of pass-through reactive functions to the data dependency graph such that all specified properties will be synchronized, handling the fact that they are from different model instances.
-
 ## Related Work
 
  * [ZJONSSON/clues](https://github.com/ZJONSSON/clues) A very similar library based on Promises.
