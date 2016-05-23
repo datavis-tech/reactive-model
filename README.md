@@ -89,7 +89,7 @@ var my = ReactiveModel()
   When a changes, b gets updated.
 </p>
 
-The naming convention of `my` pays homage to [Towards Reusable Charts](https://bost.ocks.org/mike/chart/).
+The naming convention of `my` pays homage to [Towards Reusable Charts](https://bost.ocks.org/mike/chart/#reconfiguration).
 
 ### ABC
 
@@ -110,11 +110,11 @@ var my = ReactiveModel()
   Here, b is both an output and an input.
 </p>
 
-In this example, if `a` is assigned to the value 1 and a [digest](#digest) occurs, the value of `c` will be 3.
+See also [ABC in reactive-function](https://github.com/datavis-tech/reactive-function#abc).
 
 ### CDE
 
-Here's an example that shows a reactive function with two inputs, where `e` gets set to `c + d`.
+Here's an example that shows a reactive function with two inputs, where `e = c + d`.
 
 ```javascript
 function add(x, y){ return x + y; }
@@ -171,6 +171,12 @@ my("greeting", function (fullName){
 }, "fullName");
 ```
 
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15454247/a0fb4c1e-2050-11e6-8c76-111b9defa0ff.png">
+  <br>
+  The updated data flow graph including `greeting`.
+</p>
+
 When input properties are defined, the changes will automatically propagate on the next animation frame. However, to force synchronous propagation of changes, we can call [digest](#digest).
 
 ```javascript
@@ -191,6 +197,12 @@ my(function (greeting){
   d3.select("#greeting").text(greeting);
 }, "greeting");
 ```
+
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/68416/15454260/1f12dba8-2051-11e6-9fcf-4fa31e6ba365.png">
+  <br>
+  Reactive functions with no output property add unnamed nodes to the data flow graph.
+</p>
 
 Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) that extends the above example code to interact with DOM elements and display a greeting.
 
@@ -235,42 +247,11 @@ var ReactiveModel = require("reactive-model");
  * [Data Flow](#data-flow)
  * [Configuration](#configuration)
 
-var my = ReactiveModel();
-
-```javascript
-my
-  .x(10)
-  .y(20);
-
-("x", 5).expose()
-
-var configuration = my();
-my({
-  x: 20,
-  y: 50
-});
-my.on(function (newState){
-my.off
-("fullName", function (firstName, lastName){
-  return firstName + " " + lastName;
-}, ["firstName", "lastName"]);
-ReactiveModel.digest();
-  my.a(null);
-  
-("b", function (a, done){
-  setTimeout(function (){
-    done(a + 1);
-  }, 20);
-}, "a")
-
- my.destroy();
- .call(mixin);
-  .call(mixin, 2);
 ```
-
-
-
-
+my.a(null);
+.call(mixin);
+.call(mixin, 2);
+```
 
 ### Creating Reactive Models
 
@@ -335,7 +316,7 @@ Arguments:
 
 Whenever any public property used as an input to a reactive function is set, the [`digest()`](#digest) function is automatically scheduled to be invoked on the next animation frame.
 
-Asynchronous reactive functions are supported using an additional argument, the `done` callback, which should be called asynchronously with the new value for the output property. This is inspired by the [asynchronous tests in Mocha](https://mochajs.org/#asynchronous-code). Here's an asynchronous example:
+Asynchronous reactive functions are supported using an additional argument, the `done` callback, which should be called asynchronously with the new value for the output property.
 
 ```javascript
 reactiveModel("b", function (a, done){
@@ -351,11 +332,11 @@ Synchronously evaluates the data flow graph. This is the same function as [React
 
 ### Configuration
 
-<a name="add-public-property" href="#add-public-property">#</a> <i>property</i>.<b>expose</b>()
+<a name="expose" href="#expose">#</a> <i>property</i>.<b>expose</b>()
 
 Exposes the previously added property to the configuration. Returns the model to support chaining.
 
-The previously added property *must* have a default value defined.
+The property to expose *must* have a default value defined.
 
 Here's an example where two properties `x` and `y` are defined with default values and exposed to the configuration.
 
@@ -365,19 +346,53 @@ var model = new ReactiveModel()
   ("y", 6).expose();
 ```
 
-<a name="get-configuration" href="#get-configuration">#</a> <i>model</i>.<b>configuration</b>()
+<a name="get-configuration" href="#get-configuration">#</a> <b><i>model</i></b>()
 
-Returns a serialized form of the model that can later be passed as `newState` into `configuration(newState)`. This is an object that only contains public properties that have values other than their defaults.
+Returns the model configuration. Only contains [exposed](#expose) properties that have values other than their defaults.
 
-<a name="set-configuration" href="#set-configuration">#</a> <i>model</i>.<b>configuration</b>(<i>newState</i>)
+```javascript
+var model = new ReactiveModel()
+  ("x", 5).expose()
+  ("y", 6).expose();
+  
+model.x(50);
 
-Sets the configuration of the model from its serialized form. The `newState` argument object is expected to contain values for public properties that have values other than their defaults. Public properties not included in `newState` will be set to their default values. Properties not previously added as public properties may not be included in the `newState` object.
+var configuration = model();
+```
+The value of `configuration` here will be
 
-Internally, `configuration(newState)` sets public properties to the specified values via their reactive-properties, causing the changes to be propagated through all reactive functions that depend on them.
+```json
+{ "x": 50 }
+```
 
-<a name="on-configuration" href="#on-configuration">#</a> <i>model.configuration</i>.<b>on</b>(<i>function(newState){ ... }</i>)
+Note that `y` is omitted, because it has its default value.
 
-This method can be used to listen for changes in configuration.
+<a name="set-configuration" href="#set-configuration">#</a> <b><i>model</i></b>(<i>configuration</i>)
+
+Sets the model configuration. [Exposed](#expose) properties whose values are not included in *configuration* will be set to their default values.
+
+```javascript
+var model = new ReactiveModel()
+  ("x", 5).expose()
+  ("y", 6).expose();
+  
+model.x(50);
+
+// Set the configuration.
+model({ y: 60 });
+
+console.log(model.x()); // Prints 5 (x was set back to its default value).
+console.log(model.y()); // Prints 60.
+
+```
+
+<a name="on" href="#on">#</a> <i>model</i>.<b>on</b>(<i>listener</i>)
+
+This method can be used to listen for changes in configuration. Returns the listener function that can be used to stop listening for changes.
+
+<a name="off" href="#on">#</a> <i>model</i>.<b>off</b>(<i>listener</i>)
+
+Stop listening for changes in configuration.
 
 ## Glossary
 
@@ -389,7 +404,7 @@ This method can be used to listen for changes in configuration.
  * "digest" An execution of the algorithm that evaluates the data dependency graph. This includes topological sort.
  * "evaluate" A term to denote complete resolution of the data dependency graph. After the complete data dependency graph has been **evaluated** by a digest, the state of the model is consistent with regard to its reactive functions, and all reactive functions that are transitively dependent on any changed property have been executed in the proper order, with their output values assigned to model properties.
 
-## How it Works
+## Fluff
 
 This library maintains an singleton instance of [graph-data-structure](https://github.com/datavis-tech/graph-data-structure) internally, called the "data dependency graph", in which
 
@@ -400,7 +415,7 @@ Whenever reactive functions are added to the model, nodes and edges are added to
 
 The digest algorithm performs a topological sort using the changed property nodes as sources. The resulting list of nodes is in the sorted order in which the reactive functions must be executed. After computing this ordering, each reactive function is executed, and its output value is assigned to its output property. Before executing each reactive function, a check is performed that ensures all of its input properties are defined.
 
-## Background
+The `done` callback for asynchronous reactive functions is inspired by the [asynchronous tests in Mocha](https://mochajs.org/#asynchronous-code).
 
 This is a re-design of [model.js](https://github.com/curran/model) that addresses the following issues:
 
