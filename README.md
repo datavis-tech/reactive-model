@@ -283,12 +283,6 @@ var ReactiveModel = require("reactive-model");
  * [Data Flow](#data-flow)
  * [Configuration](#configuration)
 
-```
-my.a(null);
-.call(mixin);
-.call(mixin, 2);
-```
-
 ### Creating Reactive Models
 
 <a name="constructor" href="#constructor">#</a> <b>ReactiveModel</b>()
@@ -365,6 +359,37 @@ reactiveModel("b", function (a, done){
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
 Synchronously evaluates the data flow graph. This is the same function as [ReactiveFunction.digest()](https://github.com/datavis-tech/reactive-function#digest).
+
+<a name="call" href="#call">#</a> <i>model</i>.<b>call</b>(<i>function</i>[, <i>arguments…</i>])
+
+Invokes the *function*, passing in this model along with any optional *arguments*. Returns the model to support chaining.
+
+For example, here's a function that adds two properties and a reactive function to a given model.
+
+```javascript
+function fullName(my, first, last) {
+  my
+    ("firstName", first)
+    ("lastName", last)
+    ("fullName", function (firstName, lastName){
+      return firstName + " " + lastName;
+    }, "firstName, lastName");
+}
+```
+
+The above function can be invoked like this:
+
+```javascript
+var model = ReactiveModel()
+  .call(fullName, "Jane", "Smith");
+```
+
+This is equivalent to:
+
+```javascript
+var model = ReactiveModel();
+fullName(model, "Jane", "Smith");
+```
 
 ### Configuration
 
