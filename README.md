@@ -281,16 +281,18 @@ var ReactiveModel = require("reactive-model");
 
 ## API Reference
 
- * [Creating Reactive Models](#creating-reactive-models)
+ * [Models](#models)
  * [Properties](#properties)
  * [Data Flow](#data-flow)
  * [Configuration](#configuration)
 
-### Creating Reactive Models
+### Models
 
 <a name="constructor" href="#constructor">#</a> <b>ReactiveModel</b>()
 
 Constructs a new reactive model instance.
+
+Example:
 
 ```javascript
 var model = ReactiveModel();
@@ -298,7 +300,7 @@ var model = ReactiveModel();
 
 <a name="destroy" href="#destroy">#</a> <i>model</i>.<b>destroy</b>()
 
-Cleans up resources allocated to this model. Invokes 
+Cleans up resources allocated to this *model*. Invokes 
 
  * [reactiveFunction.destroy()](https://github.com/datavis-tech/reactive-function/blob/master/README.md#destroy) on all reactive functions created on this model, and 
  * [reactiveProperty.destroy()](https://github.com/datavis-tech/reactive-property#destroy) on all properties created on this model.
@@ -318,7 +320,7 @@ Arguments:
 
 After a property is added, it is exposed as an instance of [reactive-property](https://github.com/datavis-tech/reactive-property) on the model object at `model[propertyName]`.
 
-Here's example code that shows how to add a property `a` and access it.
+Example:
 
 ```javascript
 var model = ReactiveModel();
@@ -335,56 +337,58 @@ model.a(10);
 
 ### Data Flow
 
-<a name="reactive-function" href="#reactive-function">#</a> <b><i>model</i></b>([<i>output</i>, ]<i>callback</i>, <i>inputs</i>)
+<a name="reactive-function" href="#reactive-function">#</a> <b><i>model</i></b>([<i>output</i>,] <i>callback</i>, <i>inputs</i>)
 
 Adds a reactive function to this model.
 
-Arguments
+Arguments:
 
- * *output* (optional) - The output property name (a string).
- * *callback* - The reactive function callback. Arguments are values corresponding to *inputs*. May be:
+ * *output* (optional) - The output property name.
+ * *callback* - The reactive function callback. Arguments are values corresponding to *inputs*. May be of two forms:
    * <b>callback</b>(<i>arguments…</i>) For synchronous reactive functions. The returned value will be assigned to *output*. 
-   * <b>callback</b>(<i>arguments…</i>, <i>done</i>) For asynchronous reactive functions. The function *done* should be invoked with the value to assign to *output*. The returned value is ignored.
- * *inputs* - The input property names. May be:
-   * a comma-delimited list of input property names (e.g. "a, b"), or
-   * an array of property name strings (e.g. ["a", "b"]).
+   * <b>callback</b>(<i>arguments…</i>, <i>done</i>) For asynchronous reactive functions. The function *done* should be invoked asynchronously with the value to assign to *output*. The returned value is ignored.
+ * *inputs* - The input property names. May be either
+   * a comma-delimited list of input property names (e.g. `"a, b"`), or
+   * an array of property name strings (e.g. `["a", "b"]`).
 
-The function *callback* will be invoked:
+The *callback* will be invoked:
 
  * when all input properties are defined,
  * after any input properties change,
  * during a **[digest](#digest)**.
 
-An input property is considered "defined" if it has any value other than `undefined`. The special value `null` is considered to be defined.
+An input property is considered "defined" if it has any value other than `undefined` (`null` is considered defined).
 
 An input property is considered "changed" when
 
  * the reactive function is initially set up, and
  * whenever its value is set.
 
-Any input property for one reactive function may also be an output of another.
+Any input property for one reactive function may also be the output of another.
 
-Here's an example of an asynchronous reactive function, using the `done` callback:
+Here's an example of an asynchronous reactive function.
 
 ```javascript
-reactiveModel("b", function (a, done){
-  setTimeout(function (){
-    done(a + 1);
-  }, 500);
-}, "a");
+var model = ReactiveModel()
+  ("a", 50)
+  ("b", function (a, done){
+    setTimeout(function (){
+      done(a + 1);
+    }, 500);
+  }, "a");
 ```
 
 See also **[ReactiveFunction](https://github.com/datavis-tech/reactive-function/#constructor)**.
 
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
-Synchronously evaluates the data flow graph. This is the same function as [ReactiveFunction.digest()](https://github.com/datavis-tech/reactive-function#digest).
+Synchronously evaluates the data flow graph. This is the same function as **[ReactiveFunction.digest()](https://github.com/datavis-tech/reactive-function#digest)**.
 
 <a name="call" href="#call">#</a> <i>model</i>.<b>call</b>(<i>function</i>[, <i>arguments…</i>])
 
-Invokes the *function*, passing in this model along with any optional *arguments*. Returns the model to support chaining.
+Invokes the *function*, passing in *model* along with any optional *arguments*. Returns the model to support chaining.
 
-For example, here's a function that adds two properties and a reactive function to a given model.
+Example:
 
 ```javascript
 function fullName(my, first, last) {
@@ -429,7 +433,12 @@ var model = new ReactiveModel()
 
 <a name="get-configuration" href="#get-configuration">#</a> <b><i>model</i></b>()
 
-Returns the model configuration. Only contains [exposed](#expose) properties that have values other than their defaults.
+Returns the configuration, an Object where
+
+ * keys are property names, and
+ * values are current property values.
+
+The configuration only contains [exposed](#expose) properties that have values other than their defaults.
 
 Example:
 
@@ -442,7 +451,7 @@ model.x(50);
 
 var configuration = model();
 ```
-The value of `configuration` here will be
+The value of `configuration` will be:
 
 ```json
 { "x": 50 }
@@ -452,7 +461,16 @@ Note that `y` is omitted, because it has its default value.
 
 <a name="set-configuration" href="#set-configuration">#</a> <b><i>model</i></b>(<i>configuration</i>)
 
-Sets the model configuration. [Exposed](#expose) properties whose values are not included in *configuration* will be set to their default values.
+Sets the configuration.
+
+The argument *configuration* is an Object where
+
+ * keys are property names, and
+ * values are property values to be set.
+
+Only [exposed](#expose) properties may be set via the configuration. Exposed properties whose values are not included in *configuration* will be set to their default values.
+
+Example:
 
 ```javascript
 var model = new ReactiveModel()
@@ -470,11 +488,13 @@ console.log(model.y()); // Prints 60.
 
 <a name="on" href="#on">#</a> <i>model</i>.<b>on</b>(<i>listener</i>)
 
-This method can be used to listen for changes in configuration. Returns the listener function that can be used to stop listening for changes.
+Listen for changes in configuration. Returns the listener function that can be used to stop listening for changes.
+
+The argument *listener* is a function of the form <b>listener</b>(<i>configuration</i>), where *configuration* is the same object returned from [model()](#get-configuration). This function is invoked after [exposed](#expose) properties are changed.
 
 <a name="off" href="#on">#</a> <i>model</i>.<b>off</b>(<i>listener</i>)
 
-Stop listening for changes in configuration.
+Stop listening for changes in configuration. The argument *listener* must be the value returned from **[on](#on)** (not the function passed into **[on](#on)**).
 
 ## Fluff
 
