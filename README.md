@@ -152,8 +152,7 @@ var my = ReactiveModel()
 After properties are added, they are exposed as [chainable getter-setters](https://github.com/datavis-tech/reactive-property#accessing-properties) on `my`. Here's how you can set their values.
 
 ```javascript
-my
-  .firstName("Jane")
+my.firstName("Jane")
   .lastName("Smith");
 ```
 
@@ -182,10 +181,10 @@ my("greeting", function (fullName){
 <p align="center">
   <img src="https://cloud.githubusercontent.com/assets/68416/15454247/a0fb4c1e-2050-11e6-8c76-111b9defa0ff.png">
   <br>
-  The updated data flow graph including `greeting`.
+  The updated data flow graph including the greeting.
 </p>
 
-When input properties are defined, the changes will automatically propagate on the next animation frame. However, to force synchronous propagation of changes, we can call [digest](#digest).
+When input properties are defined, the changes will automatically propagate on the next animation frame. If you don't want to wait until the next animation frame for changes to propagate, you can force synchronous propagation by invoking **[digest](#digest)**.
 
 ```javascript
 ReactiveModel.digest();
@@ -212,11 +211,13 @@ my(function (greeting){
   Reactive functions with no output property add unnamed nodes to the data flow graph.
 </p>
 
-Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) that extends the above example code to interact with DOM elements and display a greeting.
+Here's a [complete working example](http://bl.ocks.org/curran/b45cf8933cc018cf5bfd4296af97b25f) that extends the above example code to interact with DOM elements.
 
 ### Tricky Cases
 
-Reactive functions can be combined to create arbitrarily complex data flow graphs. Here's an example that demonstrates why [topological sorting](https://en.wikipedia.org/wiki/Topological_sorting) is the best algorithm for computing the order in which to execute data flow graphs. In this graph, propagation using breadth-first search (which is what [Model.js](https://github.com/curran/model) uses) would cause `e` to be set twice, and the first time it would be set with an *inconsistent state*. Using topological sorting for change propagation guarantees that `e` will only be set once, and there will never be inconsistent states.
+#### Tricky Case I
+
+Reactive functions can be combined to create arbitrarily complex data flow graphs. Here's an example that demonstrates why [topological sorting](https://en.wikipedia.org/wiki/Topological_sorting) is the correct algorithm for computing the order in which to execute reactive functions. In this graph, propagation using [breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search) (which is what [Model.js](https://github.com/curran/model) and some other libraries use) would cause `e` to be set twice, and the first time it would be set with an *inconsistent state*. Using topological sorting for change propagation guarantees that `e` will only be set once, and there will never be inconsistent states.
 
 <p align="center">
   <img src="https://cloud.githubusercontent.com/assets/68416/15400254/7f779c9a-1e08-11e6-8992-9d2362bfba63.png">
@@ -237,6 +238,8 @@ var my = ReactiveModel()
 ```
 
 See also [Tricky Case in reactive-function](https://github.com/datavis-tech/reactive-function/blob/master/README.md#tricky-case).
+
+#### Tricky Case II
 
 Here's a similar case that reactive-model handles correctly. If breadth-first search were used in this case, then `h` would get set 3 times, the first two times with an inconsistent state.
 
@@ -264,7 +267,7 @@ var my = ReactiveModel()
 For more detailed example code, have a look at the [tests](https://github.com/datavis-tech/reactive-model/blob/master/test.js).
 
 ## Installing
-You can include the library in your HTML like this:
+You can include reactive-model in your HTML like this (will introduce a global variable `ReactiveModel`):
 
 ```html
 <script src="//datavis-tech.github.io/reactive-model/reactive-model-v0.8.0.min.js"></script>
@@ -410,7 +413,7 @@ fullName(model, "Jane", "Smith");
 
 ### Configuration
 
-<a name="expose" href="#expose">#</a> <b><i>model</i></b>.<b>expose</b>()
+<a name="expose" href="#expose">#</a> <i>model</i>.<b>expose</b>()
 
 Exposes the previously added property to the configuration. Returns the model to support chaining.
 
