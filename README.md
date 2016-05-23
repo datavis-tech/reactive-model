@@ -334,19 +334,34 @@ model.a(10);
 
 <a name="reactive-function" href="#reactive-function">#</a> <b><i>model</i></b>([<i>output</i>, ]<i>callback</i>, <i>inputs</i>)
 
-Adds the given reactive function to this model and the singleton data flow graph.
+Adds a reactive function to this model.
 
-Arguments:
+Arguments
 
  * *output* (optional) - The output property name (a string).
- * *callback* - The reactive function callback (a function).
- * *inputs* - The list of input property names. May be either
-   * a comma-delimited list of input property names (a string), or
-   * an array of property name strings.
+ * *callback* - The reactive function callback. Arguments are values corresponding to *inputs*. May be:
+   * <b>callback</b>(<i>arguments…</i>) For synchronous reactive functions. The returned value will be assigned to *output*. 
+   * <b>callback</b>(<i>arguments…</i>, <i>done</i>) For asynchronous reactive functions. The function *done* should be invoked with the value to assign to *output*. The returned value is ignored.
+ * *inputs* - The input property names. May be:
+   * a comma-delimited list of input property names (e.g. "a, b"), or
+   * an array of property name strings (e.g. ["a", "b"]).
 
-Whenever any public property used as an input to a reactive function is set, the [`digest()`](#digest) function is automatically scheduled to be invoked on the next animation frame.
+The function *callback* will be invoked:
 
-Asynchronous reactive functions are supported using an additional argument, the `done` callback, which should be called asynchronously with the new value for the output property.
+ * when all input properties are defined,
+ * after any input properties change,
+ * during a **[digest](#digest)**.
+
+An input property is considered "defined" if it has any value other than `undefined`. The special value `null` is considered to be defined.
+
+An input property is considered "changed" when
+
+ * the reactive function is initially set up, and
+ * whenever its value is set.
+
+Any input property for one reactive function may also be an output of another.
+
+Here's an example of an asynchronous reactive function, using the `done` callback:
 
 ```javascript
 reactiveModel("b", function (a, done){
@@ -355,6 +370,8 @@ reactiveModel("b", function (a, done){
   }, 500);
 }, "a");
 ```
+
+See also **[ReactiveFunction](https://github.com/datavis-tech/reactive-function/#constructor)**.
 
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
