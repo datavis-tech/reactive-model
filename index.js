@@ -14,29 +14,22 @@ function invoke(method){
 // This function is exported as the public API of this module.
 function ReactiveModel(){
 
-  // This object stores the default values for all public properties.
-  // Keys are public property names.
-  // Values are default values.
-  var publicPropertyDefaults = {};
-
-  // Returns an array of public property names.
-  var publicPropertyNames = function (){
-    return Object.keys(publicPropertyDefaults);
-  };
+  // An array of property names for exposed properties.
+  var exposedProperties;
 
   // This is a string, the name of the last property added.
   // This is used in `expose()`;
   var lastPropertyAdded;
 
   // The configuration of the model is represented as an object and stored
-  // in this reactive property. Note that only values for public properties
+  // in this reactive property. Note that only values for exposed properties
   // whose values differ from their defaults are included in the configuration object.
   // The purpose of the configuration accessor API is serialization and deserialization,
   // so default values are left out for a concise serialized form.
   var configurationProperty = ReactiveProperty();
 
   // This is a reactive function set up to listen for changes in all
-  // public properties and set the configurationProperty value.
+  // exposed properties and set the configurationProperty value.
   var configurationReactiveFunction;
 
   // An array of reactive functions that have been set up on this model.
@@ -139,7 +132,7 @@ function ReactiveModel(){
     return model[propertyName];
   }
 
-  // Adds a property to the model that is not public,
+  // Adds a property to the model that is not exposed,
   // meaning that it is not included in the configuration object.
   function addProperty(propertyName, defaultValue){
     model[propertyName] = ReactiveProperty(defaultValue);
@@ -155,8 +148,8 @@ function ReactiveModel(){
     // TODO test this
     // if(!isDefined(defaultValue)){
     //  throw new Error("model.addPublicProperty() is being " +
-    //    "invoked with an undefined default value. Default values for public properties " +
-    //    "must be defined, to guarantee predictable behavior. For public properties that " +
+    //    "invoked with an undefined default value. Default values for exposed properties " +
+    //    "must be defined, to guarantee predictable behavior. For exposed properties that " +
     //    "are optional and should have the semantics of an undefined value, " +
     //    "use null as the default value.");
     //}
@@ -168,19 +161,22 @@ function ReactiveModel(){
 
     var propertyName = lastPropertyAdded;
 
-    // Store the default value for later reference.
-    publicPropertyDefaults[propertyName] = getProperty(propertyName)();
+    if(!exposedProperties){
+      exposedProperties = [];
+    }
+    exposedProperties.push(propertyName);
 
     // Destroy the previous reactive function that was listening for changes
-    // in all public properties except the newly added one.
+    // in all exposed properties except the newly added one.
     // TODO think about how this might be done only once, at the same time isFinalized is set.
     if(configurationReactiveFunction){
       configurationReactiveFunction.destroy();
     }
 
     // Set up the new reactive function that will listen for changes
-    // in all public properties including the newly added one.
-    var inputPropertyNames = publicPropertyNames();
+    // in all exposed properties including the newly added one.
+    var inputPropertyNames = exposedProperties;
+
     //console.log(inputPropertyNames);
     configurationReactiveFunction = ReactiveFunction({
       inputs: inputPropertyNames.map(getProperty),
@@ -188,12 +184,11 @@ function ReactiveModel(){
       callback: function (){
         var configuration = {};
         inputPropertyNames.forEach(function (propertyName){
-          var value = model[propertyName]();
-          var defaultValue = publicPropertyDefaults[propertyName];
+          var property = getProperty(propertyName);
 
           // Omit default values from the returned configuration object.
-          if(value !== defaultValue){
-            configuration[propertyName] = value;
+          if(property() !== property.default()){
+            configuration[propertyName] = property();
           }
         });
         return configuration;
@@ -206,23 +201,15 @@ function ReactiveModel(){
 
   function setConfiguration(newConfiguration){
 
-    // TODO throw an error if some property in configuration
-    // is not in publicProperties
-    //Object.keys(configuration).forEach(function (property){
-    //  if(!property in publicPropertyDefaults){
-    //    throw new Error("Attempting to set a property that has not" +
-    //      " been added as a public property in model.configuration(newConfiguration)");
-    //  }
-    //});
-
-    publicPropertyNames().forEach(function (propertyName){
-      var oldValue = model[propertyName]();
-
+    exposedProperties.forEach(function (propertyName){
+      var property = getProperty(propertyName);
+      var oldValue = property();
       var newValue;
+
       if(propertyName in newConfiguration){
         newValue = newConfiguration[propertyName];
       } else {
-        newValue = publicPropertyDefaults[propertyName];
+        newValue = property.default();
       }
 
       if(oldValue !== newValue){
