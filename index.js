@@ -27,6 +27,7 @@ function ReactiveModel(){
   // The purpose of the configuration accessor API is serialization and deserialization,
   // so default values are left out for a concise serialized form.
   var configurationProperty = ReactiveProperty();
+  configurationProperty.propertyName = "configuration";
 
   // This is a reactive function set up to listen for changes in all
   // exposed properties and set the configurationProperty value.
@@ -84,6 +85,7 @@ function ReactiveModel(){
     // TODO throw an error if the output property is already defined on the model.
     if(outputPropertyName){
       var output = ReactiveProperty();
+      output.propertyName = outputPropertyName;
       model[outputPropertyName] = output;
     }
 
@@ -135,7 +137,9 @@ function ReactiveModel(){
   // Adds a property to the model that is not exposed,
   // meaning that it is not included in the configuration object.
   function addProperty(propertyName, defaultValue){
-    model[propertyName] = ReactiveProperty(defaultValue);
+    var property = ReactiveProperty(defaultValue);
+    property.propertyName = propertyName;
+    model[propertyName] = property;
     lastPropertyAdded = propertyName;
     return model;
 
@@ -222,8 +226,11 @@ function ReactiveModel(){
 
   // Destroys all reactive functions that have been added to the model.
   function destroy(){
-    
     reactiveFunctions.forEach(invoke("destroy"));
+
+    if(configurationReactiveFunction){
+      configurationReactiveFunction.destroy();
+    }
 
     // TODO destroy all properties on the model, remove their listeners and nodes in the graph.
 
@@ -257,6 +264,8 @@ function ReactiveModel(){
 }
 
 ReactiveModel.digest = ReactiveFunction.digest;
+ReactiveModel.serializeGraph = ReactiveFunction.serializeGraph;
+
 //ReactiveModel.nextFrame = ReactiveFunction.nextFrame;
 
 module.exports = ReactiveModel;

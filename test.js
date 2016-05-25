@@ -17,6 +17,7 @@ describe("ReactiveModel", function (){
       var my = ReactiveModel();
       my("x", 5);
       assert.equal(my.x(), 5);
+      my.destroy();
     });
 
     it("Should add a public property and set its value.", function (){
@@ -24,6 +25,7 @@ describe("ReactiveModel", function (){
       my("x", 5);
       my.x(10);
       assert.equal(my.x(), 10);
+      my.destroy();
     });
 
     it("Should support chaining when setting multiple properties.", function (){
@@ -35,11 +37,13 @@ describe("ReactiveModel", function (){
 
       assert.equal(my.x(), 10);
       assert.equal(my.y(), 20);
+      my.destroy();
     });
 
     it("Should chain addProperty.", function (){
       var my = ReactiveModel()("x", 5);
       assert.equal(my.x(), 5);
+      my.destroy();
     });
   });
 
@@ -49,6 +53,7 @@ describe("ReactiveModel", function (){
       var my = ReactiveModel();
       my("x", 5);
       assert.equal(my.x(), 5);
+      my.destroy();
     });
 
     it("Should add a property with no default and set its value.", function (){
@@ -56,6 +61,7 @@ describe("ReactiveModel", function (){
       my("x");
       my.x(10);
       assert.equal(my.x(), 10);
+      my.destroy();
     });
 
     it("Should support chaining when setting multiple properties.", function (){
@@ -69,6 +75,7 @@ describe("ReactiveModel", function (){
 
       assert.equal(my.x(), 10);
       assert.equal(my.y(), 20);
+      my.destroy();
     });
 
     it("Should chain addProperty.", function (){
@@ -77,6 +84,7 @@ describe("ReactiveModel", function (){
         ("y", 400);
       assert.equal(my.x(), 5);
       assert.equal(my.y(), 400);
+      my.destroy();
     });
 
   });
@@ -99,6 +107,7 @@ describe("ReactiveModel", function (){
       assert.equal(Object.keys(configuration).length, 2);
       assert.equal(configuration.x, 10);
       assert.equal(configuration.y, 20);
+      my.destroy();
     });
 
     it("Should get configuration and omit default values.", function (){
@@ -110,6 +119,7 @@ describe("ReactiveModel", function (){
 
       var configuration = my();
       assert.equal(Object.keys(configuration).length, 0);
+      my.destroy();
     });
 
     it("Should set configuration.", function (){
@@ -126,6 +136,7 @@ describe("ReactiveModel", function (){
       assert.equal(my.x(), 20);
       assert.equal(my.y(), 50);
 
+      my.destroy();
     });
 
     it("Should chain setState.", function (){
@@ -135,6 +146,7 @@ describe("ReactiveModel", function (){
         ({ x: 20, y: 50 });
       assert.equal(my.x(), 20);
       assert.equal(my.y(), 50);
+      my.destroy();
     });
 
     it("Should set configuration with default values for omitted properties.", function (){
@@ -151,6 +163,7 @@ describe("ReactiveModel", function (){
 
       assert.equal(my.x(), 5);
       assert.equal(my.y(), 10);
+      my.destroy();
     });
 
     it("Should set configuration with default values and new values.", function (){
@@ -167,6 +180,7 @@ describe("ReactiveModel", function (){
 
       assert.equal(my.x(), 30);
       assert.equal(my.y(), 10);
+      my.destroy();
     });
 
     it("Should listen for changes in configuration, getting default empty configuration.", function (done){
@@ -176,6 +190,7 @@ describe("ReactiveModel", function (){
 
       my.on(function (newState){
         assert.equal(Object.keys(newState).length, 0);
+        my.destroy();
         done();
       });
     });
@@ -189,6 +204,7 @@ describe("ReactiveModel", function (){
         assert.equal(Object.keys(newState).length, 1);
         assert.equal(newState.x, 15);
         done();
+        my.destroy();
       });
 
       my.x(15);
@@ -203,6 +219,7 @@ describe("ReactiveModel", function (){
         assert.equal(Object.keys(newState).length, 2);
         assert.equal(newState.x, 15);
         assert.equal(newState.y, 45);
+        my.destroy();
         done();
       });
 
@@ -222,6 +239,7 @@ describe("ReactiveModel", function (){
         } else {
           assert.equal(Object.keys(newState).length, 2);
           assert.equal(newState.z, 45);
+          my.destroy();
           done();
         }
       });
@@ -243,6 +261,7 @@ describe("ReactiveModel", function (){
 
           setTimeout(function (){
             assert.equal(numInvocations, 1);
+            my.destroy();
             done();
           }, 10);
         }
@@ -257,6 +276,7 @@ describe("ReactiveModel", function (){
       my("b", increment, "a");
       ReactiveModel.digest();
       assert.equal(my.b(), 6);
+      my.destroy();
     });
 
     it("Should chain react.", function (){
@@ -265,6 +285,7 @@ describe("ReactiveModel", function (){
         ("b", increment, "a");
       ReactiveModel.digest();
       assert.equal(my.b(), 6);
+      my.destroy();
     });
 
     it("Should react and use newly set value.", function (){
@@ -274,6 +295,7 @@ describe("ReactiveModel", function (){
       my.a(10);
       ReactiveModel.digest();
       assert.equal(my.b(), 11);
+      my.destroy();
     });
 
     it("Should react with two public input properties.", function (){
@@ -285,6 +307,7 @@ describe("ReactiveModel", function (){
         }, "firstName, lastName");
       ReactiveModel.digest();
       assert.equal(my.fullName(), "Jane Smith");
+      my.destroy();
     });
 
     it("Should react with input properties defined in an array.", function (){
@@ -296,6 +319,7 @@ describe("ReactiveModel", function (){
         }, ["firstName", "lastName"]);
       ReactiveModel.digest();
       assert.equal(my.fullName(), "Jane Smith");
+      my.destroy();
     });
 
     it("Should propagate two hops in a single digest.", function (){
@@ -311,6 +335,7 @@ describe("ReactiveModel", function (){
       assert.equal(my.a(), 1);
       assert.equal(my.b(), 2);
       assert.equal(my.c(), 3);
+      my.destroy();
     });
 
     it("Should evaluate not-too-tricky case.", function (){
@@ -333,6 +358,7 @@ describe("ReactiveModel", function (){
       ReactiveModel.digest();
 
       assert.equal(my.e(), (1 + 1) + (2 + 1));
+      my.destroy();
     });
 
     it("Should evaluate tricky case.", function (){
@@ -361,6 +387,7 @@ describe("ReactiveModel", function (){
           e = b + d;
 
       assert.equal(my.e(), e);
+      my.destroy();
     });
 
     it("Should evaluate trickier case.", function (){
@@ -402,6 +429,7 @@ describe("ReactiveModel", function (){
           h = d + f + g;
 
       assert.equal(my.h(), h);
+      my.destroy();
     });
 
     it("Should auto-digest.", function (done){
@@ -415,6 +443,7 @@ describe("ReactiveModel", function (){
         assert.equal(my.b(), 6);
         setTimeout(function(){
           assert.equal(my.b(), 11);
+          my.destroy();
           done();
         });
       });
@@ -435,6 +464,7 @@ describe("ReactiveModel", function (){
       my.a(true);
       ReactiveModel.digest();
       assert.equal(my.b(), false);
+      my.destroy();
     });
 
     it("Should work with null as assigned value.", function (){
@@ -449,6 +479,7 @@ describe("ReactiveModel", function (){
 
       ReactiveModel.digest();
       assert.equal(my.b(), true);
+      my.destroy();
     });
 
     it("Should work with null as default value.", function (){
@@ -463,6 +494,7 @@ describe("ReactiveModel", function (){
 
       ReactiveModel.digest();
       assert.equal(my.b(), true);
+      my.destroy();
     });
 
     it("Should work with asynchronous case.", function (testDone){
@@ -480,6 +512,7 @@ describe("ReactiveModel", function (){
         }, "a")
         ("c", function (b){
           assert.equal(b, 2);
+          my.destroy();
           testDone();
         }, "b");
 
@@ -501,6 +534,7 @@ describe("ReactiveModel", function (){
         }, "a")
         ("c", function (b){
           assert.equal(b, 2);
+          my.destroy();
           testDone();
         }, "b");
 
@@ -565,6 +599,7 @@ describe("ReactiveModel", function (){
       ReactiveModel.digest();
       assert.equal(sideEffect, 6);
       
+      my.destroy();
     });
 
     it("Should no return value and multiple inputs.", function(){
@@ -580,6 +615,7 @@ describe("ReactiveModel", function (){
 
       ReactiveModel.digest();
       assert.equal(sideEffect, 55);
+      my.destroy();
     });
 
     it("Should no return value and multiple inputs defined as array.", function(){
@@ -595,7 +631,35 @@ describe("ReactiveModel", function (){
 
       ReactiveModel.digest();
       assert.equal(sideEffect, 100);
+      my.destroy();
     });
+
+    it("Should serialize the data flow graph.", function (){
+      var my = ReactiveModel()
+        ("firstName", "Jane")
+        ("lastName", "Smith")
+        ("fullName", function (firstName, lastName){
+          return firstName + " " + lastName;
+        }, "firstName, lastName");
+
+      var serialized = ReactiveModel.serializeGraph();
+
+      //console.log(JSON.stringify(serialized, null, 2));
+
+      assert.equal(serialized.nodes.length, 3);
+      assert.equal(serialized.links.length, 2);
+
+      assert.equal(serialized.nodes[0].id, "fullName");
+      assert.equal(serialized.nodes[1].id, "firstName");
+      assert.equal(serialized.nodes[2].id, "lastName");
+
+      assert.equal(serialized.links[0].source, "firstName");
+      assert.equal(serialized.links[0].target, "fullName");
+      assert.equal(serialized.links[1].source, "lastName");
+      assert.equal(serialized.links[1].target, "fullName");
+      my.destroy();
+    });
+
   });
 
   describe("model.call()", function (){
