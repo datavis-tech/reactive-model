@@ -1,6 +1,18 @@
 var ReactiveModel = require("./index");
 var assert = require("assert");
 
+
+var outputGraph = require("graph-diagrams")({
+
+  // If true, writes graph files to ../graph-diagrams for visualization.
+  outputGraphs: false,
+  project: "reactive-model"
+});
+
+function output(name){
+  outputGraph(ReactiveModel.serializeGraph(), name);
+}
+
 function increment(x){
   return x + 1;
 }
@@ -276,6 +288,7 @@ describe("ReactiveModel", function (){
       my("b", increment, "a");
       ReactiveModel.digest();
       assert.equal(my.b(), 6);
+      output("ab");
       my.destroy();
     });
 
@@ -307,6 +320,7 @@ describe("ReactiveModel", function (){
         }, "firstName, lastName");
       ReactiveModel.digest();
       assert.equal(my.fullName(), "Jane Smith");
+      output("full-name");
       my.destroy();
     });
 
@@ -335,6 +349,9 @@ describe("ReactiveModel", function (){
       assert.equal(my.a(), 1);
       assert.equal(my.b(), 2);
       assert.equal(my.c(), 3);
+
+      output("abc");
+
       my.destroy();
     });
 
@@ -358,6 +375,9 @@ describe("ReactiveModel", function (){
       ReactiveModel.digest();
 
       assert.equal(my.e(), (1 + 1) + (2 + 1));
+
+      output("not-too-tricky");
+
       my.destroy();
     });
 
@@ -387,6 +407,9 @@ describe("ReactiveModel", function (){
           e = b + d;
 
       assert.equal(my.e(), e);
+
+      output("tricky-case");
+
       my.destroy();
     });
 
@@ -426,6 +449,9 @@ describe("ReactiveModel", function (){
           h = d + f + g;
 
       assert.equal(my.h(), h);
+
+      output("trickier-case");
+
       my.destroy();
     });
 
@@ -595,11 +621,13 @@ describe("ReactiveModel", function (){
 
       ReactiveModel.digest();
       assert.equal(sideEffect, 6);
+
+      output("side-effect");
       
       my.destroy();
     });
 
-    it("Should no return value and multiple inputs.", function(){
+    it("Should support no return value and multiple inputs.", function(){
       var my = ReactiveModel()
         ("a", 5)
         ("b", 50);
@@ -612,6 +640,9 @@ describe("ReactiveModel", function (){
 
       ReactiveModel.digest();
       assert.equal(sideEffect, 55);
+
+      output("side-effect-ab");
+      
       my.destroy();
     });
 
