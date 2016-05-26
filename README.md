@@ -31,6 +31,7 @@ This library provides an abstraction for **reactive data flows**. This means you
    * [Properties](#properties)
    * [Data Flow](#data-flow)
    * [Configuration](#configuration)
+   * [Serialization](#serialization)
 
 ## Examples
 
@@ -285,6 +286,7 @@ var ReactiveModel = require("reactive-model");
  * [Properties](#properties)
  * [Data Flow](#data-flow)
  * [Configuration](#configuration)
+ * [Serialization](#serialization)
 
 ### Models
 
@@ -495,6 +497,53 @@ The argument *listener* is a function of the form <b>listener</b>(<i>configurati
 <a name="off" href="#on">#</a> <i>model</i>.<b>off</b>(<i>listener</i>)
 
 Stop listening for changes in configuration. The argument *listener* must be the value returned from **[on](#on)** (not the function passed into **[on](#on)**).
+
+### Serialization
+
+<a name="serialize" href="#serialize">#</a> ReactiveModel.<b>serializeGraph</b>()
+
+Serializes the data flow graph. Returns an object with the following properties.
+
+ * `nodes` An array of objects, each with the following properties.
+   * `id` The node identifier string.
+   * `propertyName` The property name. This is the empty string for output nodes of reactive functions with no output property.
+ * `links` An array of objects representing edges, each with the following properties.
+   * `source` The node identifier string of the source node (**u**).
+   * `target` The node identifier string of the target node (**v**).
+
+Example:
+
+```javascript
+var my = ReactiveModel()
+  ("firstName", "Jane")
+  ("lastName", "Smith")
+  ("fullName", function (firstName, lastName){
+    return firstName + " " + lastName;
+  }, "firstName, lastName");
+
+var serialized = ReactiveModel.serializeGraph();
+```
+The value of `serialized` will be:
+
+```json
+{
+  "nodes": [
+    { "id": "95", "propertyName": "fullName" },
+    { "id": "96", "propertyName": "firstName" },
+    { "id": "97", "propertyName": "lastName" }
+  ],
+  "links": [
+    { "source": "96", "target": "95" },
+    { "source": "97", "target": "95" }
+  ]
+}
+```
+
+See also:
+
+ * <a href="https://github.com/datavis-tech/reactive-function#serialize">ReactiveFunction.<b>serializeGraph</b>()</a>
+ * <a href="https://github.com/datavis-tech/graph-data-structure#serialize"><i>graph</i>.<b>serialize</b>()</a>
+ * [graph-diagrams](https://github.com/datavis-tech/graph-diagrams/)
 
 ## Related Work
 
