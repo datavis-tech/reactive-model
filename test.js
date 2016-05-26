@@ -416,9 +416,6 @@ describe("ReactiveModel", function (){
 
       ReactiveModel.digest();
 
-      // TODO add capability to serialize graph
-      //console.log(ReactiveModel.graph.serialize());
-
       var a = my.a(),
           b = a + 1,
           c = b + 1,
@@ -649,14 +646,18 @@ describe("ReactiveModel", function (){
       assert.equal(serialized.nodes.length, 3);
       assert.equal(serialized.links.length, 2);
 
-      assert.equal(serialized.nodes[0].id, "fullName");
-      assert.equal(serialized.nodes[1].id, "firstName");
-      assert.equal(serialized.nodes[2].id, "lastName");
+      assert.equal(serialized.nodes[0].id, "95");
+      assert.equal(serialized.nodes[1].id, "96");
+      assert.equal(serialized.nodes[2].id, "97");
 
-      assert.equal(serialized.links[0].source, "firstName");
-      assert.equal(serialized.links[0].target, "fullName");
-      assert.equal(serialized.links[1].source, "lastName");
-      assert.equal(serialized.links[1].target, "fullName");
+      assert.equal(serialized.nodes[0].propertyName, "fullName");
+      assert.equal(serialized.nodes[1].propertyName, "firstName");
+      assert.equal(serialized.nodes[2].propertyName, "lastName");
+
+      assert.equal(serialized.links[0].source, "96");
+      assert.equal(serialized.links[0].target, "95");
+      assert.equal(serialized.links[1].source, "97");
+      assert.equal(serialized.links[1].target, "95");
       my.destroy();
     });
 
