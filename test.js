@@ -710,6 +710,19 @@ describe("ReactiveModel", function (){
       my.destroy();
     });
 
+    it("Should remove property listeners on destroy.", function (){
+      var my = ReactiveModel()("a", 50),
+          a = my.a,
+          numInvocations = 0;
+      a.on(function (){ numInvocations++; });
+      assert.equal(numInvocations, 1);
+
+      my.destroy();
+
+      a(5);
+      assert.equal(numInvocations, 1);
+    });
+
   });
 
   describe("model.call()", function (){

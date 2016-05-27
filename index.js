@@ -224,17 +224,26 @@ function ReactiveModel(){
     return model;
   }
 
-  // Destroys all reactive functions that have been added to the model.
+  // Destroys all reactive functions and properties that have been added to the model.
   function destroy(){
+    
+    // Destroy reactive functions.
     reactiveFunctions.forEach(invoke("destroy"));
-
     if(configurationReactiveFunction){
       configurationReactiveFunction.destroy();
     }
+    
+    // Destroy properties (removes listeners).
+    Object.keys(model).forEach(function (propertyName){
+      var property = model[propertyName];
+      if(property.destroy){
+        property.destroy();
+      }
+    });
 
-    // TODO destroy all properties on the model, remove their listeners and nodes in the graph.
-
-    // TODO test bind case
+    // Release references.
+    reactiveFunctions = undefined;
+    configurationReactiveFunction = undefined;
   }
 
   function call (fn){
