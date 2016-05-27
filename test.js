@@ -455,6 +455,21 @@ describe("ReactiveModel", function (){
       my.destroy();
     });
 
+    it("Should link between models", function (){
+      var a = ReactiveModel()("foo", 5);
+      var b = ReactiveModel()("bar", 10);
+      var link = ReactiveModel.link(a.foo, b.bar);
+
+      ReactiveModel.digest();
+      assert.equal(b.bar(), 5);
+
+      a.foo(500);
+      ReactiveModel.digest();
+      assert.equal(b.bar(), 500);
+
+      link.destroy();
+    });
+
     it("Should auto-digest.", function (done){
       var my = ReactiveModel()
         ("a", 5)
@@ -677,18 +692,21 @@ describe("ReactiveModel", function (){
       assert.equal(serialized.nodes.length, 3);
       assert.equal(serialized.links.length, 2);
 
-      assert.equal(serialized.nodes[0].id, "95");
-      assert.equal(serialized.nodes[1].id, "96");
-      assert.equal(serialized.nodes[2].id, "97");
+      var idStart = 97;
+
+      assert.equal(serialized.nodes[0].id, String(idStart));
+      assert.equal(serialized.nodes[1].id, String(idStart + 1));
+      assert.equal(serialized.nodes[2].id, String(idStart + 2));
 
       assert.equal(serialized.nodes[0].propertyName, "fullName");
       assert.equal(serialized.nodes[1].propertyName, "firstName");
       assert.equal(serialized.nodes[2].propertyName, "lastName");
 
-      assert.equal(serialized.links[0].source, "96");
-      assert.equal(serialized.links[0].target, "95");
-      assert.equal(serialized.links[1].source, "97");
-      assert.equal(serialized.links[1].target, "95");
+      assert.equal(serialized.links[0].source, String(idStart + 1));
+      assert.equal(serialized.links[0].target, String(idStart));
+      assert.equal(serialized.links[1].source, String(idStart + 2));
+      assert.equal(serialized.links[1].target, String(idStart));
+
       my.destroy();
     });
 
@@ -745,16 +763,4 @@ describe("ReactiveModel", function (){
       assert.equal(my.b(), 21);
     });
   });
-  //describe("link()", function (){
-  //  it("should link", function (){
-  //    var a = ReactiveModel()("x", 5);
-  //    var b = ReactiveModel()("x", 10);
-
-  //    ReactiveModel.link(a.x, b.x);
-
-  //    ReactiveModel.digest();
-  //    
-  //    assert.equal(b.x(), 5);
-  //  });
-  //});
 });

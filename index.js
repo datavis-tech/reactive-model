@@ -263,8 +263,10 @@ function ReactiveModel(){
   return model;
 }
 
-ReactiveModel.digest = ReactiveFunction.digest;
+// Expose static functions from ReactiveFunction.
+ReactiveModel.digest         = ReactiveFunction.digest;
 ReactiveModel.serializeGraph = ReactiveFunction.serializeGraph;
+ReactiveModel.link           = ReactiveFunction.link;
 
 //ReactiveModel.nextFrame = ReactiveFunction.nextFrame;
 
