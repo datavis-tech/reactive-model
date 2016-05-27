@@ -343,11 +343,16 @@ var model = ReactiveModel();
 model("a", 5);
 
 // Acces the value of "a".
-model.a(); // returns 5
+console.log(model.a()); // Prints 5.
 
 // Set the value of "a".
 model.a(10);
+
+// Acces the default value of "a".
+console.log(model.a.default()); // Prints 5.
 ```
+
+See also [reactive-property](https://github.com/datavis-tech/reactive-property).
 
 ### Data Flow
 
@@ -431,7 +436,9 @@ This is the same function as **[ReactiveFunction.link](https://github.com/datavi
 
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
-Synchronously evaluates the data flow graph. This is the same function as **[ReactiveFunction.digest()](https://github.com/datavis-tech/reactive-function#digest)**.
+Synchronously evaluates the data flow graph.
+
+This is the same function as **[ReactiveFunction.digest()](https://github.com/datavis-tech/reactive-function#digest)**.
 
 <a name="call" href="#call">#</a> <i>model</i>.<b>call</b>(<i>function</i>[, <i>arguments…</i>])
 
