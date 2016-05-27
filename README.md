@@ -21,17 +21,30 @@ This library provides an abstraction for **reactive data flows**. This means you
 
 **Table of Contents**
 
+ * [Installing](#installing)
  * [Examples](#examples)
    * [ABCs](#abcs)
    * [Full Name](#full-name)
    * [Tricky Cases](#tricky-cases)
- * [Installing](#installing)
  * [API Reference](#api-reference)
    * [Creating Reactive Models](#creating-reactive-models)
    * [Properties](#properties)
    * [Data Flow](#data-flow)
    * [Configuration](#configuration)
    * [Serialization](#serialization)
+
+## Installing
+You can include reactive-model in your HTML like this (will introduce a global variable `ReactiveModel`):
+
+```html
+<script src="//datavis-tech.github.io/reactive-model/reactive-model-v0.11.0.min.js"></script>
+```
+
+If you are using [NPM](https://www.npmjs.com/package/reactive-model), install with `npm install reactive-model`, then require the module in your code like this:
+
+```javascript
+var ReactiveModel = require("reactive-model");
+```
 
 ## Examples
 
@@ -266,19 +279,6 @@ var my = ReactiveModel()
 ```
 
 For more detailed example code, have a look at the [tests](https://github.com/datavis-tech/reactive-model/blob/master/test.js).
-
-## Installing
-You can include reactive-model in your HTML like this (will introduce a global variable `ReactiveModel`):
-
-```html
-<script src="//datavis-tech.github.io/reactive-model/reactive-model-v0.11.0.min.js"></script>
-```
-
-If you are using [NPM](https://www.npmjs.com/package/reactive-model), install with `npm install reactive-model`, then require the module in your code like this:
-
-```javascript
-var ReactiveModel = require("reactive-model");
-```
 
 ## API Reference
 
