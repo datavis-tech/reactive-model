@@ -382,6 +382,39 @@ var model = ReactiveModel()
 
 See also **[ReactiveFunction](https://github.com/datavis-tech/reactive-function/#constructor)**.
 
+<a name="link" href="#link">#</a> <i>ReactiveModel</i>.<b>link</b>(<i>propertyA</i>, <i>propertyB</i>)
+
+Sets up one-way data binding from *propertyA* to *propertyB*. Returns an instance of **[ReactiveFunction](#constructor)**.
+
+This can be used to set up data flow between two different models. For example, a computed property on one model can be linked to a configurable input property of another model. This function enables model instances to be treated as data flow components, and allows them to be assembled into user-defined data flow graphs.
+
+Arguments:
+
+ * *propertyA* - A [reactive-property](https://github.com/datavis-tech/reactive-property). 
+ * *propertyB* - A [reactive-property](https://github.com/datavis-tech/reactive-property) that will be set to the value of *propertyA* and updated whenever *propertyA* changes.
+
+Example:
+
+```javascript
+var model1 = ReactiveModel()
+  ("someOutput", 5);
+
+var model2 = ReactiveModel()
+  ("someInput", 10);
+
+var link = ReactiveModel.link(model1.someOutput, model2.someInput);
+
+ReactiveModel.digest();
+console.log(model2.someInput()); // Prints 5
+
+model1.someOutput(500);
+ReactiveModel.digest();
+console.log(model2.someInput()); // Prints 500
+
+// The link needs to be explicitly destroyed, independently from the models.
+link.destroy();
+```
+
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
 Synchronously evaluates the data flow graph. This is the same function as **[ReactiveFunction.digest()](https://github.com/datavis-tech/reactive-function#digest)**.

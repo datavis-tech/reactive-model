@@ -456,16 +456,16 @@ describe("ReactiveModel", function (){
     });
 
     it("Should link between models", function (){
-      var a = ReactiveModel()("foo", 5);
-      var b = ReactiveModel()("bar", 10);
-      var link = ReactiveModel.link(a.foo, b.bar);
+      var model1 = ReactiveModel()("someOutput", 5);
+      var model2 = ReactiveModel()("someInput", 10);
+      var link = ReactiveModel.link(model1.someOutput, model2.someInput);
 
       ReactiveModel.digest();
-      assert.equal(b.bar(), 5);
+      assert.equal(model2.someInput(), 5);
 
-      a.foo(500);
+      model1.someOutput(500);
       ReactiveModel.digest();
-      assert.equal(b.bar(), 500);
+      assert.equal(model2.someInput(), 500);
 
       link.destroy();
     });
