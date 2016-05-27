@@ -415,6 +415,8 @@ console.log(model2.someInput()); // Prints 500
 link.destroy();
 ```
 
+This is the same function as **[ReactiveFunction.link](https://github.com/datavis-tech/reactive-function#link)**.
+
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
 Synchronously evaluates the data flow graph. This is the same function as **[ReactiveFunction.digest()](https://github.com/datavis-tech/reactive-function#digest)**.
