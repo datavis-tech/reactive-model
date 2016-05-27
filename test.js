@@ -756,11 +756,5 @@ describe("ReactiveModel", function (){
   //    
   //    assert.equal(b.x(), 5);
   //  });
-
   //});
-    // TODO more aggressive destroy - remove properties from graph & remove their listeners
-    // TODO dependencies that are not defined as public properties or outputs.
-    // TODO bind
-    //
-    // TODO move TODOs to GitHub Issues
 });
