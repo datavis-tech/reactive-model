@@ -21,19 +21,44 @@ This library provides an abstraction for **reactive data flows**. This means you
 
 **Table of Contents**
 
+ * [Installing](#installing)
  * [Examples](#examples)
    * [ABCs](#abcs)
    * [Full Name](#full-name)
    * [Tricky Cases](#tricky-cases)
- * [Installing](#installing)
  * [API Reference](#api-reference)
-   * [Creating Reactive Models](#creating-reactive-models)
+   * [Models](#models)
    * [Properties](#properties)
    * [Data Flow](#data-flow)
    * [Configuration](#configuration)
    * [Serialization](#serialization)
 
+## Installing
+You can include reactive-model in your HTML like this (will introduce a global variable `ReactiveModel`):
+
+```html
+<script src="//datavis-tech.github.io/reactive-model/reactive-model-v0.11.0.min.js"></script>
+```
+
+If you are using [NPM](https://www.npmjs.com/package/reactive-model), install with `npm install reactive-model`, then require the module in your code like this:
+
+```javascript
+var ReactiveModel = require("reactive-model");
+```
+
 ## Examples
+
+ * [Bl.ocks](#bl.ocks)
+ * [ABCs](#abcs)
+   * [AB](#ab)
+   * [ABC](#abc)
+   * [CDE](#cde)
+ * [Full Name](#full-name)
+ * [Tricky Cases](#tricky-cases)
+   * [Tricky Case I](#tricky-case-i)
+   * [Tricky Case II](#tricky-case-ii)
+   
+### Bl.ocks
 
 <table>
   <tr>
@@ -267,19 +292,6 @@ var my = ReactiveModel()
 
 For more detailed example code, have a look at the [tests](https://github.com/datavis-tech/reactive-model/blob/master/test.js).
 
-## Installing
-You can include reactive-model in your HTML like this (will introduce a global variable `ReactiveModel`):
-
-```html
-<script src="//datavis-tech.github.io/reactive-model/reactive-model-v0.11.0.min.js"></script>
-```
-
-If you are using [NPM](https://www.npmjs.com/package/reactive-model), install with `npm install reactive-model`, then require the module in your code like this:
-
-```javascript
-var ReactiveModel = require("reactive-model");
-```
-
 ## API Reference
 
  * [Models](#models)
@@ -331,11 +343,16 @@ var model = ReactiveModel();
 model("a", 5);
 
 // Acces the value of "a".
-model.a(); // returns 5
+console.log(model.a()); // Prints 5.
 
 // Set the value of "a".
 model.a(10);
+
+// Acces the default value of "a".
+console.log(model.a.default()); // Prints 5.
 ```
+
+See also [reactive-property](https://github.com/datavis-tech/reactive-property).
 
 ### Data Flow
 
@@ -419,7 +436,9 @@ This is the same function as **[ReactiveFunction.link](https://github.com/datavi
 
 <a name="digest" href="#digest">#</a> <i>ReactiveModel</i>.<b>digest</b>()
 
-Synchronously evaluates the data flow graph. This is the same function as **[ReactiveFunction.digest()](https://github.com/datavis-tech/reactive-function#digest)**.
+Synchronously evaluates the data flow graph.
+
+This is the same function as **[ReactiveFunction.digest()](https://github.com/datavis-tech/reactive-function#digest)**.
 
 <a name="call" href="#call">#</a> <i>model</i>.<b>call</b>(<i>function</i>[, <i>arguments…</i>])
 
