@@ -48,6 +48,18 @@ var ReactiveModel = require("reactive-model");
 
 ## Examples
 
+ * [Bl.ocks](#bl.ocks)
+ * [ABCs](#abcs)
+   * [AB](#ab)
+   * [ABC](#abc)
+   * [CDE](#cde)
+ * [Full Name](#full-name)
+ * [Tricky Cases](#tricky-cases)
+   * [Tricky Case I](#tricky-case-i)
+   * [Tricky Case II](#tricky-case-ii)
+   
+### Bl.ocks
+
 <table>
   <tr>
     <td>
