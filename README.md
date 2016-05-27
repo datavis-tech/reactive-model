@@ -27,7 +27,7 @@ This library provides an abstraction for **reactive data flows**. This means you
    * [Full Name](#full-name)
    * [Tricky Cases](#tricky-cases)
  * [API Reference](#api-reference)
-   * [Creating Reactive Models](#creating-reactive-models)
+   * [Models](#models)
    * [Properties](#properties)
    * [Data Flow](#data-flow)
    * [Configuration](#configuration)
