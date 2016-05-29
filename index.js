@@ -1,6 +1,10 @@
-// By Curran Kelleher April 2016
+// By Curran Kelleher
+// Last updated May 2016
 
+// See https://github.com/datavis-tech/reactive-function
 var ReactiveFunction = require("reactive-function");
+
+// See https://github.com/datavis-tech/reactive-property
 var ReactiveProperty = require("reactive-property");
 
 // Functional utility for invoking methods on collections.
