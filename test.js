@@ -1,7 +1,6 @@
 var ReactiveModel = require("./index");
 var assert = require("assert");
 
-
 var outputGraph = require("graph-diagrams")({
 
   // If true, writes graph files to ../graph-diagrams for visualization.
@@ -9,6 +8,7 @@ var outputGraph = require("graph-diagrams")({
   project: "reactive-model"
 });
 
+// Convenience function to output graphs for visualization.
 function output(name){
   outputGraph(ReactiveModel.serializeGraph(), name);
 }
@@ -102,9 +102,6 @@ describe("ReactiveModel", function (){
   });
 
   describe("Accessing configuration", function (){
-
-    // TODO add tests that check that properties added with
-    // addProperty are not included in the configuration.
 
     it("Should get configuration.", function (){
       var my = ReactiveModel()
