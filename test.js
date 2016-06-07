@@ -720,6 +720,23 @@ describe("ReactiveModel", function (){
       assert.equal(numInvocations, 1);
     });
 
+    it("Should support nested digest.", function (){
+      var my = ReactiveModel()
+        ("a", 5)
+        ("b")
+        ("c", function (b){
+          return b / 2;
+        }, "b")
+        (function (a){
+          for(var i = 0; i < a; i++){
+            my.b(i);
+            ReactiveModel.digest();
+            assert.equal(my.c(), i / 2);
+          }
+        }, "a");
+      ReactiveModel.digest();
+    });
+
   });
 
   describe("model.call()", function (){
