@@ -452,21 +452,6 @@ describe("ReactiveModel", function (){
       my.destroy();
     });
 
-    it("Should link between models", function (){
-      var model1 = ReactiveModel()("someOutput", 5);
-      var model2 = ReactiveModel()("someInput", 10);
-      var link = ReactiveModel.link(model1.someOutput, model2.someInput);
-
-      ReactiveModel.digest();
-      assert.equal(model2.someInput(), 5);
-
-      model1.someOutput(500);
-      ReactiveModel.digest();
-      assert.equal(model2.someInput(), 500);
-
-      link.destroy();
-    });
-
     it("Should auto-digest.", function (done){
       var my = ReactiveModel()
         ("a", 5)
@@ -577,49 +562,6 @@ describe("ReactiveModel", function (){
     });
     // TODO should throw an error if done() is called more than once.
 
-    it("Should remove synchronous reactive function on destroy.", function (){
-      var my = ReactiveModel()
-        ("a", 5)
-        ("b", increment, "a");
-
-      my.a(10);
-      ReactiveModel.digest();
-      assert.equal(my.b(), 11);
-
-      my.destroy();
-      my.a(20);
-      ReactiveModel.digest();
-      assert.equal(my.b(), 11);
-
-    });
-
-    it("Should remove asynchronous reactive function on destroy.", function (done){
-      var my = ReactiveModel()
-        ("a", 5);
-
-      my("b", function (a, done){
-        setTimeout(function(){
-          done(a + 1);
-        }, 5);
-      }, "a");
-
-      my.a(10);
-      ReactiveModel.digest();
-      setTimeout(function(){
-        assert.equal(my.b(), 11);
-        my.destroy();
-        my.a(20);
-
-        setTimeout(function(){
-          assert.equal(my.b(), 11);
-          done();
-        }, 10);
-
-        assert.equal(my.b(), 11);
-      }, 10);
-
-
-    });
 
     it("Should support reactive functions with no return value.", function(){
       var my = ReactiveModel()
@@ -689,7 +631,7 @@ describe("ReactiveModel", function (){
       assert.equal(serialized.nodes.length, 3);
       assert.equal(serialized.links.length, 2);
 
-      var idStart = 97;
+      var idStart = 91;
 
       assert.equal(serialized.nodes[0].id, String(idStart));
       assert.equal(serialized.nodes[1].id, String(idStart + 1));
@@ -705,19 +647,6 @@ describe("ReactiveModel", function (){
       assert.equal(serialized.links[1].target, String(idStart));
 
       my.destroy();
-    });
-
-    it("Should remove property listeners on destroy.", function (){
-      var my = ReactiveModel()("a", 50),
-          a = my.a,
-          numInvocations = 0;
-      a.on(function (){ numInvocations++; });
-      assert.equal(numInvocations, 1);
-
-      my.destroy();
-
-      a(5);
-      assert.equal(numInvocations, 1);
     });
 
     it("Should support nested digest.", function (){
@@ -737,6 +666,80 @@ describe("ReactiveModel", function (){
       ReactiveModel.digest();
     });
 
+  });
+
+  describe("Cleanup", function (){
+
+    it("Should remove synchronous reactive function on destroy.", function (){
+      var my = ReactiveModel()
+        ("a", 5)
+        ("b", increment, "a");
+
+      my.a(10);
+      ReactiveModel.digest();
+      assert.equal(my.b(), 11);
+
+      my.destroy();
+      my.a(20);
+      ReactiveModel.digest();
+      assert.equal(my.b(), 11);
+    });
+
+    it("Should remove asynchronous reactive function on destroy.", function (done){
+      var my = ReactiveModel()
+        ("a", 5);
+
+      my("b", function (a, done){
+        setTimeout(function(){
+          done(a + 1);
+        }, 5);
+      }, "a");
+
+      my.a(10);
+      ReactiveModel.digest();
+      setTimeout(function(){
+        assert.equal(my.b(), 11);
+        my.destroy();
+        my.a(20);
+
+        setTimeout(function(){
+          assert.equal(my.b(), 11);
+          done();
+        }, 10);
+
+        assert.equal(my.b(), 11);
+      }, 10);
+    });
+
+    it("Should remove property listeners on destroy.", function (){
+      var my = ReactiveModel()("a", 50),
+          a = my.a,
+          numInvocations = 0;
+      a.on(function (){ numInvocations++; });
+      assert.equal(numInvocations, 1);
+
+      my.destroy();
+
+      a(5);
+      assert.equal(numInvocations, 1);
+    });
+  });
+
+  describe("model.link()", function (){
+    it("Should link between models.", function (){
+      var model1 = ReactiveModel()("someOutput", 5);
+      var model2 = ReactiveModel()("someInput", 10);
+      var link = ReactiveModel.link(model1.someOutput, model2.someInput);
+
+      ReactiveModel.digest();
+      assert.equal(model2.someInput(), 5);
+
+      model1.someOutput(500);
+      ReactiveModel.digest();
+      assert.equal(model2.someInput(), 500);
+
+      link.destroy();
+    });
   });
 
   describe("model.call()", function (){
