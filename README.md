@@ -37,7 +37,7 @@ This library provides an abstraction for **reactive data flows**. This means you
 You can include reactive-model in your HTML like this (will introduce a global variable `ReactiveModel`):
 
 ```html
-<script src="//datavis-tech.github.io/reactive-model/reactive-model-v0.11.0.min.js"></script>
+<script src="//datavis-tech.github.io/reactive-model/reactive-model-v0.12.0.min.js"></script>
 ```
 
 If you are using [NPM](https://www.npmjs.com/package/reactive-model), install with `npm install reactive-model`, then require the module in your code like this:
