@@ -440,6 +440,30 @@ Synchronously evaluates the data flow graph.
 
 This is the same function as **[ReactiveFunction.digest()](https://github.com/datavis-tech/reactive-function#digest)**.
 
+Example:
+
+```js
+my
+  .width(100)
+  .height(200);
+ReactiveModel.digest();
+```
+
+<a name="digest" href="#digest">#</a> <i>model</i>.<b>digest</b>()
+
+Synchronously evaluates the data flow graph. Returns the model to support chaining.
+
+This is the same function as **[ReactiveFunction.digest()](https://github.com/datavis-tech/reactive-function#digest)**.
+
+Example:
+
+```js
+my
+  .width(100)
+  .height(200)
+  .digest();
+```
+
 <a name="call" href="#call">#</a> <i>model</i>.<b>call</b>(<i>function</i>[, <i>arguments…</i>])
 
 Invokes the *function*, passing in *model* along with any optional *arguments*. Returns the model to support chaining.
