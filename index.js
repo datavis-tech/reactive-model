@@ -273,6 +273,12 @@ function ReactiveModel(){
 
   model.off = configurationProperty.off;
 
+  // Expose digest on instances for convenience.
+  model.digest = function (){
+    ReactiveModel.digest();
+    return model;
+  };
+
   return model;
 }
 

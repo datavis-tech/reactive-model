@@ -298,6 +298,15 @@ describe("ReactiveModel", function (){
       my.destroy();
     });
 
+    it("Should expose chainable digest() on instances.", function (){
+      var my = ReactiveModel()
+        ("a", 5)
+        ("b", increment, "a")
+        .digest();
+      assert.equal(my.b(), 6);
+      my.destroy();
+    });
+
     it("Should react and use newly set value.", function (){
       var my = ReactiveModel()
         ("a", 5)
@@ -631,7 +640,7 @@ describe("ReactiveModel", function (){
       assert.equal(serialized.nodes.length, 3);
       assert.equal(serialized.links.length, 2);
 
-      var idStart = 91;
+      var idStart = 93;
 
       assert.equal(serialized.nodes[0].id, String(idStart));
       assert.equal(serialized.nodes[1].id, String(idStart + 1));
