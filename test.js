@@ -802,4 +802,11 @@ describe("ReactiveModel", function (){
       assert.equal(my.b(), 21);
     });
   });
+
+  describe("Edge Cases and Error Handling", function (){
+    it("Should throw error when input property is not defined.", function(){
+      var my = ReactiveModel()(function (a){}, "a");
+      //ReactiveModel.digest();
+    });
+  });
 });
