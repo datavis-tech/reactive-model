@@ -609,7 +609,7 @@ describe("ReactiveModel", function (){
       my.destroy();
     });
 
-    it("Should no return value and multiple inputs defined as array.", function(){
+    it("Should support no return value and multiple inputs defined as array.", function(){
       var my = ReactiveModel()
         ("a", 40)
         ("b", 60);
