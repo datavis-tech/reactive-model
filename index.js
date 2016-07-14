@@ -83,7 +83,18 @@ function ReactiveModel(){
     }
 
     // TODO throw an error if a property is not on the model.
-    var inputs = inputPropertyNames.map(getProperty);
+    var inputs = inputPropertyNames.map(function (propertyName){
+      var property = getProperty(propertyName);
+      if(typeof property === "undefined"){
+        throw new Error([
+          "The property \"",
+          propertyName,
+          "\" was referenced as a dependency for a reactive function before it was defined. ",
+          "Please define each property first before referencing them in reactive functions."
+        ].join(""));
+      }
+      return property;
+    });
 
     // Create a new reactive property for the output and assign it to the model.
     // TODO throw an error if the output property is already defined on the model.

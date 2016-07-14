@@ -805,8 +805,9 @@ describe("ReactiveModel", function (){
 
   describe("Edge Cases and Error Handling", function (){
     it("Should throw error when input property is not defined.", function(){
-      var my = ReactiveModel()(function (a){}, "a");
-      //ReactiveModel.digest();
+      assert.throws(function (){
+        ReactiveModel()(function (a){}, "a");
+      }, /The property "a" was referenced as a dependency for a reactive function before it was defined. Please define each property first before referencing them in reactive functions./);
     });
   });
 });
