@@ -164,8 +164,6 @@ function ReactiveModel(){
     model[propertyName] = property;
     lastPropertyAdded = propertyName;
     return model;
-
-    // TODO throw an error if the name is not available (e.g. another property name, "configuration" or "addPublicProperty").
   }
 
   // Exposes the last added property to the configuration.
