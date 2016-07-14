@@ -609,7 +609,7 @@ describe("ReactiveModel", function (){
       my.destroy();
     });
 
-    it("Should no return value and multiple inputs defined as array.", function(){
+    it("Should support no return value and multiple inputs defined as array.", function(){
       var my = ReactiveModel()
         ("a", 40)
         ("b", 60);
@@ -800,6 +800,14 @@ describe("ReactiveModel", function (){
       ReactiveModel.digest();
       
       assert.equal(my.b(), 21);
+    });
+  });
+
+  describe("Edge Cases and Error Handling", function (){
+    it("Should throw error when input property is not defined.", function(){
+      assert.throws(function (){
+        ReactiveModel()(function (a){}, "a");
+      }, /The property "a" was referenced as a dependency for a reactive function before it was defined. Please define each property first before referencing them in reactive functions./);
     });
   });
 });
