@@ -96,10 +96,14 @@ function ReactiveModel(){
     });
 
     // Create a new reactive property for the output and assign it to the model.
-    // TODO throw an error if the output property is already defined on the model.
     if(outputPropertyName){
       var output = ReactiveProperty();
       output.propertyName = outputPropertyName;
+
+      if(model[outputPropertyName]){
+        throw new Error("The output property \"" + outputPropertyName + "\" is already defined.");
+      }
+
       model[outputPropertyName] = output;
     }
 
