@@ -102,14 +102,8 @@ function ReactiveModel(){
 
     // Create a new reactive property for the output and assign it to the model.
     if(outputPropertyName){
-      output = ReactiveProperty();
-      output.propertyName = outputPropertyName;
-
-      if(model[outputPropertyName]){
-        throw new Error("The output property \"" + outputPropertyName + "\" is already defined.");
-      }
-
-      model[outputPropertyName] = output;
+      addProperty(outputPropertyName);
+      output = model[outputPropertyName];
     }
 
     // If the number of arguments expected by the callback is one greater than the
@@ -160,6 +154,11 @@ function ReactiveModel(){
   // Adds a property to the model that is not exposed,
   // meaning that it is not included in the configuration object.
   function addProperty(propertyName, defaultValue){
+
+    if(model[propertyName]){
+      throw new Error("The property \"" + propertyName + "\" is already defined.");
+    }
+
     var property = ReactiveProperty(defaultValue);
     property.propertyName = propertyName;
     model[propertyName] = property;

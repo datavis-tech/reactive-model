@@ -816,7 +816,15 @@ describe("ReactiveModel", function (){
         ReactiveModel()
           ("a", 5)
           ("a", function (a){}, "a");
-      }, /The output property "a" is already defined./);
+      }, /The property "a" is already defined./);
+    });
+
+    it("Should throw error when newly added property is already defined.", function(){
+      assert.throws(function (){
+        ReactiveModel()
+          ("b", 5)
+          ("b", 15);
+      }, /The property "b" is already defined./);
     });
 
   });
