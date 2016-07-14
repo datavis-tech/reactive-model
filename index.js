@@ -44,7 +44,12 @@ function ReactiveModel(){
   // The model instance object.
   // This is the value returned from the constructor.
   var model = function (){
-    var outputPropertyName, callback, inputPropertyNames
+
+    var outputPropertyName,
+        callback,
+        inputPropertyNames,
+        inputs,
+        output;
 
     if(arguments.length === 0){
       return configurationProperty();
@@ -82,7 +87,7 @@ function ReactiveModel(){
       inputPropertyNames = inputPropertyNames.split(",").map(invoke("trim"));
     }
 
-    var inputs = inputPropertyNames.map(function (propertyName){
+    inputs = inputPropertyNames.map(function (propertyName){
       var property = getProperty(propertyName);
       if(typeof property === "undefined"){
         throw new Error([
@@ -97,7 +102,7 @@ function ReactiveModel(){
 
     // Create a new reactive property for the output and assign it to the model.
     if(outputPropertyName){
-      var output = ReactiveProperty();
+      output = ReactiveProperty();
       output.propertyName = outputPropertyName;
 
       if(model[outputPropertyName]){
