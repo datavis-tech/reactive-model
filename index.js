@@ -82,7 +82,6 @@ function ReactiveModel(){
       inputPropertyNames = inputPropertyNames.split(",").map(invoke("trim"));
     }
 
-    // TODO throw an error if a property is not on the model.
     var inputs = inputPropertyNames.map(function (propertyName){
       var property = getProperty(propertyName);
       if(typeof property === "undefined"){
