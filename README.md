@@ -100,6 +100,12 @@ var ReactiveModel = require("reactive-model");
         <img src="http://bl.ocks.org/curran/raw/aff67b589d0f775a6a7b75f94a05fb14/thumbnail.png">
       </a>
     </td>
+    <td>
+      Responsive Axes with React<br>
+      <a href="http://bl.ocks.org/curran/85a2a0a5b4f1017a5690a5fd129d1f43">
+        <img src="http://bl.ocks.org/curran/raw/85a2a0a5b4f1017a5690a5fd129d1f43/thumbnail.png">
+      </a>
+    </td>
   </tr>
 </table>
 
