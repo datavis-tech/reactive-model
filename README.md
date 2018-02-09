@@ -2,8 +2,6 @@
 
 A JavaScript library for [dataflow programming](https://en.wikipedia.org/wiki/Dataflow_programming).
 
-[![NPM](https://nodei.co/npm/reactive-model.png)](https://npmjs.org/package/reactive-model)
-[![NPM](https://nodei.co/npm-dl/reactive-model.png?months=3)](https://npmjs.org/package/reactive-model)
 [![Build Status](https://travis-ci.org/datavis-tech/reactive-model.svg?branch=master)](https://travis-ci.org/datavis-tech/reactive-model)
 
 This library provides an abstraction for **reactive data flows**. This means you can define so-called "reactive functions" in terms of their inputs and output, and the library will take care of executing these functions in the correct order. When input properties change, those changes are propagated through the data flow graph based on [topological sorting](https://en.wikipedia.org/wiki/Topological_sorting).
